@@ -1,0 +1,393 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum GymStatus {
+  ACTIVE
+  SUSPENDED
+  TRIAL
+}
+
+enum StaffRole {
+  SUPER_ADMIN
+  GYM_OWNER
+  GYM_STAFF
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  FROZEN
+}
+
+enum PlanType {
+  MONTHLY
+  QUARTERLY
+  BIANNUAL
+  ANNUAL
+  SESSION_PASS
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING_PAYMENT
+}
+
+enum CheckInMethod {
+  QR_SCAN
+  MANUAL_STAFF
+  KIOSK
+}
+
+enum RewardType {
+  BADGE
+  DISCOUNT_PERCENT
+  DISCOUNT_FIXED
+  FREE_DAYS
+  FREE_ITEM
+}
+
+enum RewardTriggerType {
+  STREAK_MILESTONE
+  TOTAL_CHECKINS
+  MANUAL
+}
+
+enum RedemptionStatus {
+  UNLOCKED
+  REDEEMED
+  EXPIRED
+}
+
+enum PaymentProviderType {
+  JAZZCASH
+  EASYPAISA
+  STRIPE
+  CASH
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum MessageCategory {
+  UTILITY
+  MARKETING
+  AUTHENTICATION
+}
+
+enum MessageStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum MessagingProviderType {
+  TWILIO
+  META_DIRECT
+}
+
+// ==========================================
+// MODELS
+// ==========================================
+
+model Gym {
+  id              String      @id @default(uuid()) @db.Uuid
+  name            String      @db.VarChar(255)
+  slug            String      @unique @db.VarChar(100)
+  phone           String      @db.VarChar(30)
+  email           String?     @db.VarChar(255)
+  address         String?     @db.Text
+  qrCodeSecret    String      @unique @default(uuid()) @db.VarChar(100)
+  currency        String      @default("PKR") @db.VarChar(3)
+  timezone        String      @default("Asia/Karachi") @db.VarChar(50)
+  status          GymStatus   @default(ACTIVE)
+  settings        Json?       @db.JsonB
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  staff               GymStaff[]
+  members             Member[]
+  memberships         Membership[]
+  checkIns            CheckIn[]
+  streaks             Streak[]
+  rewards             Reward[]
+  rewardRedemptions   RewardRedemption[]
+  payments            Payment[]
+  whatsappLogs        WhatsAppMessageLog[]
+  auditLogs           AuditLog[]
+
+  @@map("gyms")
+}
+
+model GymStaff {
+  id              String      @id @default(uuid()) @db.Uuid
+  gymId           String?     @map("gym_id") @db.Uuid
+  email           String      @unique @db.VarChar(255)
+  passwordHash    String      @map("password_hash") @db.VarChar(255)
+  name            String      @db.VarChar(255)
+  phone           String?     @db.VarChar(30)
+  role            StaffRole   @default(GYM_STAFF)
+  isActive        Boolean     @default(true) @map("is_active")
+  lastLoginAt     DateTime?   @map("last_login_at") @db.Timestamptz(6)
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym             Gym?        @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  manualCheckIns  CheckIn[]   @relation("StaffManualCheckIns")
+
+  @@index([gymId])
+  @@index([gymId, role])
+  @@map("gym_staff")
+}
+
+model Member {
+  id                String        @id @default(uuid()) @db.Uuid
+  gymId             String        @map("gym_id") @db.Uuid
+  memberCode        String        @map("member_code") @db.VarChar(50)
+  firstName         String        @map("first_name") @db.VarChar(100)
+  lastName          String        @map("last_name") @db.VarChar(100)
+  phone             String        @db.VarChar(30)
+  email             String?       @db.VarChar(255)
+  gender            Gender?
+  dateOfBirth       DateTime?     @map("date_of_birth") @db.Date
+  joinDate          DateTime      @default(now()) @map("join_date") @db.Date
+  status            MemberStatus  @default(ACTIVE)
+  emergencyContact  String?       @map("emergency_contact") @db.VarChar(255)
+  notes             String?       @db.Text
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym               Gym           @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  memberships       Membership[]
+  checkIns          CheckIn[]
+  streak            Streak?
+  rewardRedemptions RewardRedemption[]
+  payments          Payment[]
+  whatsappLogs      WhatsAppMessageLog[]
+
+  @@unique([gymId, memberCode])
+  @@index([gymId, phone])
+  @@index([gymId, status])
+  @@index([gymId, createdAt])
+  @@map("members")
+}
+
+model Membership {
+  id              String            @id @default(uuid()) @db.Uuid
+  gymId           String            @map("gym_id") @db.Uuid
+  memberId        String            @map("member_id") @db.Uuid
+  planName        String            @map("plan_name") @db.VarChar(100)
+  planType        PlanType          @default(MONTHLY) @map("plan_type")
+  price           Int               // Integer minor units (e.g. paisa: 500,000 = 5,000.00 PKR)
+  currency        String            @default("PKR") @db.VarChar(3)
+  startDate       DateTime          @map("start_date") @db.Date
+  endDate         DateTime          @map("end_date") @db.Date
+  status          MembershipStatus  @default(ACTIVE)
+  autoRenew       Boolean           @default(false) @map("auto_renew")
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym             Gym               @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member          Member            @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  payments        Payment[]
+
+  @@index([gymId, memberId])
+  @@index([gymId, status])
+  @@index([gymId, endDate])
+  @@map("memberships")
+}
+
+model CheckIn {
+  id              String          @id @default(uuid()) @db.Uuid
+  gymId           String          @map("gym_id") @db.Uuid
+  memberId        String          @map("member_id") @db.Uuid
+  checkInTime     DateTime        @default(now()) @map("check_in_time") @db.Timestamptz(6)
+  checkInDate     DateTime        @map("check_in_date") @db.Date // Normalized to calendar date in gym's timezone
+  method          CheckInMethod   @default(QR_SCAN)
+  staffId         String?         @map("staff_id") @db.Uuid
+  notes           String?         @db.Text
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  gym             Gym             @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member          Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  staff           GymStaff?       @relation("StaffManualCheckIns", fields: [staffId], references: [id], onDelete: SetNull)
+
+  @@index([gymId, memberId, checkInDate])
+  @@index([gymId, checkInDate])
+  @@index([gymId, checkInTime])
+  @@map("check_ins")
+}
+
+model Streak {
+  id                      String    @id @default(uuid()) @db.Uuid
+  gymId                   String    @map("gym_id") @db.Uuid
+  memberId                String    @unique @map("member_id") @db.Uuid
+  currentStreak           Int       @default(0) @map("current_streak")
+  longestStreak           Int       @default(0) @map("longest_streak")
+  lastCheckInDate         DateTime? @map("last_check_in_date") @db.Date
+  streakBrokenAt          DateTime? @map("streak_broken_at") @db.Timestamptz(6)
+  streakFreezeAvailable   Int       @default(0) @map("streak_freeze_available")
+  updatedAt               DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym                     Gym       @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member                  Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([gymId, currentStreak])
+  @@index([gymId, memberId])
+  @@map("streaks")
+}
+
+model Reward {
+  id                String            @id @default(uuid()) @db.Uuid
+  gymId             String            @map("gym_id") @db.Uuid
+  title             String            @db.VarChar(255)
+  description       String?           @db.Text
+  rewardType        RewardType        @default(BADGE) @map("reward_type")
+  triggerType       RewardTriggerType @default(STREAK_MILESTONE) @map("trigger_type")
+  triggerThreshold  Int               @map("trigger_threshold") // e.g. 10 for 10-day streak
+  rewardValue       Int?              @map("reward_value")      // e.g. 10 for 10% discount, 50000 paisa, etc.
+  pointsCost        Int               @default(0) @map("points_cost")
+  badgeIcon         String?           @map("badge_icon") @db.VarChar(255)
+  isActive          Boolean           @default(true) @map("is_active")
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym               Gym               @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  redemptions       RewardRedemption[]
+
+  @@index([gymId, isActive])
+  @@index([gymId, triggerType, triggerThreshold])
+  @@map("rewards")
+}
+
+model RewardRedemption {
+  id                  String            @id @default(uuid()) @db.Uuid
+  gymId               String            @map("gym_id") @db.Uuid
+  memberId            String            @map("member_id") @db.Uuid
+  rewardId            String            @map("reward_id") @db.Uuid
+  status              RedemptionStatus  @default(UNLOCKED)
+  unlockedAt          DateTime          @default(now()) @map("unlocked_at") @db.Timestamptz(6)
+  redeemedAt          DateTime?         @map("redeemed_at") @db.Timestamptz(6)
+  redeemedByStaffId   String?           @map("redeemed_by_staff_id") @db.Uuid
+  notes               String?           @db.Text
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym                 Gym               @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member              Member            @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  reward              Reward            @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@index([gymId, memberId])
+  @@index([gymId, status])
+  @@map("reward_redemptions")
+}
+
+model Payment {
+  id                    String              @id @default(uuid()) @db.Uuid
+  gymId                 String              @map("gym_id") @db.Uuid
+  memberId              String              @map("member_id") @db.Uuid
+  membershipId          String?             @map("membership_id") @db.Uuid
+  amount                Int                 // Minor units (paisa)
+  currency              String              @default("PKR") @db.VarChar(3)
+  provider              PaymentProviderType @default(CASH)
+  status                PaymentStatus       @default(PENDING)
+  providerTransactionId String?             @map("provider_transaction_id") @db.VarChar(255)
+  providerReference     String?             @map("provider_reference") @db.VarChar(255)
+  paymentMethodDetails  Json?               @map("payment_method_details") @db.JsonB
+  dueDate               DateTime?           @map("due_date") @db.Date
+  paidAt                DateTime?           @map("paid_at") @db.Timestamptz(6)
+  failureReason         String?             @map("failure_reason") @db.Text
+  createdAt             DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym                   Gym                 @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member                Member              @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  membership            Membership?         @relation(fields: [membershipId], references: [id], onDelete: SetNull)
+
+  @@index([gymId, memberId])
+  @@index([gymId, status])
+  @@index([gymId, dueDate])
+  @@map("payments")
+}
+
+model WhatsAppMessageLog {
+  id                  String                @id @default(uuid()) @db.Uuid
+  gymId               String                @map("gym_id") @db.Uuid
+  memberId            String?               @map("member_id") @db.Uuid
+  templateId          String                @map("template_id") @db.VarChar(100)
+  templateName        String                @map("template_name") @db.VarChar(100)
+  recipientPhone      String                @map("recipient_phone") @db.VarChar(30)
+  messageCategory     MessageCategory       @default(UTILITY) @map("message_category")
+  status              MessageStatus         @default(QUEUED)
+  provider            MessagingProviderType @default(TWILIO)
+  providerMessageId   String?               @map("provider_message_id") @db.VarChar(255)
+  costPaisa           Int?                  @map("cost_paisa") // Meta template cost in paisa
+  currency            String                @default("PKR") @db.VarChar(3)
+  errorMessage        String?               @map("error_message") @db.Text
+  sentAt              DateTime?             @map("sent_at") @db.Timestamptz(6)
+  createdAt           DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym                 Gym                   @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member              Member?               @relation(fields: [memberId], references: [id], onDelete: SetNull)
+
+  @@index([gymId, createdAt])
+  @@index([gymId, status])
+  @@index([gymId, messageCategory])
+  @@map("whatsapp_messages_log")
+}
+
+model AuditLog {
+  id          String    @id @default(uuid()) @db.Uuid
+  gymId       String?   @map("gym_id") @db.Uuid
+  staffId     String?   @map("staff_id") @db.Uuid
+  actorRole   String    @map("actor_role") @db.VarChar(50)
+  action      String    @db.VarChar(100)
+  resource    String    @db.VarChar(100)
+  metadata    Json?     @db.JsonB
+  ipAddress   String?   @map("ip_address") @db.VarChar(45)
+  userAgent   String?   @map("user_agent") @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  gym         Gym?      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@index([gymId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}

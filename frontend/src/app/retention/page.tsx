@@ -24,6 +24,7 @@ export default function RetentionPage() {
   const [loading, setLoading] = useState(true);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchRisk = async () => {
@@ -45,16 +46,19 @@ export default function RetentionPage() {
       <Sidebar
         onOpenQrModal={() => setIsQrModalOpen(true)}
         onOpenCheckInModal={() => setIsCheckInOpen(true)}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+      <main className="flex-1 lg:ml-64 ml-0 flex flex-col min-h-screen w-full overflow-x-hidden">
         <Header
           title="Churn Prevention & Member Retention"
           subtitle="Proactive early warning system to stop silent gym dropouts before they stop paying"
           onOpenCheckInModal={() => setIsCheckInOpen(true)}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
-        <div className="p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
+        <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
           {/* Rules Configuration & Weight Breakdown Card */}
           <div className="glass-card rounded-2xl p-6 border border-white/5 relative overflow-hidden">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-white/5 gap-4">

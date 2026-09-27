@@ -47,6 +47,7 @@ export default function CheckInKioskPage() {
     },
   ]);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleCheckIn = async (codeToUse?: string) => {
     const target = codeToUse || identifier;
@@ -84,15 +85,20 @@ export default function CheckInKioskPage() {
 
   return (
     <div className="min-h-screen bg-[#090d16] flex">
-      <Sidebar onOpenQrModal={() => setIsQrModalOpen(true)} />
+      <Sidebar
+        onOpenQrModal={() => setIsQrModalOpen(true)}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+      />
 
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+      <main className="flex-1 lg:ml-64 ml-0 flex flex-col min-h-screen w-full overflow-x-hidden">
         <Header
           title="Front-Desk Check-In Kiosk"
           subtitle="Front reception terminal: scan member QR code, barcode, or enter member ID"
+          onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
-        <div className="p-8 space-y-6 flex-1 max-w-[1400px] w-full mx-auto">
+        <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1400px] w-full mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left: Check-in Terminal Input */}
             <div className="lg:col-span-7 space-y-6">

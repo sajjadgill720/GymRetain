@@ -286,7 +286,55 @@ async function main() {
     },
   });
 
-  console.log('✅ Seed completed successfully with 3 Pakistani gyms and realistic retention test data!');
+  // 5. Permanent Canary Defense Test Gym (for automated cross-tenant security verification)
+  const canaryGym = await prisma.gym.create({
+    data: {
+      name: 'Canary Defense Test Gym',
+      slug: 'canary-test-gym',
+      phone: '+92510000000',
+      email: 'canary@gymretain.pk',
+      address: 'Canary Security Testing Suite, Islamabad',
+      currency: 'PKR',
+      timezone: 'Asia/Karachi',
+      status: 'ACTIVE',
+    },
+  });
+
+  const canaryOwner = await prisma.gymStaff.create({
+    data: {
+      gymId: canaryGym.id,
+      email: 'canary.owner@gymretain.pk',
+      name: 'Canary Security Officer',
+      phone: '+923000000002',
+      passwordHash: defaultPasswordHash,
+      role: 'GYM_OWNER',
+    },
+  });
+
+  const canaryMember = await prisma.member.create({
+    data: {
+      gymId: canaryGym.id,
+      memberCode: 'CANARY-001',
+      firstName: 'Canary',
+      lastName: 'TargetMember',
+      phone: '+923000000001',
+      email: 'canary.member@gymretain.pk',
+      gender: 'OTHER',
+      status: 'ACTIVE',
+    },
+  });
+
+  await prisma.streak.create({
+    data: {
+      gymId: canaryGym.id,
+      memberId: canaryMember.id,
+      currentStreak: 10,
+      longestStreak: 10,
+      lastCheckInDate: startOfDay(new Date()),
+    },
+  });
+
+  console.log('✅ Seed completed with 3 Pakistani gyms + Permanent Canary Security Test Gym!');
   console.log('----------------------------------------------------');
   console.log('Demo Credentials (Password for all: GymRetain2026!):');
   console.log('1. Super Admin:       superadmin@gymretain.pk');
@@ -294,6 +342,7 @@ async function main() {
   console.log('3. Lahore Staff:      usman.staff@ironhouse.pk');
   console.log('4. Karachi Owner:     tariq.owner@ktowncrossfit.pk (Gym: K-Town Crossfit)');
   console.log('5. Islamabad Owner:   hamza.owner@margallafit.pk (Gym: Margalla Heights)');
+  console.log('6. Canary Test Gym:   canary.owner@gymretain.pk (Gym: Canary Defense)');
   console.log('----------------------------------------------------');
 }
 

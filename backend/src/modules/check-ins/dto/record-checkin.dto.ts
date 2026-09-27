@@ -10,6 +10,10 @@ export class RecordCheckInDto {
   qrSecret?: string; // Secret from the scanned gym QR code to verify physical location
 
   @IsOptional()
+  @IsString()
+  qrPayload?: string; // Raw scanned QR code payload JSON
+
+  @IsOptional()
   @IsIn(['QR_SCAN', 'MANUAL_STAFF', 'KIOSK'])
   method?: 'QR_SCAN' | 'MANUAL_STAFF' | 'KIOSK';
 

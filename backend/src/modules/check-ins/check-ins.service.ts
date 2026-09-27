@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -35,14 +36,31 @@ export class CheckInsService {
     dto: RecordCheckInDto,
     staffId?: string,
   ) {
-    // Verify Gym QR Secret if provided
+    // Verify Gym QR Code / Secret (Defense against cross-tenant QR scans)
+    if (dto.qrPayload) {
+      try {
+        const parsed = JSON.parse(dto.qrPayload);
+        if (parsed.gymId && parsed.gymId !== gymId) {
+          throw new ForbiddenException(
+            'Cross-tenant QR violation: Scanned QR code belongs to a different gym',
+          );
+        }
+        if (parsed.qrSecret) {
+          dto.qrSecret = parsed.qrSecret;
+        }
+      } catch (err: any) {
+        if (err instanceof ForbiddenException) throw err;
+        throw new BadRequestException('Malformed QR code payload');
+      }
+    }
+
     if (dto.qrSecret) {
       const gym = await this.prisma.gym.findUnique({
         where: { id: gymId },
         select: { qrCodeSecret: true },
       });
       if (!gym || gym.qrCodeSecret !== dto.qrSecret) {
-        throw new BadRequestException('Invalid QR code scanned for this gym');
+        throw new ForbiddenException('Invalid or expired QR code for this gym');
       }
     }
 

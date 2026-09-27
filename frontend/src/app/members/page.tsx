@@ -29,6 +29,7 @@ export default function MembersPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // New Member form state
   const [formFirstName, setFormFirstName] = useState('');
@@ -87,17 +88,20 @@ export default function MembersPage() {
       <Sidebar
         onOpenQrModal={() => setIsQrModalOpen(true)}
         onOpenCheckInModal={() => setIsCheckInOpen(true)}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+      <main className="flex-1 lg:ml-64 ml-0 flex flex-col min-h-screen w-full overflow-x-hidden">
         <Header
           title="Member Directory"
           subtitle="Manage gym members, attendance history, active streaks, and membership plans"
           onOpenCheckInModal={() => setIsCheckInOpen(true)}
           onOpenAddMemberModal={() => setIsAddModalOpen(true)}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
-        <div className="p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
+        <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
           {/* Search & Filters Bar */}
           <div className="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="relative flex-1 w-full">

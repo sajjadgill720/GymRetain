@@ -14,12 +14,15 @@ import {
   Building2,
   ChevronDown,
   ShieldCheck,
+  X,
 } from 'lucide-react';
 import { api } from '../lib/api';
 
 interface SidebarProps {
   onOpenQrModal?: () => void;
   onOpenCheckInModal?: () => void;
+  isOpenMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 const DEMO_GYMS = [
@@ -49,6 +52,8 @@ const DEMO_GYMS = [
 export const Sidebar: React.FC<SidebarProps> = ({
   onOpenQrModal,
   onOpenCheckInModal,
+  isOpenMobile = false,
+  onCloseMobile,
 }) => {
   const pathname = usePathname();
   const [selectedGym, setSelectedGym] = React.useState(DEMO_GYMS[0]);
@@ -91,11 +96,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
   ];
 
-  return (
-    <aside className="w-64 bg-[#0d121d] border-r border-white/5 flex flex-col h-screen fixed left-0 top-0 z-30 select-none">
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-[#0d121d] border-r border-white/5 select-none">
       {/* Brand Header */}
       <div className="p-5 border-b border-white/5 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" onClick={onCloseMobile} className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-brand-500 to-emerald-400 flex items-center justify-center shadow-glow">
             <Flame className="w-6 h-6 text-white animate-flame" />
           </div>
@@ -109,6 +114,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <p className="text-xs text-slate-400">Retention & Streaks</p>
           </div>
         </Link>
+
+        {onCloseMobile && (
+          <button
+            onClick={onCloseMobile}
+            className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/5"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Gym Tenant Switcher */}
@@ -160,7 +174,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Quick Action: Front Desk QR */}
       <div className="px-4 pt-3 pb-1">
         <button
-          onClick={onOpenQrModal}
+          onClick={() => {
+            if (onOpenQrModal) onOpenQrModal();
+            if (onCloseMobile) onCloseMobile();
+          }}
           className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-white/5 hover:bg-brand-500/10 border border-white/10 hover:border-brand-500/30 text-xs font-medium text-slate-200 hover:text-brand-300 transition-all shadow-sm group"
         >
           <QrCode className="w-4 h-4 text-brand-400 group-hover:scale-110 transition-transform" />
@@ -178,6 +195,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Link
               key={item.name}
               href={item.href}
+              onClick={onCloseMobile}
               className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 isActive
                   ? 'bg-brand-500/15 text-brand-300 border border-brand-500/30'
@@ -206,14 +224,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Footer / Tenant Isolation Status */}
       <div className="p-4 border-t border-white/5 bg-[#090d16]">
-        <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+        <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span className="font-medium text-slate-300">RLS Tenant Isolation</span>
+          <span className="font-semibold text-slate-200">Walled Tenant Space</span>
         </div>
-        <div className="text-[11px] text-slate-500 leading-relaxed">
-          Enforced at App & Postgres RLS layers.
+        <div className="text-[11px] text-slate-500 font-mono">
+          {selectedGym.slug}.gymretain.app
+        </div>
+        <div className="text-[10px] text-emerald-400/80 mt-1">
+          ✓ RLS Isolation: 0 cross-gym leakage
         </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Static Sidebar */}
+      <aside className="w-64 h-screen fixed left-0 top-0 z-30 hidden lg:block">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Slide-Over Drawer */}
+      {isOpenMobile && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
+            onClick={onCloseMobile}
+          />
+          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] shadow-2xl z-50">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 };

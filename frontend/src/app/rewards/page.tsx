@@ -25,6 +25,7 @@ export default function RewardsPage() {
   const [isAddRewardOpen, setIsAddRewardOpen] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // New Reward Rule form state
   const [title, setTitle] = useState('');
@@ -77,16 +78,19 @@ export default function RewardsPage() {
       <Sidebar
         onOpenQrModal={() => setIsQrModalOpen(true)}
         onOpenCheckInModal={() => setIsCheckInOpen(true)}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+      <main className="flex-1 lg:ml-64 ml-0 flex flex-col min-h-screen w-full overflow-x-hidden">
         <Header
           title="Rewards & Streak Gamification Engine"
           subtitle="Configure streak milestones to gamify gym loyalty and celebrate consistent members"
           onOpenCheckInModal={() => setIsCheckInOpen(true)}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
-        <div className="p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
+        <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
           {/* Header Action Card */}
           <div className="glass-card rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">

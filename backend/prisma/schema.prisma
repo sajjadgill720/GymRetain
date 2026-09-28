@@ -140,6 +140,7 @@ model Gym {
   rewardRedemptions   RewardRedemption[]
   payments            Payment[]
   whatsappLogs        WhatsAppMessageLog[]
+  whatsappTemplates   WhatsAppTemplate[]
   auditLogs           AuditLog[]
 
   @@map("gyms")
@@ -179,6 +180,8 @@ model Member {
   dateOfBirth       DateTime?     @map("date_of_birth") @db.Date
   joinDate          DateTime      @default(now()) @map("join_date") @db.Date
   status            MemberStatus  @default(ACTIVE)
+  isOptedOut        Boolean       @default(false) @map("is_opted_out")
+  optedOutAt        DateTime?     @map("opted_out_at") @db.Timestamptz(6)
   emergencyContact  String?       @map("emergency_contact") @db.VarChar(255)
   notes             String?       @db.Text
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -196,6 +199,7 @@ model Member {
   @@unique([gymId, memberCode])
   @@index([gymId, phone])
   @@index([gymId, status])
+  @@index([gymId, isOptedOut])
   @@index([gymId, createdAt])
   @@map("members")
 }
@@ -391,3 +395,24 @@ model AuditLog {
   @@index([action, createdAt])
   @@map("audit_logs")
 }
+
+model WhatsAppTemplate {
+  id              String          @id @default(uuid()) @db.Uuid
+  gymId           String?         @map("gym_id") @db.Uuid // null = global platform template
+  name            String          @db.VarChar(100)
+  metaTemplateId  String          @map("meta_template_id") @db.VarChar(100)
+  category        MessageCategory @default(UTILITY)
+  language        String          @default("en_US") @db.VarChar(10)
+  body            String          @db.Text
+  isActive        Boolean         @default(true) @map("is_active")
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym             Gym?            @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@unique([gymId, name])
+  @@index([gymId, isActive])
+  @@map("whatsapp_templates")
+}
+

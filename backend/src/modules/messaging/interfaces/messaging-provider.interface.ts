@@ -23,5 +23,6 @@ export interface SendMessageResult {
  */
 export interface MessagingProvider {
   sendTemplateMessage(params: SendTemplateMessageParams): Promise<SendMessageResult>;
-  verifyWebhookSignature(headers: Record<string, any>, payload: any): boolean;
+  verifyWebhookSignature(headers: Record<string, any>, payload: any, url?: string): boolean;
+  getDeliveryStatus?(providerMessageId: string): Promise<string>;
 }

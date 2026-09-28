@@ -105,6 +105,59 @@ async function seedCanary() {
     });
   }
 
+  // 5. Permanent Core WhatsApp Meta Templates
+  const templates = [
+    {
+      name: 'streak_celebration',
+      metaTemplateId: 'meta_streak_v1',
+      category: 'UTILITY' as const,
+      body: '🔥 Salam {{1}}! That is {{2}} days in a row at {{3}}! Momentum is everything—keep the flame alive! 💪',
+    },
+    {
+      name: 'missed_visit_nudge',
+      category: 'MARKETING' as const,
+      metaTemplateId: 'meta_missed_visit_v1',
+      body: 'Salam {{1}}! We missed you at {{2}} over the past {{3}} days. Your fitness goals are waiting—drop in for a session today! 🏋️‍♂️',
+    },
+    {
+      name: 'payment_reminder',
+      category: 'UTILITY' as const,
+      metaTemplateId: 'meta_payment_reminder_v1',
+      body: 'Salam {{1}}! Friendly reminder that your {{2}} membership renewal is due. Keep your workout access seamless. 💳',
+    },
+    {
+      name: 'reward_unlocked',
+      category: 'UTILITY' as const,
+      metaTemplateId: 'meta_reward_unlocked_v1',
+      body: '🎁 Congratulations {{1}}! You have unlocked a milestone reward: "{{2}}" at {{3}}! Claim it at the front desk. 🏆',
+    },
+  ];
+
+  for (const t of templates) {
+    await prisma.whatsAppTemplate.upsert({
+      where: {
+        gymId_name: {
+          gymId: canaryGym.id,
+          name: t.name,
+        },
+      },
+      update: {
+        metaTemplateId: t.metaTemplateId,
+        category: t.category,
+        body: t.body,
+        isActive: true,
+      },
+      create: {
+        gymId: canaryGym.id,
+        name: t.name,
+        metaTemplateId: t.metaTemplateId,
+        category: t.category,
+        body: t.body,
+        isActive: true,
+      },
+    });
+  }
+
   console.log('✅ Canary Defense Test Gym verified & persistent:');
   console.log(`   - Gym ID:     ${canaryGym.id} (${canaryGym.name})`);
   console.log(`   - Owner ID:   ${canaryOwner.id} (${canaryOwner.email})`);

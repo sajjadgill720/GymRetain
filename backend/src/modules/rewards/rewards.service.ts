@@ -3,11 +3,18 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateRewardDto } from './dto/create-reward.dto';
 import { Prisma } from '@prisma/client';
 
+import { AutomationTriggerService } from '../messaging/automation-trigger.service';
+import { Optional } from '@nestjs/common';
+
 @Injectable()
 export class RewardsService {
   private readonly logger = new Logger(RewardsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional()
+    private readonly triggerService?: AutomationTriggerService,
+  ) {}
 
   /**
    * List configurable reward rules for this gym
@@ -90,6 +97,14 @@ export class RewardsService {
         this.logger.log(
           `Member ${memberId} unlocked reward: "${reward.title}" (Streak: ${currentStreak})`,
         );
+
+        if (this.triggerService) {
+          this.triggerService
+            .triggerRewardUnlockedNotification(gymId, memberId, reward.title)
+            .catch((err) => {
+              this.logger.error(`Failed to dispatch WhatsApp reward notification: ${err.message}`);
+            });
+        }
       }
     }
 

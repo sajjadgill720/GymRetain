@@ -334,7 +334,50 @@ async function main() {
     },
   });
 
-  console.log('✅ Seed completed with 3 Pakistani gyms + Permanent Canary Security Test Gym!');
+  // Seed Core WhatsApp Templates for all gyms
+  const allGyms = [gym1, gym2, gym3, canaryGym];
+  const coreTemplatesData = [
+    {
+      name: 'streak_celebration',
+      metaTemplateId: 'meta_streak_v1',
+      category: 'UTILITY' as const,
+      body: '🔥 Salam {{1}}! That is {{2}} days in a row at {{3}}! Momentum is everything—keep the flame alive! 💪',
+    },
+    {
+      name: 'missed_visit_nudge',
+      category: 'MARKETING' as const,
+      metaTemplateId: 'meta_missed_visit_v1',
+      body: 'Salam {{1}}! We missed you at {{2}} over the past {{3}} days. Your fitness goals are waiting—drop in for a session today! 🏋️‍♂️',
+    },
+    {
+      name: 'payment_reminder',
+      category: 'UTILITY' as const,
+      metaTemplateId: 'meta_payment_reminder_v1',
+      body: 'Salam {{1}}! Friendly reminder that your {{2}} membership renewal is due. Keep your workout access seamless. 💳',
+    },
+    {
+      name: 'reward_unlocked',
+      category: 'UTILITY' as const,
+      metaTemplateId: 'meta_reward_unlocked_v1',
+      body: '🎁 Congratulations {{1}}! You have unlocked a milestone reward: "{{2}}" at {{3}}! Claim it at the front desk. 🏆',
+    },
+  ];
+
+  for (const g of allGyms) {
+    for (const t of coreTemplatesData) {
+      await prisma.whatsAppTemplate.create({
+        data: {
+          gymId: g.id,
+          name: t.name,
+          metaTemplateId: t.metaTemplateId,
+          category: t.category,
+          body: t.body,
+        },
+      });
+    }
+  }
+
+  console.log('✅ Seed completed with 3 Pakistani gyms + Permanent Canary Security Test Gym + Core WhatsApp Templates!');
   console.log('----------------------------------------------------');
   console.log('Demo Credentials (Password for all: GymRetain2026!):');
   console.log('1. Super Admin:       superadmin@gymretain.pk');

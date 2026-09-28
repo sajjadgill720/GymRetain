@@ -1,0 +1,1 @@
+# GymRetain Static Assets

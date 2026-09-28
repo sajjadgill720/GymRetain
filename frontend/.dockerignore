@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+.github
+.agents
+.vscode
+npm-debug.log
+.env*.local

@@ -1,6 +1,9 @@
 version: '3.8'
 
 services:
+  # ==========================================
+  # 1. PostgreSQL Database with RLS
+  # ==========================================
   postgres:
     image: postgres:16-alpine
     container_name: gymretain_postgres
@@ -13,6 +16,67 @@ services:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d gymretain']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gymretain_net
+
+  # ==========================================
+  # 2. NestJS Backend API
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gymretain_backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      API_PREFIX: api/v1
+      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/gymretain?schema=public
+      JWT_SECRET: gymretain_jwt_production_secret_key_change_in_real_prod
+      JWT_EXPIRES_IN: 7d
+    ports:
+      - '4000:4000'
+    # Automatically apply migrations & seed on container launch, then start API
+    command: >
+      sh -c "npx prisma migrate deploy &&
+             npm run prisma:seed &&
+             node dist/main"
+    networks:
+      - gymretain_net
+
+  # ==========================================
+  # 3. Next.js Frontend Dashboard
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: gymretain_frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+    ports:
+      - '3000:3000'
+    networks:
+      - gymretain_net
 
 volumes:
   pgdata:
+    driver: local
+
+networks:
+  gymretain_net:
+    driver: bridge

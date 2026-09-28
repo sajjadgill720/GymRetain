@@ -99,8 +99,63 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
         )}
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Mobile Card List (Tested for 375px: Zero horizontal scrolling) */}
+      <div className="block md:hidden space-y-3">
+        {displayList.map((m) => {
+          const isHigh = m.riskLevel === 'HIGH';
+          return (
+            <div
+              key={m.memberId}
+              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-2.5"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="font-bold text-sm text-white">{m.fullName}</div>
+                  <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                    {m.memberCode} • {m.phone}
+                  </div>
+                </div>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase shrink-0 ${
+                    isHigh
+                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  }`}
+                >
+                  {m.riskLevel} ({m.riskScore})
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-slate-300 pt-1 border-t border-white/5">
+                <div className="flex items-center gap-1.5 text-rose-300 font-medium">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{m.factors.daysSinceLastCheckIn}d inactive</span>
+                </div>
+                {m.factors.isPaymentOverdue ? (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-medium">
+                    Payment Overdue
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-slate-400">
+                    -{m.factors.frequencyDropPercentage}% visits
+                  </span>
+                )}
+              </div>
+
+              <button
+                onClick={() => setActiveNudgeMember(m)}
+                className="w-full py-2 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-white border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Send WhatsApp Nudge</span>
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Table (Visible md and above) */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
             <tr className="border-b border-white/5 text-slate-400 text-[11px] uppercase tracking-wider font-semibold">

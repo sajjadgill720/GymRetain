@@ -16,12 +16,14 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node prisma/seed.ts",
+    "prisma:seed:canary": "ts-node prisma/seed-canary.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:isolation": "jest test/tenant-isolation.spec.ts",
     "test:streak": "jest test/streak-calculation.spec.ts",
-    "test:risk": "jest test/risk-scoring.spec.ts"
+    "test:risk": "jest test/risk-scoring.spec.ts",
+    "test:e2e": "jest test/tenant-isolation.e2e-spec.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",
@@ -75,7 +77,7 @@
       "ts"
     ],
     "rootDir": ".",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": ".*spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },

@@ -100,6 +100,13 @@ export class RewardsService {
    * List unlocked or redeemed rewards for a member
    */
   async getMemberRedemptions(gymId: string, memberId: string) {
+    const member = await this.prisma.member.findFirst({
+      where: { id: memberId, gymId },
+    });
+    if (!member) {
+      throw new NotFoundException('Member not found');
+    }
+
     return this.prisma.rewardRedemption.findMany({
       where: { gymId, memberId },
       include: { reward: true },

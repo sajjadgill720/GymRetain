@@ -75,12 +75,12 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-base sm:text-lg font-bold tracking-tight text-white">{title}</h1>
 
-              {/* Walled Workspace Domain Badge (Signals Data Privacy) */}
-              <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{currentGym.slug}.gymretain.app</span>
+              {/* Walled Workspace Domain Badge (Signals Data Privacy on all screens) */}
+              <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] sm:text-[10px] font-mono text-emerald-400">
+                <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-emerald-400" />
+                <span className="truncate max-w-[140px] sm:max-w-none">{currentGym.slug}.gymretain.app</span>
                 <span className="text-[8px] bg-emerald-400/20 text-emerald-300 px-1 py-0.2 rounded font-bold uppercase">
-                  WALLED SPACE
+                  WALLED
                 </span>
               </div>
             </div>

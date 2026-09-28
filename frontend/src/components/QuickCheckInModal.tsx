@@ -63,7 +63,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
       <div className="glass-card max-w-md w-full rounded-2xl p-6 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-slate-400 hover:text-white"
+          className="absolute right-4 top-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shadow-sm"
         >
           <X className="w-5 h-5" />
         </button>
@@ -124,7 +124,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
                         setIdentifier(demo.code);
                         handleCheckIn(demo.code);
                       }}
-                      className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-white/5 hover:bg-brand-500/20 text-slate-300 hover:text-brand-300 border border-white/10 transition-colors"
+                      className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-white/5 hover:bg-brand-500/20 text-slate-300 hover:text-brand-300 border border-white/10 transition-colors shadow-sm shadow-black/20 hover:shadow-brand-500/20 btn-shadow"
                     >
                       {demo.name}
                     </button>
@@ -136,7 +136,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
                 <button
                   onClick={() => handleCheckIn()}
                   disabled={loading}
-                  className="w-full py-2.5 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold text-xs tracking-wide shadow-glow transition-all flex items-center justify-center gap-2"
+                  className="w-full py-2.5 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold text-xs tracking-wide shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all flex items-center justify-center gap-2"
                 >
                   <UserCheck className="w-4 h-4" />
                   <span>{loading ? 'Verifying & Recording...' : 'Confirm Check-In'}</span>
@@ -196,13 +196,13 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
             <div className="flex items-center gap-2 pt-2">
               <button
                 onClick={handleReset}
-                className="flex-1 py-2 px-3 rounded-lg bg-surface-100 hover:bg-surface-50 text-xs font-medium text-slate-300 transition-colors"
+                className="flex-1 py-2 px-3 rounded-lg bg-surface-100 hover:bg-surface-50 text-xs font-medium text-slate-300 transition-colors shadow-sm shadow-black/40 hover:shadow-md btn-shadow"
               >
                 Check In Another
               </button>
               <button
                 onClick={onClose}
-                className="flex-1 py-2 px-3 rounded-lg bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-glow transition-all"
+                className="flex-1 py-2 px-3 rounded-lg bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all"
               >
                 Done
               </button>

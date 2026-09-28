@@ -118,7 +118,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onCloseMobile && (
           <button
             onClick={onCloseMobile}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/5"
+            className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 shadow-sm"
           >
             <X className="w-5 h-5" />
           </button>
@@ -133,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowGymDropdown(!showGymDropdown)}
-            className="w-full flex items-center justify-between p-2.5 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/5 transition-all text-left group"
+            className="w-full flex items-center justify-between p-2.5 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/5 transition-all text-left shadow-sm shadow-black/40 hover:shadow-md group btn-shadow"
           >
             <div className="flex items-center gap-2.5 overflow-hidden">
               <Building2 className="w-4 h-4 text-brand-400 shrink-0" />
@@ -156,9 +156,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={gym.id}
                   onClick={() => handleSelectGym(gym)}
-                  className={`w-full text-left p-2 rounded-md text-xs transition-colors flex items-center justify-between ${
+                  className={`w-full text-left p-2 rounded-md text-xs transition-colors flex items-center justify-between shadow-sm ${
                     selectedGym.id === gym.id
-                      ? 'bg-brand-500/10 text-brand-400 font-medium'
+                      ? 'bg-brand-500/15 text-brand-400 font-medium shadow-brand-500/10'
                       : 'text-slate-300 hover:bg-white/5'
                   }`}
                 >
@@ -178,7 +178,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             if (onOpenQrModal) onOpenQrModal();
             if (onCloseMobile) onCloseMobile();
           }}
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-white/5 hover:bg-brand-500/10 border border-white/10 hover:border-brand-500/30 text-xs font-medium text-slate-200 hover:text-brand-300 transition-all shadow-sm group"
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-white/5 hover:bg-brand-500/15 border border-white/10 hover:border-brand-500/30 text-xs font-medium text-slate-200 hover:text-brand-300 transition-all shadow-md shadow-black/40 hover:shadow-brand-500/20 group btn-shadow"
         >
           <QrCode className="w-4 h-4 text-brand-400 group-hover:scale-110 transition-transform" />
           <span>Front-Desk QR Placard</span>
@@ -198,7 +198,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={onCloseMobile}
               className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-brand-500/15 text-brand-300 border border-brand-500/30'
+                  ? 'bg-brand-500/15 text-brand-300 border border-brand-500/30 shadow-sm shadow-brand-500/10'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -212,7 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
               {item.badge && (
                 <span
-                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${item.badgeColor}`}
+                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shadow-sm ${item.badgeColor}`}
                 >
                   {item.badge}
                 </span>

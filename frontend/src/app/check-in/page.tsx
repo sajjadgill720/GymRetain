@@ -118,7 +118,7 @@ export default function CheckInKioskPage() {
 
                   <button
                     onClick={() => setIsQrModalOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/10 text-xs font-medium text-slate-300 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/10 text-xs font-medium text-slate-300 transition-colors shadow-sm shadow-black/40 hover:shadow-md btn-shadow"
                   >
                     <QrCode className="w-4 h-4 text-emerald-400" />
                     <span>View QR Placard</span>
@@ -157,7 +157,7 @@ export default function CheckInKioskPage() {
                   <button
                     onClick={() => handleCheckIn()}
                     disabled={loading}
-                    className="w-full py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold text-sm tracking-wide shadow-glow transition-all flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold text-sm tracking-wide shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all flex items-center justify-center gap-2"
                   >
                     <UserCheck className="w-5 h-5" />
                     <span>{loading ? 'Validating...' : 'Record Check-In (Enter)'}</span>
@@ -179,7 +179,7 @@ export default function CheckInKioskPage() {
                             setIdentifier(t.code);
                             handleCheckIn(t.code);
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-surface-100 hover:bg-brand-500/20 text-xs text-slate-300 hover:text-brand-300 font-mono border border-white/5 transition-colors"
+                          className="px-3 py-1.5 rounded-lg bg-surface-100 hover:bg-brand-500/20 text-xs text-slate-300 hover:text-brand-300 font-mono border border-white/5 transition-colors shadow-sm shadow-black/20 hover:shadow-brand-500/20 btn-shadow"
                         >
                           {t.name}
                         </button>

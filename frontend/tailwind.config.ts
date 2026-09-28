@@ -42,6 +42,13 @@ const config: Config = {
       boxShadow: {
         glow: '0 0 20px -5px rgba(16, 185, 129, 0.3)',
         'glow-orange': '0 0 20px -5px rgba(249, 115, 22, 0.3)',
+        'btn': '0 2px 6px 0 rgba(0, 0, 0, 0.35), 0 1px 2px 0 rgba(0, 0, 0, 0.2)',
+        'btn-hover': '0 4px 14px 0 rgba(0, 0, 0, 0.45), 0 2px 4px 0 rgba(0, 0, 0, 0.25)',
+        'btn-primary': '0 4px 14px 0 rgba(16, 185, 129, 0.35), 0 2px 4px 0 rgba(0, 0, 0, 0.3)',
+        'btn-rose': '0 4px 14px 0 rgba(244, 63, 94, 0.35), 0 2px 4px 0 rgba(0, 0, 0, 0.3)',
+        'btn-surface': '0 2px 8px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(255, 255, 255, 0.05) inset',
+        'btn-amber': '0 4px 14px 0 rgba(245, 158, 11, 0.35), 0 2px 4px 0 rgba(0, 0, 0, 0.3)',
+        'btn-whatsapp': '0 4px 14px 0 rgba(37, 211, 102, 0.3), 0 2px 4px 0 rgba(0, 0, 0, 0.3)',
       },
     },
   },

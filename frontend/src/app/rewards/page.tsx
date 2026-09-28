@@ -109,7 +109,7 @@ export default function RewardsPage() {
 
             <button
               onClick={() => setIsAddRewardOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-glow transition-all shrink-0"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all shrink-0"
             >
               <Plus className="w-4 h-4" />
               <span>Create Milestone Rule</span>
@@ -167,7 +167,7 @@ export default function RewardsPage() {
           <div className="glass-card max-w-md w-full rounded-2xl p-6 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => setIsAddRewardOpen(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white"
+              className="absolute right-4 top-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shadow-sm"
             >
               <X className="w-5 h-5" />
             </button>
@@ -243,14 +243,14 @@ export default function RewardsPage() {
                 <button
                   type="button"
                   onClick={() => setIsAddRewardOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all shadow-sm shadow-black/20"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-xs font-semibold text-white shadow-glow transition-all"
+                  className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all"
                 >
                   {submitting ? 'Saving...' : 'Save Milestone'}
                 </button>

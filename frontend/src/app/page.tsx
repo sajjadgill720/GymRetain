@@ -97,7 +97,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-3 shrink-0">
                 <Link
                   href="/retention"
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-lg shadow-rose-500/20 transition-all flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-md shadow-rose-500/30 hover:shadow-lg hover:shadow-rose-500/40 transition-all flex items-center justify-center gap-2 btn-shadow btn-shadow-rose"
                 >
                   <PhoneCall className="w-4 h-4" />
                   <span>Review At-Risk Call List</span>

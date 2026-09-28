@@ -64,12 +64,12 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-1.5 bg-[#10141f] p-1 rounded-lg border border-white/5">
+          <div className="flex items-center gap-1.5 bg-[#10141f] p-1 rounded-lg border border-white/5 shadow-inner">
             <button
               onClick={() => setSelectedFilter('ALL')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-all shadow-sm ${
                 selectedFilter === 'ALL'
-                  ? 'bg-surface-50 text-white font-semibold'
+                  ? 'bg-surface-50 text-white font-semibold shadow-black/40'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -77,9 +77,9 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
             </button>
             <button
               onClick={() => setSelectedFilter('HIGH')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-all shadow-sm ${
                 selectedFilter === 'HIGH'
-                  ? 'bg-rose-500/20 text-rose-300 font-semibold border border-rose-500/30'
+                  ? 'bg-rose-500/25 text-rose-300 font-semibold border border-rose-500/30 shadow-rose-500/20'
                   : 'text-slate-400 hover:text-rose-300'
               }`}
             >
@@ -87,9 +87,9 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
             </button>
             <button
               onClick={() => setSelectedFilter('MEDIUM')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-all shadow-sm ${
                 selectedFilter === 'MEDIUM'
-                  ? 'bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30'
+                  ? 'bg-amber-500/25 text-amber-300 font-semibold border border-amber-500/30 shadow-amber-500/20'
                   : 'text-slate-400 hover:text-amber-300'
               }`}
             >
@@ -144,7 +144,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
 
               <button
                 onClick={() => setActiveNudgeMember(m)}
-                className="w-full py-2 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-white border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all"
+                className="w-full py-2 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-white border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-500/15 hover:shadow-emerald-500/30 btn-shadow"
               >
                 <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Send WhatsApp Nudge</span>
@@ -264,7 +264,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   <td className="py-3.5 text-right pr-1">
                     <button
                       onClick={() => setActiveNudgeMember(m)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500/15 hover:bg-brand-500 text-brand-300 hover:text-white border border-brand-500/30 text-xs font-medium transition-all shadow-sm group-hover:border-brand-500"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500/15 hover:bg-brand-500 text-brand-300 hover:text-white border border-brand-500/30 text-xs font-medium transition-all shadow-sm shadow-brand-500/20 hover:shadow-md hover:shadow-brand-500/30 group-hover:border-brand-500 btn-shadow"
                     >
                       <MessageCircle className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white" />
                       <span>Send Nudge</span>
@@ -339,14 +339,14 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
             <div className="flex items-center justify-end gap-2.5">
               <button
                 onClick={() => setActiveNudgeMember(null)}
-                className="px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                className="px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all shadow-sm shadow-black/20"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSendNudge}
                 disabled={nudgeSent}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-xs font-semibold text-white shadow-glow transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-xs font-semibold text-white shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40 btn-shadow-primary transition-all disabled:opacity-50"
               >
                 {nudgeSent ? (
                   <>

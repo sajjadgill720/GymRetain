@@ -130,7 +130,7 @@ export default function MembersPage() {
 
               <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-glow transition-all shrink-0"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Member</span>
@@ -227,7 +227,7 @@ export default function MembersPage() {
                             onClick={() => {
                               setIsCheckInOpen(true);
                             }}
-                            className="text-xs px-2.5 py-1 rounded bg-white/5 hover:bg-brand-500/20 text-slate-300 hover:text-brand-300 border border-white/5 transition-all"
+                            className="text-xs px-2.5 py-1 rounded-lg bg-surface-100 hover:bg-brand-500/20 text-slate-300 hover:text-brand-300 border border-white/5 transition-all shadow-sm shadow-black/40 hover:shadow-md btn-shadow"
                           >
                             Check In
                           </button>
@@ -248,7 +248,7 @@ export default function MembersPage() {
           <div className="glass-card max-w-lg w-full rounded-2xl p-6 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => setIsAddModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white"
+              className="absolute right-4 top-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shadow-sm"
             >
               <X className="w-5 h-5" />
             </button>
@@ -350,14 +350,14 @@ export default function MembersPage() {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all shadow-sm shadow-black/20"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={formSubmitting}
-                  className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-xs font-semibold text-white shadow-glow transition-all"
+                  className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all"
                 >
                   {formSubmitting ? 'Registering...' : 'Register Member'}
                 </button>

@@ -64,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="lg:hidden p-2 rounded-lg bg-surface-100 text-slate-300 hover:text-white border border-white/10"
+              className="lg:hidden p-2 rounded-lg bg-surface-100 text-slate-300 hover:text-white border border-white/10 shadow-sm shadow-black/40 hover:shadow-md"
               aria-label="Toggle navigation menu"
             >
               <Menu className="w-5 h-5" />
@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
               <h1 className="text-base sm:text-lg font-bold tracking-tight text-white">{title}</h1>
 
               {/* Walled Workspace Domain Badge (Signals Data Privacy on all screens) */}
-              <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] sm:text-[10px] font-mono text-emerald-400">
+              <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] sm:text-[10px] font-mono text-emerald-400 shadow-sm shadow-emerald-500/10">
                 <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-emerald-400" />
                 <span className="truncate max-w-[140px] sm:max-w-none">{currentGym.slug}.gymretain.app</span>
                 <span className="text-[8px] bg-emerald-400/20 text-emerald-300 px-1 py-0.2 rounded font-bold uppercase">
@@ -96,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
               setIsSimulatorOpen(true);
               setSimResponse(null);
             }}
-            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-medium transition-all"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-medium transition-all shadow-sm shadow-emerald-500/20 hover:shadow-md hover:shadow-emerald-500/30 btn-shadow"
             title="Test what members see on WhatsApp when they text STREAK"
           >
             <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
@@ -107,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenCheckInModal && (
             <button
               onClick={onOpenCheckInModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/10 text-xs font-semibold text-white transition-all shadow-sm hover:border-brand-500/40"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/10 text-xs font-semibold text-white transition-all shadow-sm shadow-black/40 hover:shadow-md hover:border-brand-500/40 btn-shadow"
             >
               <UserCheck className="w-4 h-4 text-emerald-400" />
               <span>Check-In</span>
@@ -118,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenAddMemberModal && (
             <button
               onClick={onOpenAddMemberModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white transition-all shadow-glow hover:shadow-lg"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white transition-all shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">Add Member</span>
@@ -129,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Staff User Avatar */}
           <div className="flex items-center gap-2 pl-1">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center font-bold text-xs text-slate-900 shadow-md">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center font-bold text-xs text-slate-900 shadow-md shadow-amber-500/20">
               BC
             </div>
             <div className="hidden xl:block text-left">
@@ -146,13 +146,13 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="glass-card max-w-sm w-full rounded-2xl p-5 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => setIsSimulatorOpen(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white"
+              className="absolute right-4 top-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shadow-sm"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-sm shadow-emerald-500/20">
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div>
@@ -170,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({
                   type="text"
                   value={simPhone}
                   onChange={(e) => setSimPhone(e.target.value)}
-                  className="w-full bg-[#10141f] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-mono"
+                  className="w-full bg-[#10141f] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-mono shadow-inner"
                 />
               </div>
 
@@ -184,10 +184,10 @@ export const Header: React.FC<HeaderProps> = ({
                       key={kw}
                       type="button"
                       onClick={() => setSimText(kw)}
-                      className={`px-2.5 py-1 rounded text-[11px] font-mono font-semibold transition-all ${
+                      className={`px-2.5 py-1 rounded text-[11px] font-mono font-semibold transition-all shadow-sm ${
                         simText === kw
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-surface-100 text-slate-300 hover:bg-surface-50'
+                          ? 'bg-emerald-500 text-white shadow-emerald-500/30'
+                          : 'bg-surface-100 text-slate-300 hover:bg-surface-50 shadow-black/20'
                       }`}
                     >
                       {kw}
@@ -199,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={handleSimulate}
                 disabled={simLoading}
-                className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-semibold text-xs tracking-wide shadow-glow transition-all flex items-center justify-center gap-1.5 mt-2"
+                className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-semibold text-xs tracking-wide shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40 btn-shadow-primary transition-all flex items-center justify-center gap-1.5 mt-2"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{simLoading ? 'Sending...' : `Send "${simText}" via WhatsApp`}</span>

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from '../../components/Sidebar';
-import { Header } from '../../components/Header';
+import { TopNavbar } from '../../components/TopNavbar';
 import { QuickCheckInModal } from '../../components/QuickCheckInModal';
 import { FrontDeskQrModal } from '../../components/FrontDeskQrModal';
 import { api } from '../../lib/api';
@@ -29,7 +28,6 @@ export default function MembersPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // New Member form state
   const [formFirstName, setFormFirstName] = useState('');
@@ -84,43 +82,50 @@ export default function MembersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] flex">
-      <Sidebar
+    <div className="min-h-screen bg-[#111111] flex flex-col">
+      <TopNavbar
         onOpenQrModal={() => setIsQrModalOpen(true)}
         onOpenCheckInModal={() => setIsCheckInOpen(true)}
-        isOpenMobile={isMobileMenuOpen}
-        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      <main className="flex-1 lg:ml-64 ml-0 flex flex-col min-h-screen w-full overflow-x-hidden">
-        <Header
-          title="Member Directory"
-          subtitle="Manage gym members, attendance history, active streaks, and membership plans"
-          onOpenCheckInModal={() => setIsCheckInOpen(true)}
-          onOpenAddMemberModal={() => setIsAddModalOpen(true)}
-          onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
-        />
+      <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
+        {/* Page Context Ribbon */}
+        <div className="border-b border-[#26221E] bg-[#161310]/50 py-4 px-4 sm:px-8">
+          <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F7F5F2]">Member Directory</h1>
+              <p className="text-xs text-[#A39E98] mt-0.5">Manage gym members, attendance history, active streaks, and membership plans</p>
+            </div>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#BFA785] hover:bg-[#B29976] text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all shrink-0 self-start sm:self-auto cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Member</span>
+            </button>
+          </div>
+        </div>
 
         <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
           {/* Search & Filters Bar */}
-          <div className="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-[#161310] border border-[#2A2520] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
             <div className="relative flex-1 w-full">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Search className="w-4 h-4 text-[#A39E98] absolute left-3.5 top-3" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name, member code (e.g. GR-1001), or phone (+92...)"
-                className="w-full bg-[#10141f] border border-white/5 focus:border-brand-500 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl pl-10 pr-4 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] focus:outline-none transition-colors"
               />
             </div>
 
-            <div className="flex items-center gap-2 self-stretch sm:self-auto">
-              <Filter className="w-4 h-4 text-slate-400" />
+            <div className="flex items-center gap-2.5 self-stretch sm:self-auto">
+              <Filter className="w-4 h-4 text-[#A39E98]" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-[#10141f] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-brand-500"
+                className="bg-[#1C1814] border border-[#2A2520] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] focus:outline-none focus:border-[#BFA785]"
               >
                 <option value="">All Statuses</option>
                 <option value="ACTIVE">Active Only</option>
@@ -130,7 +135,7 @@ export default function MembersPage() {
 
               <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all shrink-0"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#BFA785] hover:bg-[#B29976] text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Member</span>
@@ -139,11 +144,11 @@ export default function MembersPage() {
           </div>
 
           {/* Members Table */}
-          <div className="glass-card rounded-2xl p-6">
+          <div className="bg-[#161310] border border-[#2A2520] rounded-2xl p-5 sm:p-6 shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-white/5 text-slate-400 text-[11px] uppercase tracking-wider font-semibold">
+                  <tr className="border-b border-[#26221E] text-[#A39E98] text-[11px] uppercase tracking-wider font-semibold">
                     <th className="pb-3 pl-1">Member</th>
                     <th className="pb-3">Contact</th>
                     <th className="pb-3">Current Streak</th>
@@ -152,32 +157,32 @@ export default function MembersPage() {
                     <th className="pb-3 text-right pr-1">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-[#26221E]">
                   {members.map((member) => {
                     const currentStreak = member.streak?.currentStreak || 0;
                     const activePlan = member.memberships?.[0];
 
                     return (
-                      <tr key={member.id} className="hover:bg-white/[0.02] transition-colors group">
+                      <tr key={member.id} className="hover:bg-[#1C1814]/60 transition-colors group">
                         {/* Member Name */}
                         <td className="py-3.5 pl-1">
-                          <div className="font-semibold text-white group-hover:text-brand-300 transition-colors">
+                          <div className="font-semibold text-[#F7F5F2] group-hover:text-[#BFA785] transition-colors">
                             {member.firstName} {member.lastName}
                           </div>
-                          <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                          <div className="text-[11px] text-[#A39E98] font-mono mt-0.5">
                             {member.memberCode}
                           </div>
                         </td>
 
                         {/* Contact */}
                         <td className="py-3.5">
-                          <div className="flex items-center gap-1 text-slate-300 font-mono">
-                            <Phone className="w-3 h-3 text-slate-500" />
+                          <div className="flex items-center gap-1.5 text-[#F7F5F2] font-mono">
+                            <Phone className="w-3.5 h-3.5 text-[#A39E98]" />
                             <span>{member.phone}</span>
                           </div>
                           {member.email && (
-                            <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
-                              <Mail className="w-3 h-3 text-slate-500" />
+                            <div className="flex items-center gap-1.5 text-[11px] text-[#A39E98] mt-0.5">
+                              <Mail className="w-3.5 h-3.5 text-[#6B6661]" />
                               <span>{member.email}</span>
                             </div>
                           )}
@@ -185,10 +190,10 @@ export default function MembersPage() {
 
                         {/* Streak Badge */}
                         <td className="py-3.5">
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-300">
-                            <Flame className="w-3.5 h-3.5 text-orange-400" />
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#BFA785]/15 border border-[#BFA785]/30 text-[#BFA785]">
+                            <Flame className="w-3.5 h-3.5 text-[#BFA785]" />
                             <span className="font-bold font-mono text-xs">{currentStreak}</span>
-                            <span className="text-[10px] text-orange-400/80">days</span>
+                            <span className="text-[10px] text-[#BFA785]">days</span>
                           </div>
                         </td>
 
@@ -196,25 +201,25 @@ export default function MembersPage() {
                         <td className="py-3.5">
                           {activePlan ? (
                             <div>
-                              <div className="font-medium text-slate-200">{activePlan.planName}</div>
-                              <div className="text-[10px] text-slate-400 font-mono">
+                              <div className="font-semibold text-[#F7F5F2]">{activePlan.planName}</div>
+                              <div className="text-[10px] text-[#A39E98] font-mono">
                                 PKR {(activePlan.price / 100).toLocaleString()} • Exp: {activePlan.endDate}
                               </div>
                             </div>
                           ) : (
-                            <span className="text-slate-500 italic text-[11px]">No active plan</span>
+                            <span className="text-[#6B6661] italic text-[11px]">No active plan</span>
                           )}
                         </td>
 
                         {/* Status */}
                         <td className="py-3.5">
                           <span
-                            className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                            className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
                               member.status === 'ACTIVE'
-                                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                                ? 'bg-[#4E9F6E]/15 text-[#4E9F6E] border border-[#4E9F6E]/30'
                                 : member.status === 'FROZEN'
-                                ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
-                                : 'bg-slate-500/20 text-slate-400'
+                                ? 'bg-[#E5A13B]/15 text-[#E5A13B] border border-[#E5A13B]/30'
+                                : 'bg-[#26221E] text-[#A39E98]'
                             }`}
                           >
                             {member.status}
@@ -227,7 +232,7 @@ export default function MembersPage() {
                             onClick={() => {
                               setIsCheckInOpen(true);
                             }}
-                            className="text-xs px-2.5 py-1 rounded-lg bg-surface-100 hover:bg-brand-500/20 text-slate-300 hover:text-brand-300 border border-white/5 transition-all shadow-sm shadow-black/40 hover:shadow-md btn-shadow"
+                            className="text-xs px-3 py-1.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] text-[#F7F5F2] hover:text-[#BFA785] border border-[#2A2520] hover:border-[#BFA785]/40 transition-all shadow-sm btn-shadow"
                           >
                             Check In
                           </button>
@@ -244,29 +249,29 @@ export default function MembersPage() {
 
       {/* Add Member Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-card max-w-lg w-full rounded-2xl p-6 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#161310] max-w-lg w-full rounded-2xl p-6 border border-[#2A2520] shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => setIsAddModalOpen(false)}
-              className="absolute right-4 top-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shadow-sm"
+              className="absolute right-4 top-4 p-1.5 rounded-lg text-[#A39E98] hover:text-white hover:bg-[#26221E] shadow-sm btn-shadow"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center border border-brand-500/30 shadow-glow">
+              <div className="w-10 h-10 rounded-xl bg-[#BFA785]/15 text-[#BFA785] flex items-center justify-center border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10">
                 <Plus className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Enroll New Gym Member</h3>
-                <p className="text-xs text-slate-400">Scoped strictly to current gym tenant</p>
+                <h3 className="text-base font-bold text-[#F7F5F2]">Enroll New Gym Member</h3>
+                <p className="text-xs text-[#A39E98]">Scoped strictly to current gym tenant</p>
               </div>
             </div>
 
             <form onSubmit={handleCreateMember} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                  <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                     First Name *
                   </label>
                   <input
@@ -275,11 +280,11 @@ export default function MembersPage() {
                     value={formFirstName}
                     onChange={(e) => setFormFirstName(e.target.value)}
                     placeholder="e.g. Usman"
-                    className="w-full bg-[#10141f] border border-white/10 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none"
+                    className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                  <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                     Last Name
                   </label>
                   <input
@@ -287,14 +292,14 @@ export default function MembersPage() {
                     value={formLastName}
                     onChange={(e) => setFormLastName(e.target.value)}
                     placeholder="e.g. Khan"
-                    className="w-full bg-[#10141f] border border-white/10 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none"
+                    className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                  <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                     Phone (WhatsApp) *
                   </label>
                   <input
@@ -303,11 +308,11 @@ export default function MembersPage() {
                     value={formPhone}
                     onChange={(e) => setFormPhone(e.target.value)}
                     placeholder="+923001234567"
-                    className="w-full bg-[#10141f] border border-white/10 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none"
+                    className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] font-mono focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                  <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                     Email Address
                   </label>
                   <input
@@ -315,13 +320,13 @@ export default function MembersPage() {
                     value={formEmail}
                     onChange={(e) => setFormEmail(e.target.value)}
                     placeholder="member@email.com"
-                    className="w-full bg-[#10141f] border border-white/10 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none"
+                    className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                   Membership Plan
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -333,31 +338,31 @@ export default function MembersPage() {
                       if (e.target.value === 'Monthly Gold') setFormPricePaisa(650000);
                       if (e.target.value === 'Quarterly VIP') setFormPricePaisa(1600000);
                     }}
-                    className="bg-[#10141f] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                    className="bg-[#1C1814] border border-[#2A2520] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] focus:outline-none"
                   >
                     <option value="Monthly Standard">Monthly Standard (5,000 PKR)</option>
                     <option value="Monthly Gold">Monthly Gold (6,500 PKR)</option>
                     <option value="Quarterly VIP">Quarterly VIP (16,000 PKR)</option>
                   </select>
 
-                  <div className="bg-[#10141f] border border-white/10 rounded-xl px-3 py-2 text-xs text-emerald-400 font-mono flex items-center">
+                  <div className="bg-[#1C1814] border border-[#2A2520] rounded-xl px-3 py-2 text-xs text-[#4E9F6E] font-mono flex items-center">
                     PKR {(formPricePaisa / 100).toLocaleString()} (paisa: {formPricePaisa})
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-4">
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-[#26221E]">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all shadow-sm shadow-black/20"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#A39E98] hover:text-white hover:bg-[#26221E] transition-all btn-shadow"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={formSubmitting}
-                  className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all"
+                  className="px-5 py-2.5 rounded-xl bg-[#BFA785] hover:bg-[#B29976] disabled:opacity-50 text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all"
                 >
                   {formSubmitting ? 'Registering...' : 'Register Member'}
                 </button>

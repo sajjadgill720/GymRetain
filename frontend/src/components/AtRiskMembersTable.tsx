@@ -46,51 +46,51 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
   };
 
   return (
-    <div className="glass-card rounded-2xl p-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-5 gap-3">
+    <div className="bg-[#161310] border border-[#2A2520] rounded-2xl p-5 sm:p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-5 gap-3 border-b border-[#26221E] mb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-rose-400" />
+            <h2 className="text-base font-bold text-[#F7F5F2] tracking-tight flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-[#D9534F]" />
               Member Churn Risk Detection
             </h2>
-            <span className="text-[11px] font-semibold text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">
+            <span className="text-[11px] font-bold text-[#D9534F] bg-[#D9534F]/10 px-2.5 py-0.5 rounded-full border border-[#D9534F]/25">
               Rules-Based AI Engine
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[#A39E98] mt-1">
             Members exhibiting silent churn indicators: prolonged absence, frequency collapse, or overdue payments.
           </p>
         </div>
 
         {showFilters && (
-          <div className="flex items-center gap-1.5 bg-[#10141f] p-1 rounded-lg border border-white/5 shadow-inner">
+          <div className="flex items-center gap-1.5 bg-[#1C1814] p-1 rounded-xl border border-[#2A2520] shadow-inner">
             <button
               onClick={() => setSelectedFilter('ALL')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-all shadow-sm ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm btn-shadow ${
                 selectedFilter === 'ALL'
-                  ? 'bg-surface-50 text-white font-semibold shadow-black/40'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#26221E] text-[#F7F5F2] border border-[#38312A]'
+                  : 'text-[#A39E98] hover:text-[#F7F5F2]'
               }`}
             >
               All ({members.length})
             </button>
             <button
               onClick={() => setSelectedFilter('HIGH')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-all shadow-sm ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm btn-shadow ${
                 selectedFilter === 'HIGH'
-                  ? 'bg-rose-500/25 text-rose-300 font-semibold border border-rose-500/30 shadow-rose-500/20'
-                  : 'text-slate-400 hover:text-rose-300'
+                  ? 'bg-[#D9534F]/20 text-[#D9534F] border border-[#D9534F]/35 shadow-[#D9534F]/20'
+                  : 'text-[#A39E98] hover:text-[#D9534F]'
               }`}
             >
               High ({members.filter((m) => m.riskLevel === 'HIGH').length})
             </button>
             <button
               onClick={() => setSelectedFilter('MEDIUM')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-all shadow-sm ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm btn-shadow ${
                 selectedFilter === 'MEDIUM'
-                  ? 'bg-amber-500/25 text-amber-300 font-semibold border border-amber-500/30 shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-amber-300'
+                  ? 'bg-[#E5A13B]/20 text-[#E5A13B] border border-[#E5A13B]/35 shadow-[#E5A13B]/20'
+                  : 'text-[#A39E98] hover:text-[#E5A13B]'
               }`}
             >
               Medium ({members.filter((m) => m.riskLevel === 'MEDIUM').length})
@@ -106,37 +106,37 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
           return (
             <div
               key={m.memberId}
-              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-2.5"
+              className="p-4 rounded-xl bg-[#1C1814] border border-[#2A2520] hover:border-[#BFA785]/30 space-y-3 shadow-sm"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="font-bold text-sm text-white">{m.fullName}</div>
-                  <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                  <div className="font-bold text-sm text-[#F7F5F2]">{m.fullName}</div>
+                  <div className="text-[11px] text-[#A39E98] font-mono mt-0.5">
                     {m.memberCode} • {m.phone}
                   </div>
                 </div>
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase shrink-0 ${
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase shrink-0 ${
                     isHigh
-                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      ? 'bg-[#D9534F]/20 text-[#D9534F] border border-[#D9534F]/30'
+                      : 'bg-[#E5A13B]/20 text-[#E5A13B] border border-[#E5A13B]/30'
                   }`}
                 >
                   {m.riskLevel} ({m.riskScore})
                 </span>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-300 pt-1 border-t border-white/5">
-                <div className="flex items-center gap-1.5 text-rose-300 font-medium">
+              <div className="flex items-center justify-between text-xs text-[#A39E98] pt-2 border-t border-[#26221E]">
+                <div className="flex items-center gap-1.5 text-[#D9534F] font-semibold">
                   <Clock className="w-3.5 h-3.5" />
                   <span>{m.factors.daysSinceLastCheckIn}d inactive</span>
                 </div>
                 {m.factors.isPaymentOverdue ? (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-medium">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#D9534F]/20 text-[#D9534F] border border-[#D9534F]/30 font-bold">
                     Payment Overdue
                   </span>
                 ) : (
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-[#A39E98]">
                     -{m.factors.frequencyDropPercentage}% visits
                   </span>
                 )}
@@ -144,9 +144,9 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
 
               <button
                 onClick={() => setActiveNudgeMember(m)}
-                className="w-full py-2 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-white border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-500/15 hover:shadow-emerald-500/30 btn-shadow"
+                className="w-full py-2.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] text-[#4E9F6E] hover:text-white border border-[#4E9F6E]/40 hover:border-[#4E9F6E] text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm btn-shadow"
               >
-                <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <MessageCircle className="w-3.5 h-3.5 text-[#4E9F6E]" />
                 <span>Send WhatsApp Nudge</span>
               </button>
             </div>
@@ -158,7 +158,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-white/5 text-slate-400 text-[11px] uppercase tracking-wider font-semibold">
+            <tr className="border-b border-[#26221E] text-[#A39E98] text-[11px] uppercase tracking-wider font-semibold">
               <th className="pb-3 pl-1">Member</th>
               <th className="pb-3">Risk Score</th>
               <th className="pb-3">Inactivity</th>
@@ -167,18 +167,18 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
               <th className="pb-3 text-right pr-1">Automated Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-[#26221E]">
             {displayList.map((m) => {
               const isHigh = m.riskLevel === 'HIGH';
 
               return (
-                <tr key={m.memberId} className="hover:bg-white/[0.02] transition-colors group">
+                <tr key={m.memberId} className="hover:bg-[#1C1814]/60 transition-colors group">
                   {/* Member Name & Code */}
                   <td className="py-3.5 pl-1">
-                    <div className="font-semibold text-white group-hover:text-brand-300 transition-colors">
+                    <div className="font-semibold text-[#F7F5F2] group-hover:text-[#BFA785] transition-colors">
                       {m.fullName}
                     </div>
-                    <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                    <div className="text-[11px] text-[#A39E98] font-mono flex items-center gap-1.5 mt-0.5">
                       <span>{m.memberCode}</span>
                       <span>•</span>
                       <span>{m.phone}</span>
@@ -188,26 +188,26 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   {/* Risk Score Progress */}
                   <td className="py-3.5">
                     <div className="flex items-center gap-2">
-                      <div className="w-12 h-2 rounded-full bg-slate-800 overflow-hidden">
+                      <div className="w-14 h-2 rounded-full bg-[#26221E] overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
-                            isHigh ? 'bg-rose-500' : 'bg-amber-500'
+                            isHigh ? 'bg-[#D9534F]' : 'bg-[#E5A13B]'
                           }`}
                           style={{ width: `${m.riskScore}%` }}
                         />
                       </div>
                       <span
                         className={`text-xs font-bold font-mono ${
-                          isHigh ? 'text-rose-400' : 'text-amber-400'
+                          isHigh ? 'text-[#D9534F]' : 'text-[#E5A13B]'
                         }`}
                       >
                         {m.riskScore}
                       </span>
                       <span
-                        className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
+                        className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
                           isHigh
-                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                            : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            ? 'bg-[#D9534F]/20 text-[#D9534F] border border-[#D9534F]/30'
+                            : 'bg-[#E5A13B]/20 text-[#E5A13B] border border-[#E5A13B]/30'
                         }`}
                       >
                         {m.riskLevel}
@@ -217,24 +217,24 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
 
                   {/* Days Inactive */}
                   <td className="py-3.5">
-                    <div className="flex items-center gap-1.5 text-slate-300">
-                      <Clock className="w-3.5 h-3.5 text-slate-500" />
+                    <div className="flex items-center gap-1.5 text-[#F7F5F2]">
+                      <Clock className="w-3.5 h-3.5 text-[#A39E98]" />
                       <span className="font-medium">
                         {m.factors.daysSinceLastCheckIn} days
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">No check-in recorded</div>
+                    <div className="text-[10px] text-[#6B6661] mt-0.5">No check-in recorded</div>
                   </td>
 
                   {/* Frequency Drop */}
                   <td className="py-3.5">
-                    <div className="flex items-center gap-1.5 text-slate-300">
-                      <ArrowDownRight className="w-3.5 h-3.5 text-rose-400" />
-                      <span className="font-semibold text-rose-400">
+                    <div className="flex items-center gap-1.5 text-[#D9534F]">
+                      <ArrowDownRight className="w-3.5 h-3.5 text-[#D9534F]" />
+                      <span className="font-semibold text-[#D9534F]">
                         -{m.factors.frequencyDropPercentage}%
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">
+                    <div className="text-[10px] text-[#A39E98] mt-0.5">
                       From {m.factors.fourWeekRollingAvg}/wk avg
                     </div>
                   </td>
@@ -243,18 +243,18 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   <td className="py-3.5">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {m.factors.isPaymentOverdue ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D9534F]/15 text-[#D9534F] border border-[#D9534F]/30">
                           <CreditCard className="w-3 h-3" /> Overdue
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#4E9F6E]/15 text-[#4E9F6E] border border-[#4E9F6E]/30">
                           Paid
                         </span>
                       )}
 
                       {m.factors.isRecentlyBrokenStreak && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded bg-orange-500/15 text-orange-300 border border-orange-500/30">
-                          <Flame className="w-3 h-3 text-orange-400" /> Broken Streak
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5A13B]/15 text-[#E5A13B] border border-[#E5A13B]/30">
+                          <Flame className="w-3 h-3 text-[#E5A13B]" /> Broken Streak
                         </span>
                       )}
                     </div>
@@ -264,9 +264,9 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   <td className="py-3.5 text-right pr-1">
                     <button
                       onClick={() => setActiveNudgeMember(m)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500/15 hover:bg-brand-500 text-brand-300 hover:text-white border border-brand-500/30 text-xs font-medium transition-all shadow-sm shadow-brand-500/20 hover:shadow-md hover:shadow-brand-500/30 group-hover:border-brand-500 btn-shadow"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] text-[#4E9F6E] hover:text-white border border-[#4E9F6E]/30 hover:border-[#4E9F6E] text-xs font-semibold transition-all shadow-sm btn-shadow"
                     >
-                      <MessageCircle className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white" />
+                      <MessageCircle className="w-3.5 h-3.5 text-[#4E9F6E]" />
                       <span>Send Nudge</span>
                     </button>
                   </td>
@@ -279,46 +279,46 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
 
       {/* WhatsApp Nudge Preview Modal (Phase 2 Preview) */}
       {activeNudgeMember && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-card max-w-md w-full rounded-2xl p-6 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#161310] max-w-md w-full rounded-2xl p-6 border border-[#2A2520] shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={() => setActiveNudgeMember(null)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white"
+              className="absolute right-4 top-4 p-1.5 rounded-lg text-[#A39E98] hover:text-white hover:bg-[#26221E] shadow-sm btn-shadow"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-xl bg-[#4E9F6E]/15 text-[#4E9F6E] flex items-center justify-center border border-[#4E9F6E]/30 shadow-sm shadow-[#4E9F6E]/20">
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">WhatsApp Re-Engagement Nudge</h3>
-                <p className="text-xs text-slate-400">Meta WhatsApp Business API Template</p>
+                <h3 className="text-base font-bold text-[#F7F5F2]">WhatsApp Re-Engagement Nudge</h3>
+                <p className="text-xs text-[#A39E98]">Meta WhatsApp Business API Template</p>
               </div>
             </div>
 
             {/* Recipient info */}
-            <div className="p-3 rounded-lg bg-surface-100 border border-white/5 mb-4 text-xs">
-              <div className="flex justify-between text-slate-400">
+            <div className="p-3.5 rounded-xl bg-[#1C1814] border border-[#2A2520] mb-4 text-xs space-y-1.5">
+              <div className="flex justify-between text-[#A39E98]">
                 <span>Recipient:</span>
-                <span className="font-semibold text-white">{activeNudgeMember.fullName}</span>
+                <span className="font-semibold text-[#F7F5F2]">{activeNudgeMember.fullName}</span>
               </div>
-              <div className="flex justify-between text-slate-400 mt-1">
+              <div className="flex justify-between text-[#A39E98]">
                 <span>Phone:</span>
-                <span className="font-mono text-emerald-400">{activeNudgeMember.phone}</span>
+                <span className="font-mono text-[#4E9F6E]">{activeNudgeMember.phone}</span>
               </div>
-              <div className="flex justify-between text-slate-400 mt-1">
+              <div className="flex justify-between text-[#A39E98]">
                 <span>Risk Reason:</span>
-                <span className="text-rose-400 font-medium">
+                <span className="text-[#D9534F] font-bold">
                   {activeNudgeMember.factors.daysSinceLastCheckIn} days absent (Score: {activeNudgeMember.riskScore})
                 </span>
               </div>
             </div>
 
             {/* WhatsApp Message Preview Bubble */}
-            <div className="p-4 rounded-xl bg-[#0b241b] border border-emerald-500/20 text-xs text-emerald-100 leading-relaxed font-sans mb-5 shadow-inner">
-              <p className="font-medium text-emerald-300 mb-1">
+            <div className="p-4 rounded-xl bg-[#14241B] border border-[#4E9F6E]/30 text-xs text-[#EAF5EF] leading-relaxed font-sans mb-5 shadow-inner">
+              <p className="font-semibold text-[#4E9F6E] mb-1">
                 Assalam-o-Alaikum {activeNudgeMember.fullName.split(' ')[0]} bhai! 👋
               </p>
               <p>
@@ -330,7 +330,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                 Drop by today or tomorrow, and front desk will set you up with your personalized
                 catch-up workout! 💪
               </p>
-              <div className="text-[10px] text-emerald-400/60 text-right mt-2 font-mono">
+              <div className="text-[10px] text-[#4E9F6E]/70 text-right mt-2 font-mono">
                 Category: UTILITY • Approved Template
               </div>
             </div>
@@ -339,14 +339,14 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
             <div className="flex items-center justify-end gap-2.5">
               <button
                 onClick={() => setActiveNudgeMember(null)}
-                className="px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all shadow-sm shadow-black/20"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#A39E98] hover:text-white hover:bg-[#26221E] transition-all btn-shadow"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSendNudge}
                 disabled={nudgeSent}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-xs font-semibold text-white shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40 btn-shadow-primary transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4E9F6E] hover:bg-[#41885C] text-xs font-bold text-white shadow-md shadow-[#4E9F6E]/30 hover:shadow-lg hover:shadow-[#4E9F6E]/40 btn-shadow transition-all disabled:opacity-50"
               >
                 {nudgeSent ? (
                   <>

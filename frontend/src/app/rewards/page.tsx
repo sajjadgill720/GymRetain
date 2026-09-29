@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from '../../components/Sidebar';
-import { Header } from '../../components/Header';
+import { TopNavbar } from '../../components/TopNavbar';
 import { QuickCheckInModal } from '../../components/QuickCheckInModal';
 import { FrontDeskQrModal } from '../../components/FrontDeskQrModal';
 import { api } from '../../lib/api';
@@ -25,7 +24,6 @@ export default function RewardsPage() {
   const [isAddRewardOpen, setIsAddRewardOpen] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // New Reward Rule form state
   const [title, setTitle] = useState('');
@@ -74,34 +72,35 @@ export default function RewardsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] flex">
-      <Sidebar
+    <div className="min-h-screen bg-[#111111] flex flex-col">
+      <TopNavbar
         onOpenQrModal={() => setIsQrModalOpen(true)}
         onOpenCheckInModal={() => setIsCheckInOpen(true)}
-        isOpenMobile={isMobileMenuOpen}
-        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      <main className="flex-1 lg:ml-64 ml-0 flex flex-col min-h-screen w-full overflow-x-hidden">
-        <Header
-          title="Rewards & Streak Gamification Engine"
-          subtitle="Configure streak milestones to gamify gym loyalty and celebrate consistent members"
-          onOpenCheckInModal={() => setIsCheckInOpen(true)}
-          onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
-        />
+      <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
+        {/* Page Context Ribbon */}
+        <div className="border-b border-[#26221E] bg-[#161310]/50 py-4 px-4 sm:px-8">
+          <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F7F5F2]">Rewards & Streaks</h1>
+              <p className="text-xs text-[#A39E98] mt-0.5">Configure streak milestones to gamify gym loyalty and celebrate consistent members</p>
+            </div>
+          </div>
+        </div>
 
         <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
           {/* Header Action Card */}
-          <div className="glass-card rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-[#161310] border border-[#2A2520] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30 shadow-glow-orange">
+              <div className="w-12 h-12 rounded-2xl bg-[#BFA785]/15 text-[#BFA785] flex items-center justify-center border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10">
                 <Award className="w-6 h-6 animate-flame" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-white tracking-tight">
+                <h2 className="text-base font-bold text-[#F7F5F2] tracking-tight">
                   Gym Milestone Rewards Engine
                 </h2>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-[#A39E98] mt-0.5">
                   Automatically unlocks when a member hits consecutive day check-in milestones.
                 </p>
               </div>
@@ -109,7 +108,7 @@ export default function RewardsPage() {
 
             <button
               onClick={() => setIsAddRewardOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all shrink-0"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#BFA785] hover:bg-[#B29976] text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all shrink-0"
             >
               <Plus className="w-4 h-4" />
               <span>Create Milestone Rule</span>
@@ -121,37 +120,37 @@ export default function RewardsPage() {
             {rewards.map((reward) => (
               <div
                 key={reward.id}
-                className="glass-card rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-amber-500/30 transition-all flex flex-col justify-between"
+                className="bg-[#161310] border border-[#2A2520] rounded-2xl p-6 relative overflow-hidden group hover:border-[#BFA785]/40 transition-all flex flex-col justify-between shadow-sm"
               >
                 <div>
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-orange-500/15 border border-orange-500/30 text-orange-400 text-xs font-mono font-bold">
-                      <Flame className="w-3.5 h-3.5 animate-flame" />
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#BFA785]/15 border border-[#BFA785]/30 text-[#BFA785] text-xs font-mono font-bold">
+                      <Flame className="w-3.5 h-3.5 text-[#BFA785] animate-flame" />
                       <span>{reward.triggerThreshold}-Day Streak</span>
                     </div>
 
-                    <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    <span className="text-[10px] uppercase font-bold text-[#4E9F6E] bg-[#4E9F6E]/15 px-2.5 py-0.5 rounded-full border border-[#4E9F6E]/30">
                       {reward.rewardType.replace('_', ' ')}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-white mt-4 tracking-tight group-hover:text-amber-300 transition-colors">
+                  <h3 className="text-lg font-bold text-[#F7F5F2] mt-4 tracking-tight group-hover:text-[#BFA785] transition-colors">
                     {reward.title}
                   </h3>
 
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  <p className="text-xs text-[#A39E98] mt-1.5 leading-relaxed">
                     {reward.description || 'Awarded automatically when member reaches milestone.'}
                   </p>
                 </div>
 
-                <div className="pt-6 border-t border-white/5 mt-6 flex items-center justify-between text-xs">
-                  <div className="text-slate-400">
+                <div className="pt-5 border-t border-[#26221E] mt-6 flex items-center justify-between text-xs">
+                  <div className="text-[#A39E98]">
                     Redeemed:{' '}
-                    <span className="font-bold text-white font-mono">
+                    <span className="font-bold text-[#F7F5F2] font-mono">
                       {reward._count?.redemptions ?? 0} members
                     </span>
                   </div>
-                  <span className="text-[11px] font-semibold text-brand-400 flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-[#BFA785] flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Active Rule
                   </span>
                 </div>
@@ -163,28 +162,28 @@ export default function RewardsPage() {
 
       {/* Add Reward Modal */}
       {isAddRewardOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-card max-w-md w-full rounded-2xl p-6 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#161310] max-w-md w-full rounded-2xl p-6 border border-[#2A2520] shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => setIsAddRewardOpen(false)}
-              className="absolute right-4 top-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shadow-sm"
+              className="absolute right-4 top-4 p-1.5 rounded-lg text-[#A39E98] hover:text-white hover:bg-[#26221E] shadow-sm btn-shadow"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+              <div className="w-10 h-10 rounded-xl bg-[#BFA785]/15 text-[#BFA785] flex items-center justify-center border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Create Streak Milestone</h3>
-                <p className="text-xs text-slate-400">Configurable per gym tenant</p>
+                <h3 className="text-base font-bold text-[#F7F5F2]">Create Streak Milestone</h3>
+                <p className="text-xs text-[#A39E98]">Configurable per gym tenant</p>
               </div>
             </div>
 
             <form onSubmit={handleCreateReward} className="space-y-4">
               <div>
-                <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                   Milestone Title *
                 </label>
                 <input
@@ -193,12 +192,12 @@ export default function RewardsPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. 21-Day Habit Master"
-                  className="w-full bg-[#10141f] border border-white/10 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none"
+                  className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                   Required Streak (Consecutive Days) *
                 </label>
                 <input
@@ -207,18 +206,18 @@ export default function RewardsPage() {
                   required
                   value={triggerThreshold}
                   onChange={(e) => setTriggerThreshold(parseInt(e.target.value, 10))}
-                  className="w-full bg-[#10141f] border border-white/10 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none"
+                  className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] font-mono focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                   Reward Type
                 </label>
                 <select
                   value={rewardType}
                   onChange={(e) => setRewardType(e.target.value as any)}
-                  className="w-full bg-[#10141f] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                  className="w-full bg-[#1C1814] border border-[#2A2520] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] focus:outline-none focus:border-[#BFA785]"
                 >
                   <option value="BADGE">Digital Badge & Profile Flair</option>
                   <option value="FREE_ITEM">Free Item / Smoothie / Shake</option>
@@ -227,7 +226,7 @@ export default function RewardsPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
                   Description / Redemptions Notes
                 </label>
                 <textarea
@@ -235,22 +234,22 @@ export default function RewardsPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                   placeholder="e.g. Show badge at reception juice bar to claim free whey protein shake."
-                  className="w-full bg-[#10141f] border border-white/10 focus:border-brand-500 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none resize-none"
+                  className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] focus:outline-none resize-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#26221E]">
                 <button
                   type="button"
                   onClick={() => setIsAddRewardOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all shadow-sm shadow-black/20"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#A39E98] hover:text-white hover:bg-[#26221E] transition-all btn-shadow"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all"
+                  className="px-5 py-2.5 rounded-xl bg-[#BFA785] hover:bg-[#B29976] disabled:opacity-50 text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all"
                 >
                   {submitting ? 'Saving...' : 'Save Milestone'}
                 </button>

@@ -97,28 +97,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#0d121d] border-r border-white/5 select-none">
+    <div className="flex flex-col h-full bg-[#161310] border-r border-[#26221E] select-none">
       {/* Brand Header */}
-      <div className="p-5 border-b border-white/5 flex items-center justify-between">
+      <div className="p-5 border-b border-[#26221E] flex items-center justify-between">
         <Link href="/" onClick={onCloseMobile} className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-brand-500 to-emerald-400 flex items-center justify-center shadow-glow">
-            <Flame className="w-6 h-6 text-white animate-flame" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#8B7454] via-[#BFA785] to-[#E2D2BC] flex items-center justify-center shadow-md shadow-[#BFA785]/20">
+            <Flame className="w-6 h-6 text-[#111111] animate-flame" />
           </div>
           <div>
-            <span className="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+            <span className="text-xl font-bold tracking-tight text-[#F7F5F2] flex items-center gap-1.5">
               GymRetain
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono font-medium border border-brand-500/30">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#BFA785]/15 text-[#BFA785] font-mono font-bold border border-[#BFA785]/30">
                 PRO
               </span>
             </span>
-            <p className="text-xs text-slate-400">Retention & Streaks</p>
+            <p className="text-xs text-[#A39E98]">Retention & Streaks</p>
           </div>
         </Link>
 
         {onCloseMobile && (
           <button
             onClick={onCloseMobile}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 shadow-sm"
+            className="lg:hidden p-1.5 text-[#A39E98] hover:text-white rounded-lg hover:bg-[#26221E] shadow-sm btn-shadow"
           >
             <X className="w-5 h-5" />
           </button>
@@ -126,44 +126,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Gym Tenant Switcher */}
-      <div className="p-4 border-b border-white/5">
-        <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2 block">
+      <div className="p-4 border-b border-[#26221E]">
+        <label className="text-[11px] font-semibold uppercase tracking-wider text-[#A39E98] mb-2 block">
           Current Tenant Gym
         </label>
         <div className="relative">
           <button
             onClick={() => setShowGymDropdown(!showGymDropdown)}
-            className="w-full flex items-center justify-between p-2.5 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/5 transition-all text-left shadow-sm shadow-black/40 hover:shadow-md group btn-shadow"
+            className="w-full flex items-center justify-between p-2.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] border border-[#2A2520] transition-all text-left shadow-sm shadow-black/40 hover:shadow-md group btn-shadow"
           >
             <div className="flex items-center gap-2.5 overflow-hidden">
-              <Building2 className="w-4 h-4 text-brand-400 shrink-0" />
+              <Building2 className="w-4 h-4 text-[#BFA785] shrink-0" />
               <div className="overflow-hidden">
-                <div className="text-xs font-medium text-white truncate">
+                <div className="text-xs font-semibold text-[#F7F5F2] truncate">
                   {selectedGym.name}
                 </div>
-                <div className="text-[10px] text-slate-400">{selectedGym.city}</div>
+                <div className="text-[10px] text-[#A39E98]">{selectedGym.city}</div>
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors shrink-0" />
+            <ChevronDown className="w-4 h-4 text-[#A39E98] group-hover:text-white transition-colors shrink-0" />
           </button>
 
           {showGymDropdown && (
-            <div className="absolute left-0 right-0 top-full mt-1.5 bg-[#141926] border border-white/10 rounded-lg shadow-2xl p-1.5 z-50">
-              <div className="text-[10px] text-slate-400 px-2 py-1 uppercase font-semibold">
+            <div className="absolute left-0 right-0 top-full mt-1.5 bg-[#1C1814] border border-[#332C26] rounded-xl shadow-2xl p-1.5 z-50">
+              <div className="text-[10px] text-[#A39E98] px-2 py-1 uppercase font-semibold">
                 Switch Multi-Tenant Gym
               </div>
               {DEMO_GYMS.map((gym) => (
                 <button
                   key={gym.id}
                   onClick={() => handleSelectGym(gym)}
-                  className={`w-full text-left p-2 rounded-md text-xs transition-colors flex items-center justify-between shadow-sm ${
+                  className={`w-full text-left p-2 rounded-lg text-xs transition-colors flex items-center justify-between shadow-sm btn-shadow ${
                     selectedGym.id === gym.id
-                      ? 'bg-brand-500/15 text-brand-400 font-medium shadow-brand-500/10'
-                      : 'text-slate-300 hover:bg-white/5'
+                      ? 'bg-[#BFA785]/20 text-[#BFA785] font-semibold border border-[#BFA785]/30'
+                      : 'text-[#A39E98] hover:text-[#F7F5F2] hover:bg-[#26221E]'
                   }`}
                 >
                   <span className="truncate">{gym.name}</span>
-                  <span className="text-[10px] text-slate-500">{gym.city.split(',')[0]}</span>
+                  <span className="text-[10px] text-[#6B6661]">{gym.city.split(',')[0]}</span>
                 </button>
               ))}
             </div>
@@ -178,15 +178,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             if (onOpenQrModal) onOpenQrModal();
             if (onCloseMobile) onCloseMobile();
           }}
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-white/5 hover:bg-brand-500/15 border border-white/10 hover:border-brand-500/30 text-xs font-medium text-slate-200 hover:text-brand-300 transition-all shadow-md shadow-black/40 hover:shadow-brand-500/20 group btn-shadow"
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#1C1814] hover:bg-[#26221E] border border-[#2A2520] hover:border-[#BFA785]/40 text-xs font-medium text-[#F7F5F2] hover:text-[#BFA785] transition-all shadow-sm shadow-black/40 hover:shadow-md group btn-shadow"
         >
-          <QrCode className="w-4 h-4 text-brand-400 group-hover:scale-110 transition-transform" />
+          <QrCode className="w-4 h-4 text-[#BFA785] group-hover:scale-110 transition-transform" />
           <span>Front-Desk QR Placard</span>
         </button>
       </div>
 
       {/* Nav Menu */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -196,23 +196,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.name}
               href={item.href}
               onClick={onCloseMobile}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-brand-500/15 text-brand-300 border border-brand-500/30 shadow-sm shadow-brand-500/10'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-[#BFA785]/15 text-[#BFA785] border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10 font-bold'
+                  : 'text-[#A39E98] hover:text-[#F7F5F2] hover:bg-[#1C1814]'
               }`}
             >
               <div className="flex items-center gap-3">
                 <Icon
                   className={`w-4 h-4 ${
-                    isActive ? 'text-brand-400' : 'text-slate-400 group-hover:text-white'
+                    isActive ? 'text-[#BFA785]' : 'text-[#A39E98] group-hover:text-white'
                   }`}
                 />
                 <span>{item.name}</span>
               </div>
               {item.badge && (
                 <span
-                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shadow-sm ${item.badgeColor}`}
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm ${item.badgeColor}`}
                 >
                   {item.badge}
                 </span>
@@ -223,15 +223,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Footer / Tenant Isolation Status */}
-      <div className="p-4 border-t border-white/5 bg-[#090d16]">
-        <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span className="font-semibold text-slate-200">Walled Tenant Space</span>
+      <div className="p-4 border-t border-[#26221E] bg-[#111111]">
+        <div className="flex items-center gap-2 text-xs text-[#A39E98] mb-1">
+          <ShieldCheck className="w-4 h-4 text-[#4E9F6E]" />
+          <span className="font-semibold text-[#F7F5F2]">Walled Tenant Space</span>
         </div>
-        <div className="text-[11px] text-slate-500 font-mono">
+        <div className="text-[11px] text-[#6B6661] font-mono">
           {selectedGym.slug}.gymretain.app
         </div>
-        <div className="text-[10px] text-emerald-400/80 mt-1">
+        <div className="text-[10px] text-[#4E9F6E]/90 mt-1">
           ✓ RLS Isolation: 0 cross-gym leakage
         </div>
       </div>

@@ -147,3 +147,22 @@ backend/
     ├── streak-calculation.spec.ts # Verifies streak increment / break rules
     └── risk-scoring.spec.ts       # Verifies weighted churn risk calculations
 ```
+
+---
+
+## 📚 Documentation Index (`Readme/`)
+
+All system guides, audits, and architectural specifications are housed in the `Readme/` folder:
+
+| Document | Description |
+|---|---|
+| [`TOP_NAVIGATION_REDESIGN.md`](Readme/TOP_NAVIGATION_REDESIGN.md) | Full-width Amazon/Stripe 2-tier sticky top navigation bar architecture |
+| [`UI_REBUILD_MYNEXT9TO5.md`](Readme/UI_REBUILD_MYNEXT9TO5.md) | Modern SaaS UI redesign, warm charcoal `#111111`, bento surfaces, 30-sec glance |
+| [`DESIGN_SYSTEM_V2.md`](Readme/DESIGN_SYSTEM_V2.md) | Design tokens, color system, button shadow utilities (`btn-shadow`), typography |
+| [`PHASE1_TENANT_ISOLATION.md`](Readme/PHASE1_TENANT_ISOLATION.md) | Dual-layer tenant isolation audit & adversarial test suite |
+| [`PHASE2_WHATSAPP_AUTOMATION.md`](Readme/PHASE2_WHATSAPP_AUTOMATION.md) | WhatsApp automation, inbound keyword simulator, streak notifications |
+| [`DOCKER_GUIDE.md`](Readme/DOCKER_GUIDE.md) | Complete Docker containerization guide and local orchestration |
+| [`CODE_STYLE.md`](Readme/CODE_STYLE.md) | Workspace rules on button shadows, industry styling, and markdown organization |
+| [`BACKEND_README.md`](Readme/BACKEND_README.md) | Backend NestJS quickstart, environment variables, and Prisma commands |
+| [`FRONTEND_README.md`](Readme/FRONTEND_README.md) | Next.js frontend setup, port configuration, and mock API mode |
+

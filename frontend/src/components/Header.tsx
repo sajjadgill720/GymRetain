@@ -58,13 +58,13 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="border-b border-white/5 bg-[#090d16]/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <header className="border-b border-[#26221E] bg-[#111111]/95 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
         {/* Left: Mobile Menu + Titles + Walled Subdomain Badge */}
         <div className="flex items-center gap-3">
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="lg:hidden p-2 rounded-lg bg-surface-100 text-slate-300 hover:text-white border border-white/10 shadow-sm shadow-black/40 hover:shadow-md"
+              className="lg:hidden p-2 rounded-xl bg-[#1C1814] text-[#A39E98] hover:text-[#F7F5F2] border border-[#2A2520] shadow-sm shadow-black/40 hover:shadow-md btn-shadow"
               aria-label="Toggle navigation menu"
             >
               <Menu className="w-5 h-5" />
@@ -73,18 +73,18 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-base sm:text-lg font-bold tracking-tight text-white">{title}</h1>
+              <h1 className="text-base sm:text-lg font-bold tracking-tight text-[#F7F5F2]">{title}</h1>
 
               {/* Walled Workspace Domain Badge (Signals Data Privacy on all screens) */}
-              <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] sm:text-[10px] font-mono text-emerald-400 shadow-sm shadow-emerald-500/10">
-                <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-emerald-400" />
+              <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-0.5 rounded-full bg-[#4E9F6E]/10 border border-[#4E9F6E]/25 text-[9px] sm:text-[10px] font-mono text-[#4E9F6E] shadow-sm">
+                <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[#4E9F6E]" />
                 <span className="truncate max-w-[140px] sm:max-w-none">{currentGym.slug}.gymretain.app</span>
-                <span className="text-[8px] bg-emerald-400/20 text-emerald-300 px-1 py-0.2 rounded font-bold uppercase">
+                <span className="text-[8px] bg-[#4E9F6E]/20 text-[#4E9F6E] px-1 py-0.2 rounded font-bold uppercase">
                   WALLED
                 </span>
               </div>
             </div>
-            {subtitle && <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-[#A39E98] mt-0.5 line-clamp-1">{subtitle}</p>}
           </div>
         </div>
 
@@ -96,10 +96,10 @@ export const Header: React.FC<HeaderProps> = ({
               setIsSimulatorOpen(true);
               setSimResponse(null);
             }}
-            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-medium transition-all shadow-sm shadow-emerald-500/20 hover:shadow-md hover:shadow-emerald-500/30 btn-shadow"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] border border-[#2A2520] hover:border-[#BFA785]/40 text-[#A39E98] hover:text-[#BFA785] text-xs font-semibold transition-all shadow-sm shadow-black/40 hover:shadow-md btn-shadow"
             title="Test what members see on WhatsApp when they text STREAK"
           >
-            <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <MessageCircle className="w-3.5 h-3.5 text-[#4E9F6E]" />
             <span>Test Member WhatsApp</span>
           </button>
 
@@ -107,9 +107,9 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenCheckInModal && (
             <button
               onClick={onOpenCheckInModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/10 text-xs font-semibold text-white transition-all shadow-sm shadow-black/40 hover:shadow-md hover:border-brand-500/40 btn-shadow"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-[#1C1814] hover:bg-[#26221E] border border-[#2A2520] hover:border-[#BFA785]/40 text-xs font-semibold text-[#F7F5F2] transition-all shadow-sm shadow-black/40 hover:shadow-md btn-shadow"
             >
-              <UserCheck className="w-4 h-4 text-emerald-400" />
+              <UserCheck className="w-4 h-4 text-[#4E9F6E]" />
               <span>Check-In</span>
             </button>
           )}
@@ -118,23 +118,23 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenAddMemberModal && (
             <button
               onClick={onOpenAddMemberModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white transition-all shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-[#BFA785] hover:bg-[#B29976] text-xs font-bold text-[#111111] transition-all shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">Add Member</span>
             </button>
           )}
 
-          <div className="h-6 w-[1px] bg-white/10 hidden sm:block" />
+          <div className="h-6 w-[1px] bg-[#26221E] hidden sm:block" />
 
           {/* Staff User Avatar */}
           <div className="flex items-center gap-2 pl-1">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center font-bold text-xs text-slate-900 shadow-md shadow-amber-500/20">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#8B7454] to-[#BFA785] flex items-center justify-center font-bold text-xs text-[#111111] shadow-sm shadow-[#BFA785]/20">
               BC
             </div>
             <div className="hidden xl:block text-left">
-              <div className="text-xs font-semibold text-white">Bilal Chaudhry</div>
-              <div className="text-[10px] text-amber-400 font-mono">OWNER</div>
+              <div className="text-xs font-semibold text-[#F7F5F2]">Bilal Chaudhry</div>
+              <div className="text-[10px] text-[#BFA785] font-mono font-bold">OWNER</div>
             </div>
           </div>
         </div>
@@ -142,52 +142,52 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* WhatsApp Inbound Keyword Simulator Modal */}
       {isSimulatorOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-card max-w-sm w-full rounded-2xl p-5 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#161310] max-w-sm w-full rounded-2xl p-6 border border-[#2A2520] shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => setIsSimulatorOpen(false)}
-              className="absolute right-4 top-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shadow-sm"
+              className="absolute right-4 top-4 p-1.5 rounded-lg text-[#A39E98] hover:text-white hover:bg-[#26221E] shadow-sm btn-shadow"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-sm shadow-emerald-500/20">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-9 h-9 rounded-xl bg-[#4E9F6E]/15 text-[#4E9F6E] flex items-center justify-center border border-[#4E9F6E]/30 shadow-sm shadow-[#4E9F6E]/20">
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">WhatsApp Member Experience</h3>
-                <p className="text-[11px] text-slate-400">Zero-app friction: Text STREAK</p>
+                <h3 className="text-sm font-bold text-[#F7F5F2]">WhatsApp Member Experience</h3>
+                <p className="text-[11px] text-[#A39E98]">Zero-app friction: Text STREAK</p>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1.5">
                   Member Phone (Hamza Sheikh):
                 </label>
                 <input
                   type="text"
                   value={simPhone}
                   onChange={(e) => setSimPhone(e.target.value)}
-                  className="w-full bg-[#10141f] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-mono shadow-inner"
+                  className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] font-mono shadow-inner outline-none transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1.5">
                   Message Keyword:
                 </label>
-                <div className="flex gap-1.5">
+                <div className="flex gap-2">
                   {['STREAK', 'STATUS', 'HELP'].map((kw) => (
                     <button
                       key={kw}
                       type="button"
                       onClick={() => setSimText(kw)}
-                      className={`px-2.5 py-1 rounded text-[11px] font-mono font-semibold transition-all shadow-sm ${
+                      className={`px-3 py-1.5 rounded-lg text-[11px] font-mono font-semibold transition-all shadow-sm btn-shadow ${
                         simText === kw
-                          ? 'bg-emerald-500 text-white shadow-emerald-500/30'
-                          : 'bg-surface-100 text-slate-300 hover:bg-surface-50 shadow-black/20'
+                          ? 'bg-[#4E9F6E] text-white shadow-[#4E9F6E]/30 font-bold'
+                          : 'bg-[#1C1814] text-[#A39E98] hover:text-[#F7F5F2] hover:bg-[#26221E] border border-[#2A2520]'
                       }`}
                     >
                       {kw}
@@ -199,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={handleSimulate}
                 disabled={simLoading}
-                className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-semibold text-xs tracking-wide shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40 btn-shadow-primary transition-all flex items-center justify-center gap-1.5 mt-2"
+                className="w-full py-2.5 rounded-xl bg-[#4E9F6E] hover:bg-[#41885C] disabled:opacity-50 text-white font-bold text-xs tracking-wide shadow-md shadow-[#4E9F6E]/30 hover:shadow-lg hover:shadow-[#4E9F6E]/40 btn-shadow transition-all flex items-center justify-center gap-1.5 mt-2"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{simLoading ? 'Sending...' : `Send "${simText}" via WhatsApp`}</span>
@@ -207,7 +207,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               {/* WhatsApp Chat Bubble Display */}
               {simResponse && (
-                <div className="mt-4 p-3.5 rounded-xl bg-[#0b241b] border border-emerald-500/30 text-xs text-emerald-100 font-sans shadow-inner whitespace-pre-line leading-relaxed">
+                <div className="mt-4 p-4 rounded-xl bg-[#14241B] border border-[#4E9F6E]/30 text-xs text-[#EAF5EF] font-sans shadow-inner whitespace-pre-line leading-relaxed">
                   {simResponse}
                 </div>
               )}

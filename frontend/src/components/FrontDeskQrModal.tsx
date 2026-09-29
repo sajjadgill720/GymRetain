@@ -37,21 +37,21 @@ export const FrontDeskQrModal: React.FC<FrontDeskQrModalProps> = ({ isOpen, onCl
 
   return (
     <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="glass-card max-w-lg w-full rounded-3xl p-8 border border-white/10 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-[#161310] max-w-lg w-full rounded-2xl p-6 sm:p-8 border border-[#2A2520] shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shadow-sm"
+          className="absolute right-5 top-5 p-1.5 rounded-lg text-[#A39E98] hover:text-white hover:bg-[#26221E] shadow-sm btn-shadow"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold mb-2 shadow-sm shadow-brand-500/10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BFA785]/15 border border-[#BFA785]/30 text-[#BFA785] text-xs font-semibold mb-2 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Front-Desk Attendance Placard</span>
           </div>
-          <h2 className="text-xl font-black text-white tracking-tight">{currentGym.name}</h2>
-          <p className="text-xs text-slate-400">{currentGym.city}</p>
+          <h2 className="text-xl font-black text-[#F7F5F2] tracking-tight">{currentGym.name}</h2>
+          <p className="text-xs text-[#A39E98]">{currentGym.city}</p>
         </div>
 
         {/* Printable Placard Container */}
@@ -81,26 +81,26 @@ export const FrontDeskQrModal: React.FC<FrontDeskQrModalProps> = ({ isOpen, onCl
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-between pt-6">
+        <div className="flex items-center justify-between pt-6 border-t border-[#26221E] mt-6">
           <button
             onClick={handleRotate}
-            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-amber-400 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 text-xs text-[#A39E98] hover:text-[#BFA785] transition-colors"
           >
             <RotateCw className={`w-3.5 h-3.5 ${rotated ? 'animate-spin' : ''}`} />
             <span>{rotated ? 'Secret Key Rotated!' : 'Rotate QR Secret'}</span>
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-surface-100 hover:bg-surface-50 border border-white/10 text-xs font-semibold text-white transition-all shadow-sm shadow-black/40 hover:shadow-md btn-shadow"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] border border-[#2A2520] hover:border-[#BFA785]/40 text-xs font-semibold text-[#F7F5F2] transition-all shadow-sm btn-shadow"
             >
-              <Printer className="w-4 h-4 text-slate-300" />
+              <Printer className="w-4 h-4 text-[#A39E98]" />
               <span>Print Placard</span>
             </button>
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white shadow-md shadow-brand-500/30 hover:shadow-lg hover:shadow-brand-500/40 btn-shadow-primary transition-all"
+              className="px-5 py-2.5 rounded-xl bg-[#BFA785] hover:bg-[#B29976] text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all"
             >
               Close
             </button>

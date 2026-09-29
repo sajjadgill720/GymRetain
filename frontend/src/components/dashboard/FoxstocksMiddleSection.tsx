@@ -58,14 +58,14 @@ export const FoxstocksMiddleSection: React.FC = () => {
         </div>
 
         {/* Workout Sessions / Check-In Action Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-[#18181B] dark:bg-[#121622] text-white border border-zinc-800 dark:border-surface-border shadow-md flex items-center justify-between">
+        <div className="p-4 sm:p-5 rounded-2xl bg-surface text-content-primary border border-surface-border shadow-md flex items-center justify-between">
           <div>
-            <div className="text-[11px] text-zinc-400 font-medium">Monthly Workouts</div>
-            <div className="text-xl font-extrabold text-white mt-0.5">2,840 Visits</div>
+            <div className="text-[11px] text-content-tertiary font-medium">Monthly Workouts</div>
+            <div className="text-xl font-extrabold text-content-primary mt-0.5">2,840 Visits</div>
           </div>
           <Link
             href="/check-in"
-            className="w-9 h-9 rounded-xl bg-purple-600 dark:bg-cyan-500 hover:bg-purple-500 text-white dark:text-black flex items-center justify-center transition-all btn-shadow"
+            className="w-9 h-9 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black flex items-center justify-center transition-all btn-shadow"
             title="Open Kiosk Check-In"
           >
             <ArrowRight className="w-4 h-4" />

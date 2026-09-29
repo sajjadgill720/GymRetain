@@ -37,39 +37,39 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
   const avgDaily = (totalCheckIns / displayData.length).toFixed(1);
 
   return (
-    <div className="bg-[#121215] border border-zinc-800 rounded-lg p-4 sm:p-5 shadow-sm relative overflow-hidden">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 gap-3 border-b border-zinc-800/80">
+    <div className="bg-surface border border-surface-border rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 gap-3 border-b border-surface-border">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold text-zinc-100 tracking-tight">
+            <h2 className="text-sm font-semibold text-content-primary tracking-tight">
               Attendance Trends
             </h2>
-            <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
               <TrendingUp className="w-3 h-3" /> +14.2% MoM
             </span>
           </div>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <p className="text-xs text-content-secondary mt-0.5">
             Daily check-in volume to anticipate churn dips before memberships expire.
           </p>
         </div>
 
-        <div className="flex items-center gap-1 bg-zinc-900/80 p-0.5 rounded-md border border-zinc-800">
+        <div className="flex items-center gap-1 bg-surface-subtle p-1 rounded-xl border border-surface-border">
           <button
             onClick={() => setRange(14)}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-all btn-shadow ${
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all btn-shadow ${
               range === 14
-                ? 'bg-zinc-800 text-white shadow-sm font-semibold border border-zinc-700/60'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-surface text-content-primary shadow-xs font-semibold'
+                : 'text-content-secondary hover:text-content-primary'
             }`}
           >
             14D
           </button>
           <button
             onClick={() => setRange(30)}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-all btn-shadow ${
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all btn-shadow ${
               range === 30
-                ? 'bg-zinc-800 text-white shadow-sm font-semibold border border-zinc-700/60'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-surface text-content-primary shadow-xs font-semibold'
+                : 'text-content-secondary hover:text-content-primary'
             }`}
           >
             30D
@@ -79,17 +79,17 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
 
       {/* Quick stats ribbon */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 my-4">
-        <div className="p-3 rounded-md bg-zinc-900/60 border border-zinc-800">
-          <div className="text-[11px] text-zinc-400 font-medium uppercase tracking-wider">Total Check-Ins</div>
-          <div className="text-xl font-bold font-mono text-zinc-100 mt-1">{totalCheckIns}</div>
+        <div className="p-3.5 rounded-xl bg-surface-subtle border border-surface-border">
+          <div className="text-[11px] text-content-tertiary font-medium uppercase tracking-wider">Total Check-Ins</div>
+          <div className="text-xl font-bold font-mono text-content-primary mt-1">{totalCheckIns}</div>
         </div>
-        <div className="p-3 rounded-md bg-zinc-900/60 border border-zinc-800">
-          <div className="text-[11px] text-zinc-400 font-medium uppercase tracking-wider">Daily Average Visits</div>
-          <div className="text-xl font-bold font-mono text-emerald-400 mt-1">{avgDaily} <span className="text-xs font-normal text-zinc-500">/ day</span></div>
+        <div className="p-3.5 rounded-xl bg-surface-subtle border border-surface-border">
+          <div className="text-[11px] text-content-tertiary font-medium uppercase tracking-wider">Daily Average Visits</div>
+          <div className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-1">{avgDaily} <span className="text-xs font-normal text-content-secondary">/ day</span></div>
         </div>
-        <div className="hidden sm:block p-3 rounded-md bg-zinc-900/60 border border-zinc-800">
-          <div className="text-[11px] text-zinc-400 font-medium uppercase tracking-wider">Peak Day Volume</div>
-          <div className="text-xl font-bold font-mono text-blue-400 mt-1">{maxVal} <span className="text-xs font-normal text-zinc-500">visits</span></div>
+        <div className="hidden sm:block p-3.5 rounded-xl bg-surface-subtle border border-surface-border">
+          <div className="text-[11px] text-content-tertiary font-medium uppercase tracking-wider">Peak Day Volume</div>
+          <div className="text-xl font-bold font-mono text-purple-600 dark:text-neon-cyan mt-1">{maxVal} <span className="text-xs font-normal text-content-secondary">visits</span></div>
         </div>
       </div>
 
@@ -102,9 +102,9 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
           >
             <defs>
               <linearGradient id="attendanceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.20" />
-                <stop offset="70%" stopColor="#3B82F6" stopOpacity="0.02" />
-                <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+                <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.25" />
+                <stop offset="70%" stopColor="#7C3AED" stopOpacity="0.03" />
+                <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
               </linearGradient>
             </defs>
 
@@ -118,7 +118,8 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                   y1={y}
                   x2={chartWidth - paddingX}
                   y2={y}
-                  stroke="rgba(255, 255, 255, 0.06)"
+                  stroke="currentColor"
+                  className="text-surface-border"
                   strokeDasharray="4 4"
                 />
               );
@@ -130,8 +131,8 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
             {/* Line Path */}
             <polyline
               fill="none"
-              stroke="#3B82F6"
-              strokeWidth="2"
+              stroke="#7C3AED"
+              strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
               points={points}
@@ -149,8 +150,8 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                     cx={cx}
                     cy={cy}
                     r={isHovered ? 5 : 3}
-                    fill={isHovered ? '#3B82F6' : '#121215'}
-                    stroke="#3B82F6"
+                    fill={isHovered ? '#7C3AED' : '#FFFFFF'}
+                    stroke="#7C3AED"
                     strokeWidth={isHovered ? 2.5 : 1.5}
                     className="transition-all duration-150 cursor-pointer"
                     onMouseEnter={() => setHoveredIndex(i)}
@@ -164,7 +165,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                       y1={paddingY}
                       x2={cx}
                       y2={chartHeight - paddingY}
-                      stroke="rgba(59, 130, 246, 0.4)"
+                      stroke="rgba(124, 58, 237, 0.4)"
                       strokeWidth="1"
                       strokeDasharray="2 2"
                     />
@@ -177,23 +178,23 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
           {/* Active Hover Tooltip */}
           {hoveredIndex !== null && (
             <div
-              className="absolute pointer-events-none transform -translate-x-1/2 bg-[#18181B] border border-zinc-700 px-3 py-1.5 rounded-md shadow-xl z-20 text-center"
+              className="absolute pointer-events-none transform -translate-x-1/2 bg-surface border border-surface-border px-3.5 py-2 rounded-xl shadow-xl z-20 text-center"
               style={{
                 left: `${(getX(hoveredIndex) / chartWidth) * 100}%`,
                 top: `${(getY(displayData[hoveredIndex].checkIns) / chartHeight) * 100 - 15}%`,
               }}
             >
-              <div className="text-[10px] text-zinc-400 font-mono">
+              <div className="text-[10px] text-content-tertiary font-mono">
                 {displayData[hoveredIndex].date}
               </div>
-              <div className="text-xs font-semibold font-mono text-zinc-100">
+              <div className="text-xs font-semibold font-mono text-content-primary">
                 {displayData[hoveredIndex].checkIns} Check-Ins
               </div>
             </div>
           )}
 
           {/* X Axis Labels */}
-          <div className="flex justify-between text-[11px] text-slate-500 px-5 pt-2 font-mono">
+          <div className="flex justify-between text-[11px] text-content-tertiary px-5 pt-2 font-mono">
             <span>{displayData[0]?.date}</span>
             <span>{displayData[Math.floor(displayData.length / 2)]?.date}</span>
             <span>{displayData[displayData.length - 1]?.date} (Today)</span>

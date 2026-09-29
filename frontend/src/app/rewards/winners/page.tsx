@@ -318,19 +318,19 @@ export default function StreakWinnersPage() {
         )}
 
         {/* 2. Top Header & Quick Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-zinc-800/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-surface-border">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-100 flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-amber-400" />
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-amber-500" />
                 Streak Reward Winners
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                 {pendingCount} Pending Redemption
               </span>
             </div>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-xs text-content-tertiary mt-1">
               Members who unlocked milestone achievements. Verify streak qualifications and fulfill rewards at the front desk.
             </p>
           </div>
@@ -338,9 +338,9 @@ export default function StreakWinnersPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/rewards"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#121215] hover:bg-[#18181B] border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-colors btn-shadow"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-content-primary transition-colors btn-shadow"
             >
-              <Award className="w-3.5 h-3.5 text-zinc-400" />
+              <Award className="w-3.5 h-3.5 text-content-tertiary" />
               <span>Configure Rules</span>
             </Link>
           </div>
@@ -350,85 +350,85 @@ export default function StreakWinnersPage() {
         <section aria-label="Streak Winner Key Performance Metrics">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
             {/* Stat 1: Total Unlocked Rewards */}
-            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 sm:p-4 shadow-sm hover:border-zinc-700/80 transition-colors">
-              <div className="flex items-center justify-between text-xs text-zinc-400">
-                <span className="font-medium">Total Rewards Won</span>
+            <div className="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm hover:border-purple-500/40 dark:hover:border-cyan-400/40 transition-colors">
+              <div className="flex items-center justify-between text-xs text-content-tertiary">
+                <span className="font-semibold">Total Rewards Won</span>
                 <Trophy className="w-4 h-4 text-amber-500" />
               </div>
               <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100 font-mono">
+                <span className="text-2xl sm:text-3xl font-bold tracking-tight text-content-primary font-mono">
                   {totalWinners}
                 </span>
-                <span className="text-xs text-zinc-400 font-normal">milestones</span>
+                <span className="text-xs text-content-tertiary font-normal">milestones</span>
               </div>
-              <p className="text-[11px] text-zinc-500 mt-1">Streaks successfully hit</p>
+              <p className="text-[11px] text-content-tertiary mt-1">Streaks successfully hit</p>
             </div>
 
             {/* Stat 2: Pending Front-Desk Claim */}
-            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 sm:p-4 shadow-sm hover:border-zinc-700/80 transition-colors">
-              <div className="flex items-center justify-between text-xs text-zinc-400">
-                <span className="font-medium">Pending Claim</span>
-                <Clock className="w-4 h-4 text-amber-400" />
+            <div className="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm hover:border-purple-500/40 dark:hover:border-cyan-400/40 transition-colors">
+              <div className="flex items-center justify-between text-xs text-content-tertiary">
+                <span className="font-semibold">Pending Claim</span>
+                <Clock className="w-4 h-4 text-amber-500" />
               </div>
               <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-amber-400 font-mono">
+                <span className="text-2xl sm:text-3xl font-bold tracking-tight text-amber-600 dark:text-amber-400 font-mono">
                   {pendingCount}
                 </span>
-                <span className="text-xs text-amber-400/90 font-medium">ready</span>
+                <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">ready</span>
               </div>
-              <p className="text-[11px] text-zinc-500 mt-1">Awaiting reception pickup</p>
+              <p className="text-[11px] text-content-tertiary mt-1">Awaiting reception pickup</p>
             </div>
 
             {/* Stat 3: Claimed / Fulfilled */}
-            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 sm:p-4 shadow-sm hover:border-zinc-700/80 transition-colors">
-              <div className="flex items-center justify-between text-xs text-zinc-400">
-                <span className="font-medium">Fulfilled</span>
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <div className="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm hover:border-purple-500/40 dark:hover:border-cyan-400/40 transition-colors">
+              <div className="flex items-center justify-between text-xs text-content-tertiary">
+                <span className="font-semibold">Fulfilled</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               </div>
               <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-emerald-400 font-mono">
+                <span className="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400 font-mono">
                   {redeemedCount}
                 </span>
-                <span className="text-xs text-emerald-400/90 font-medium">claimed</span>
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">claimed</span>
               </div>
-              <p className="text-[11px] text-zinc-500 mt-1">Given to members</p>
+              <p className="text-[11px] text-content-tertiary mt-1">Given to members</p>
             </div>
 
             {/* Stat 4: Top Active Streak Winner */}
-            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 sm:p-4 shadow-sm hover:border-zinc-700/80 transition-colors">
-              <div className="flex items-center justify-between text-xs text-zinc-400">
-                <span className="font-medium">Top Streak Member</span>
+            <div className="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm hover:border-purple-500/40 dark:hover:border-cyan-400/40 transition-colors">
+              <div className="flex items-center justify-between text-xs text-content-tertiary">
+                <span className="font-semibold">Top Streak Member</span>
                 <Flame className="w-4 h-4 text-orange-500" />
               </div>
               <div className="mt-2 flex items-baseline gap-2 truncate">
-                <span className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-100 truncate">
+                <span className="text-lg sm:text-xl font-bold tracking-tight text-content-primary truncate">
                   {topStreakWinner?.member?.firstName || 'Hamza'} {topStreakWinner?.member?.lastName?.charAt(0) || 'S'}.
                 </span>
-                <span className="text-xs text-orange-400 font-mono shrink-0">
+                <span className="text-xs text-orange-500 font-mono shrink-0">
                   {topStreakWinner?.member?.streak?.currentStreak || 12}d
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-500 mt-1">Active gym record</p>
+              <p className="text-[11px] text-content-tertiary mt-1">Active gym record</p>
             </div>
           </div>
         </section>
 
         {/* 4. Controls Bar: Search & Status Filters */}
-        <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3 sm:p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="bg-surface border border-surface-border rounded-2xl p-3 sm:p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-tertiary" />
             <input
               type="text"
               placeholder="Search by member name, code (GR-1001), phone, or reward..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#18181B] border border-zinc-700/80 rounded-md pl-9 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
+              className="w-full bg-surface-subtle border border-surface-border rounded-xl pl-9 pr-3 py-2 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400 transition-colors"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-content-tertiary hover:text-content-primary"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -436,33 +436,33 @@ export default function StreakWinnersPage() {
           </div>
 
           {/* Status Tabs */}
-          <div className="flex items-center gap-1 bg-[#18181B] p-0.5 rounded-md border border-zinc-800 shrink-0">
+          <div className="flex items-center gap-1 bg-surface-subtle p-1 rounded-xl border border-surface-border shrink-0">
             <button
               onClick={() => setStatusFilter('ALL')}
-              className={`px-3 py-1 rounded text-xs font-medium transition-all btn-shadow ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all btn-shadow ${
                 statusFilter === 'ALL'
-                  ? 'bg-zinc-800 text-zinc-100 border border-zinc-700/60 shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-surface text-content-primary shadow-sm'
+                  : 'text-content-tertiary hover:text-content-primary'
               }`}
             >
               All Winners ({winners.length})
             </button>
             <button
               onClick={() => setStatusFilter('UNLOCKED')}
-              className={`px-3 py-1 rounded text-xs font-medium transition-all btn-shadow ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all btn-shadow ${
                 statusFilter === 'UNLOCKED'
-                  ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm'
-                  : 'text-zinc-400 hover:text-amber-400'
+                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400 shadow-sm'
+                  : 'text-content-tertiary hover:text-amber-500'
               }`}
             >
               Ready to Claim ({pendingCount})
             </button>
             <button
               onClick={() => setStatusFilter('REDEEMED')}
-              className={`px-3 py-1 rounded text-xs font-medium transition-all btn-shadow ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all btn-shadow ${
                 statusFilter === 'REDEEMED'
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
-                  : 'text-zinc-400 hover:text-emerald-400'
+                  ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 shadow-sm'
+                  : 'text-content-tertiary hover:text-emerald-500'
               }`}
             >
               Claimed ({redeemedCount})
@@ -471,11 +471,11 @@ export default function StreakWinnersPage() {
         </div>
 
         {/* 5. Winners Data Table (Desktop) & Card List (Mobile) */}
-        <div className="bg-[#121215] border border-zinc-800 rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-surface border border-surface-border rounded-2xl shadow-sm overflow-hidden">
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-left text-xs text-zinc-300">
-              <thead className="bg-[#18181B]/70 border-b border-zinc-800 text-[11px] uppercase tracking-wider text-zinc-400 font-semibold select-none">
+            <table className="w-full text-left text-xs text-content-secondary">
+              <thead className="bg-surface-subtle border-b border-surface-border text-[11px] uppercase tracking-wider text-content-tertiary font-semibold select-none">
                 <tr>
                   <th className="py-3 px-4">Member</th>
                   <th className="py-3 px-4">Streak Milestone</th>
@@ -485,7 +485,7 @@ export default function StreakWinnersPage() {
                   <th className="py-3 px-4 text-right">Fulfillment</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60">
+              <tbody className="divide-y divide-surface-border">
                 {filteredWinners.map((winner) => {
                   const isPending = winner.status === 'UNLOCKED';
                   const streakCount = winner.member?.streak?.currentStreak ?? winner.reward?.triggerThreshold ?? 10;
@@ -493,20 +493,20 @@ export default function StreakWinnersPage() {
                   return (
                     <tr
                       key={winner.id}
-                      className="hover:bg-zinc-800/30 transition-colors"
+                      className="hover:bg-surface-subtle/50 transition-colors"
                     >
                       {/* Member Info */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-semibold text-zinc-200 shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-surface-subtle border border-surface-border flex items-center justify-center text-xs font-semibold text-content-primary shrink-0">
                             {winner.member?.firstName?.[0] || 'M'}
                             {winner.member?.lastName?.[0] || ''}
                           </div>
                           <div>
-                            <div className="font-medium text-zinc-100">
+                            <div className="font-semibold text-content-primary">
                               {winner.member?.firstName} {winner.member?.lastName}
                             </div>
-                            <div className="text-[11px] text-zinc-500 font-mono">
+                            <div className="text-[11px] text-content-tertiary font-mono">
                               {winner.member?.memberCode} • {winner.member?.phone}
                             </div>
                           </div>
@@ -516,11 +516,11 @@ export default function StreakWinnersPage() {
                       {/* Milestone */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-mono font-medium text-xs border border-amber-500/20">
-                            <Flame className="w-3.5 h-3.5 text-amber-400" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 font-mono font-medium text-xs border border-amber-500/20">
+                            <Flame className="w-3.5 h-3.5 text-amber-500" />
                             {winner.reward?.triggerThreshold} Days
                           </span>
-                          <span className="text-[11px] text-zinc-500">
+                          <span className="text-[11px] text-content-tertiary">
                             (Current: {streakCount}d)
                           </span>
                         </div>
@@ -529,20 +529,20 @@ export default function StreakWinnersPage() {
                       {/* Reward Won */}
                       <td className="py-3.5 px-4">
                         <div>
-                          <div className="font-medium text-zinc-200 flex items-center gap-1.5">
+                          <div className="font-semibold text-content-primary flex items-center gap-1.5">
                             {winner.reward?.rewardType === 'FREE_ITEM' && (
-                              <Gift className="w-3.5 h-3.5 text-purple-400" />
+                              <Gift className="w-3.5 h-3.5 text-purple-500" />
                             )}
                             {winner.reward?.rewardType === 'DISCOUNT_PERCENT' && (
-                              <Tag className="w-3.5 h-3.5 text-blue-400" />
+                              <Tag className="w-3.5 h-3.5 text-blue-500" />
                             )}
                             {winner.reward?.rewardType === 'BADGE' && (
-                              <Award className="w-3.5 h-3.5 text-amber-400" />
+                              <Award className="w-3.5 h-3.5 text-amber-500" />
                             )}
                             <span>{winner.reward?.title}</span>
                           </div>
                           {winner.reward?.description && (
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5">
+                            <p className="text-[11px] text-content-tertiary line-clamp-1 mt-0.5">
                               {winner.reward.description}
                             </p>
                           )}
@@ -550,7 +550,7 @@ export default function StreakWinnersPage() {
                       </td>
 
                       {/* Unlocked Date */}
-                      <td className="py-3.5 px-4 font-mono text-[11px] text-zinc-400">
+                      <td className="py-3.5 px-4 font-mono text-[11px] text-content-tertiary">
                         {new Date(winner.unlockedAt).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
@@ -561,12 +561,12 @@ export default function StreakWinnersPage() {
                       {/* Status */}
                       <td className="py-3.5 px-4">
                         {isPending ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/25 text-[11px] font-medium">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 text-[11px] font-medium">
                             <Clock className="w-3 h-3" />
                             Ready to Claim
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-[11px] font-medium">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 text-[11px] font-medium">
                             <CheckCircle2 className="w-3 h-3" />
                             Claimed
                           </span>
@@ -581,13 +581,13 @@ export default function StreakWinnersPage() {
                               setActiveFulfillTarget(winner);
                               setFulfillNotes('');
                             }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-xs transition-all shadow-sm btn-shadow-primary"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs transition-all shadow-sm btn-shadow"
                           >
                             <Check className="w-3.5 h-3.5" />
                             <span>Fulfill Reward</span>
                           </button>
                         ) : (
-                          <span className="text-[11px] text-zinc-500 font-mono">
+                          <span className="text-[11px] text-content-tertiary font-mono">
                             {winner.redeemedAt
                               ? `Fulfilled ${new Date(winner.redeemedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
                               : 'Fulfilled'}
@@ -602,46 +602,46 @@ export default function StreakWinnersPage() {
           </div>
 
           {/* Mobile Card List */}
-          <div className="block md:hidden divide-y divide-zinc-800/80">
+          <div className="block md:hidden divide-y divide-surface-border">
             {filteredWinners.map((winner) => {
               const isPending = winner.status === 'UNLOCKED';
               return (
                 <div key={winner.id} className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-semibold text-zinc-200">
+                      <div className="w-8 h-8 rounded-full bg-surface-subtle border border-surface-border flex items-center justify-center text-xs font-semibold text-content-primary">
                         {winner.member?.firstName?.[0]}
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-zinc-100">
+                        <div className="text-sm font-semibold text-content-primary">
                           {winner.member?.firstName} {winner.member?.lastName}
                         </div>
-                        <div className="text-[11px] text-zinc-500 font-mono">
+                        <div className="text-[11px] text-content-tertiary font-mono">
                           {winner.member?.memberCode}
                         </div>
                       </div>
                     </div>
                     {isPending ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/25 text-[10px] font-medium">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 text-[10px] font-medium">
                         Ready to Claim
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-[10px] font-medium">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 text-[10px] font-medium">
                         Claimed
                       </span>
                     )}
                   </div>
 
-                  <div className="p-2.5 rounded-md bg-[#18181B] border border-zinc-800 flex items-center justify-between">
+                  <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border flex items-center justify-between">
                     <div>
-                      <div className="text-xs font-medium text-zinc-200">
+                      <div className="text-xs font-semibold text-content-primary">
                         {winner.reward?.title}
                       </div>
-                      <div className="text-[10px] text-zinc-500 mt-0.5">
+                      <div className="text-[10px] text-content-tertiary mt-0.5">
                         Unlocked for {winner.reward?.triggerThreshold}-day streak
                       </div>
                     </div>
-                    <Flame className="w-4 h-4 text-amber-400" />
+                    <Flame className="w-4 h-4 text-amber-500" />
                   </div>
 
                   {isPending && (
@@ -650,7 +650,7 @@ export default function StreakWinnersPage() {
                         setActiveFulfillTarget(winner);
                         setFulfillNotes('');
                       }}
-                      className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-md bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-xs shadow-sm btn-shadow-primary transition-all"
+                      className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow transition-all"
                     >
                       <Check className="w-3.5 h-3.5" />
                       <span>Fulfill Member Reward</span>
@@ -664,9 +664,9 @@ export default function StreakWinnersPage() {
           {/* Empty State */}
           {filteredWinners.length === 0 && (
             <div className="py-12 text-center">
-              <Trophy className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-              <p className="text-sm font-medium text-zinc-300">No streak winners found</p>
-              <p className="text-xs text-zinc-500 mt-1">
+              <Trophy className="w-8 h-8 text-content-tertiary mx-auto mb-2" />
+              <p className="text-sm font-semibold text-content-primary">No streak winners found</p>
+              <p className="text-xs text-content-tertiary mt-1">
                 {searchTerm
                   ? 'No members matching your search query.'
                   : 'Streak winners will automatically show up here when members hit milestone targets.'}
@@ -678,42 +678,42 @@ export default function StreakWinnersPage() {
 
       {/* 6. Front-Desk Reward Fulfillment Modal */}
       {activeFulfillTarget && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#121215] max-w-md w-full rounded-lg p-5 sm:p-6 border border-zinc-800 shadow-2xl relative animate-in fade-in zoom-in-95 duration-100">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface max-w-md w-full rounded-3xl p-5 sm:p-6 border border-surface-border shadow-2xl relative animate-in fade-in zoom-in-95 duration-100">
             <button
               onClick={() => setActiveFulfillTarget(null)}
-              className="absolute right-4 top-4 p-1.5 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 shadow-sm btn-shadow"
+              className="absolute right-4 top-4 p-1.5 rounded-xl text-content-tertiary hover:text-content-primary hover:bg-surface-subtle shadow-sm btn-shadow"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-md bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
+              <div className="w-9 h-9 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
                 <Gift className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-zinc-100">Fulfill Streak Reward</h3>
-                <p className="text-xs text-zinc-400">Front-desk verification & handoff</p>
+                <h3 className="text-base font-bold text-content-primary">Fulfill Streak Reward</h3>
+                <p className="text-xs text-content-tertiary">Front-desk verification &amp; handoff</p>
               </div>
             </div>
 
             {/* Member & Reward Summary */}
-            <div className="p-3.5 rounded-md bg-[#18181B] border border-zinc-800 space-y-2 mb-4">
+            <div className="p-3.5 rounded-2xl bg-surface-subtle border border-surface-border space-y-2 mb-4">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Recipient:</span>
-                <span className="font-medium text-zinc-200">
+                <span className="text-content-tertiary">Recipient:</span>
+                <span className="font-semibold text-content-primary">
                   {activeFulfillTarget.member?.firstName} {activeFulfillTarget.member?.lastName} ({activeFulfillTarget.member?.memberCode})
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Streak Record:</span>
-                <span className="font-mono text-amber-400 font-medium">
+                <span className="text-content-tertiary">Streak Record:</span>
+                <span className="font-mono text-amber-600 dark:text-amber-400 font-semibold">
                   {activeFulfillTarget.reward?.triggerThreshold} Days Achieved
                 </span>
               </div>
-              <div className="flex items-center justify-between text-xs border-t border-zinc-800/80 pt-2">
-                <span className="text-zinc-500">Reward Item:</span>
-                <span className="font-medium text-zinc-100">
+              <div className="flex items-center justify-between text-xs border-t border-surface-border pt-2">
+                <span className="text-content-tertiary">Reward Item:</span>
+                <span className="font-semibold text-content-primary">
                   {activeFulfillTarget.reward?.title}
                 </span>
               </div>
@@ -721,7 +721,7 @@ export default function StreakWinnersPage() {
 
             {/* Staff Notes */}
             <div className="mb-4">
-              <label className="text-xs font-medium text-zinc-400 block mb-1.5">
+              <label className="text-xs font-medium text-content-secondary block mb-1.5">
                 Staff Notes (Optional)
               </label>
               <input
@@ -729,16 +729,16 @@ export default function StreakWinnersPage() {
                 placeholder="e.g. Handed chocolate whey shake at reception bar"
                 value={fulfillNotes}
                 onChange={(e) => setFulfillNotes(e.target.value)}
-                className="w-full bg-[#18181B] border border-zinc-700 rounded-md px-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
+                className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
               />
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-zinc-800">
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-surface-border">
               <button
                 type="button"
                 onClick={() => setActiveFulfillTarget(null)}
-                className="px-3 py-1.5 rounded-md text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors btn-shadow"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-content-tertiary hover:text-content-primary transition-colors btn-shadow"
               >
                 Cancel
               </button>
@@ -746,7 +746,7 @@ export default function StreakWinnersPage() {
                 type="button"
                 disabled={fulfilling}
                 onClick={handleConfirmFulfill}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-xs shadow-sm btn-shadow-primary disabled:opacity-50 transition-all"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow disabled:opacity-50 transition-all"
               >
                 {fulfilling ? (
                   <span>Fulfilling...</span>

@@ -20,7 +20,9 @@ import {
   Sparkles,
   Send,
   Dumbbell,
+  LogOut,
 } from 'lucide-react';
+import { useAuth, GymInfo } from '../lib/AuthProvider';
 import { api } from '../lib/api';
 
 interface SidebarProps {
@@ -30,29 +32,18 @@ interface SidebarProps {
   onCloseMobile?: () => void;
 }
 
-const DEMO_GYMS = [
-  {
-    id: '11111111-1111-1111-1111-111111111111',
-    name: 'Iron House Gym & Fitness',
-    slug: 'iron-house-lahore',
-    city: 'Lahore, Pakistan',
-    currency: 'PKR',
-  },
-  {
-    id: '22222222-2222-2222-2222-222222222222',
-    name: 'K-Town Crossfit & Performance',
-    slug: 'ktown-crossfit',
-    city: 'Karachi, Pakistan',
-    currency: 'PKR',
-  },
-  {
-    id: '33333333-3333-3333-3333-333333333333',
-    name: 'Margalla Heights Fitness Club',
-    slug: 'margalla-heights',
-    city: 'Islamabad, Pakistan',
-    currency: 'PKR',
-  },
-];
+/**
+ * DEMO_FALLBACK_GYM: Used ONLY when no auth context is available
+ * (e.g. user hasn't logged in, or backend is offline in demo mode).
+ * This is a single default gym, NOT a list of all gyms in the system.
+ */
+const DEMO_FALLBACK_GYM: GymInfo = {
+  id: '11111111-1111-1111-1111-111111111111',
+  name: 'Iron House Gym & Fitness',
+  slug: 'iron-house-lahore',
+  city: 'Lahore, Pakistan',
+  currency: 'PKR',
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({
   onOpenQrModal,
@@ -61,7 +52,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile,
 }) => {
   const pathname = usePathname();
-  const [selectedGym, setSelectedGym] = useState(DEMO_GYMS[0]);
+  const { user, gyms, activeGym, switchGym, logout } = useAuth();
+
+  // Resolved gym: from auth context, or demo fallback
+  const currentGym = activeGym || DEMO_FALLBACK_GYM;
+  const userGyms = gyms.length > 0 ? gyms : [DEMO_FALLBACK_GYM];
+  const hasMultipleGyms = userGyms.length > 1;
+
   const [showGymDropdown, setShowGymDropdown] = useState(false);
 
   // WhatsApp Simulator modal state
@@ -71,9 +68,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [simResponse, setSimResponse] = useState<string | null>(null);
   const [simLoading, setSimLoading] = useState(false);
 
-  const handleSelectGym = (gym: typeof DEMO_GYMS[0]) => {
-    setSelectedGym(gym);
-    api.setGym(gym);
+  const handleSelectGym = (gym: GymInfo) => {
+    switchGym(gym.id);
     setShowGymDropdown(false);
   };
 
@@ -83,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const res = await fetch('http://localhost:4000/api/v1/messaging/whatsapp/simulate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: simPhone, message: simText, gymId: selectedGym.id }),
+        body: JSON.stringify({ phone: simPhone, message: simText, gymId: currentGym.id }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -95,17 +91,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
       // Fallback demo simulation
       if (simText.toUpperCase().includes('STREAK')) {
         setSimResponse(
-          `🔥 *${selectedGym.name} Member Status*\nSalam Hamza! Here is your attendance summary:\n\n• *Current Streak:* 12 consecutive days 🔥\n• *Personal Best:* 12 days\n• *Active Plan:* Monthly Gold\n• *Next Reward:* 3 more days until the 15-Day Milestone (Free Whey Protein Shake)! 🎁\n\nDrop by today to keep your streak alive! 💪`,
+          `🔥 *${currentGym.name} Member Status*\nSalam Hamza! Here is your attendance summary:\n\n• *Current Streak:* 12 consecutive days 🔥\n• *Personal Best:* 12 days\n• *Active Plan:* Monthly Gold\n• *Next Reward:* 3 more days until the 15-Day Milestone (Free Whey Protein Shake)! 🎁\n\nDrop by today to keep your streak alive! 💪`,
         );
       } else {
         setSimResponse(
-          `Salam! Welcome to *${selectedGym.name}* on WhatsApp.\n\nReply with:\n• *STREAK* — View your active workout streak & badge progress\n• *STATUS* — Check membership expiration date\n• *HELP* — Speak with front-desk reception`,
+          `Salam! Welcome to *${currentGym.name}* on WhatsApp.\n\nReply with:\n• *STREAK* — View your active workout streak & badge progress\n• *STATUS* — Check membership expiration date\n• *HELP* — Speak with front-desk reception`,
         );
       }
     } finally {
       setSimLoading(false);
     }
   };
+
+  // Resolved user display
+  const userName = user?.name || 'Bilal C.';
+  const userRole = user?.role || 'OWNER';
+  const userInitials =
+    userName
+      .split(' ')
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || 'BC';
 
   const navSections = [
     {
@@ -161,7 +168,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#0C0C0E] border-r border-zinc-800 select-none">
-      {/* Brand Logo & Location Switcher */}
+      {/* Brand Logo & Location */}
       <div className="p-4 border-b border-zinc-800/80">
         <div className="flex items-center justify-between mb-3">
           <Link href="/" className="flex items-center gap-2.5 group">
@@ -186,38 +193,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
-        {/* Tenant Gym Location Dropdown */}
+        {/* Gym Location — show dropdown ONLY if user has multiple gyms */}
         <div className="relative">
-          <button
-            onClick={() => setShowGymDropdown(!showGymDropdown)}
-            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md bg-[#121215] hover:bg-[#18181B] border border-zinc-800 text-xs font-medium text-zinc-200 transition-colors btn-shadow text-left"
-          >
-            <div className="flex items-center gap-2 truncate">
-              <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-              <span className="truncate">{selectedGym.name}</span>
-            </div>
-            <ChevronDown className="w-3.5 h-3.5 text-zinc-500 shrink-0 ml-1" />
-          </button>
+          {hasMultipleGyms ? (
+            <>
+              <button
+                onClick={() => setShowGymDropdown(!showGymDropdown)}
+                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md bg-[#121215] hover:bg-[#18181B] border border-zinc-800 text-xs font-medium text-zinc-200 transition-colors btn-shadow text-left"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                  <span className="truncate">{currentGym.name}</span>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-500 shrink-0 ml-1" />
+              </button>
 
-          {showGymDropdown && (
-            <div className="absolute left-0 top-full mt-1.5 w-full bg-[#121215] border border-zinc-800 rounded-md shadow-xl py-1 z-50">
-              <div className="px-2.5 py-1 text-[10px] uppercase font-semibold text-zinc-500 border-b border-zinc-800/80">
-                Tenant Switcher
-              </div>
-              {DEMO_GYMS.map((gym) => (
-                <button
-                  key={gym.id}
-                  onClick={() => handleSelectGym(gym)}
-                  className={`w-full text-left px-2.5 py-2 text-xs transition-colors flex flex-col ${
-                    selectedGym.id === gym.id
-                      ? 'bg-zinc-800 text-white font-medium'
-                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
-                  }`}
-                >
-                  <span className="truncate">{gym.name}</span>
-                  <span className="text-[10px] text-zinc-500 font-mono">{gym.city.split(',')[0]}</span>
-                </button>
-              ))}
+              {showGymDropdown && (
+                <div className="absolute left-0 top-full mt-1.5 w-full bg-[#121215] border border-zinc-800 rounded-md shadow-xl py-1 z-50">
+                  <div className="px-2.5 py-1 text-[10px] uppercase font-semibold text-zinc-500 border-b border-zinc-800/80">
+                    Your Gyms
+                  </div>
+                  {userGyms.map((gym) => (
+                    <button
+                      key={gym.id}
+                      onClick={() => handleSelectGym(gym)}
+                      className={`w-full text-left px-2.5 py-2 text-xs transition-colors flex flex-col ${
+                        currentGym.id === gym.id
+                          ? 'bg-zinc-800 text-white font-medium'
+                          : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                      }`}
+                    >
+                      <span className="truncate">{gym.name}</span>
+                      {gym.city && (
+                        <span className="text-[10px] text-zinc-500 font-mono">
+                          {gym.city.split(',')[0]}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            /* Single-gym user: static display, no dropdown */
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#121215] border border-zinc-800 text-xs font-medium text-zinc-200">
+              <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+              <span className="truncate">{currentGym.name}</span>
             </div>
           )}
         </div>
@@ -306,11 +327,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex items-center justify-between p-2 rounded-md bg-[#121215] border border-zinc-800">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-medium text-xs text-zinc-300">
-              BC
+              {userInitials}
             </div>
             <div>
-              <div className="text-xs font-medium text-zinc-200 leading-none">Bilal C.</div>
-              <div className="text-[10px] text-zinc-500 font-mono mt-0.5">OWNER</div>
+              <div className="text-xs font-medium text-zinc-200 leading-none">{userName}</div>
+              <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{userRole}</div>
             </div>
           </div>
           <span className="text-[9px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.2 rounded font-mono font-medium border border-emerald-500/20">

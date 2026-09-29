@@ -166,6 +166,66 @@ export class AuthService {
     };
   }
 
+  /**
+   * Returns the authenticated user's profile and their gym details.
+   * Gym info is fetched from the database, scoped by the JWT's gymId claim.
+   */
+  async getMe(jwtUser: JwtPayload) {
+    const staff = await this.prisma.gymStaff.findUnique({
+      where: { id: jwtUser.sub },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        gymId: true,
+        gym: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            phone: true,
+            address: true,
+            currency: true,
+            timezone: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    if (!staff || !staff.isActive) {
+      throw new UnauthorizedException('Account is inactive or not found');
+    }
+
+    return {
+      user: {
+        id: staff.id,
+        email: staff.email,
+        name: staff.name,
+        phone: staff.phone,
+        role: staff.role,
+      },
+      // Returns an array for forward-compatibility if multi-gym is ever added.
+      // Currently always 0 or 1 gym.
+      gyms: staff.gym
+        ? [
+            {
+              id: staff.gym.id,
+              name: staff.gym.name,
+              slug: staff.gym.slug,
+              city: staff.gym.address || '',
+              currency: staff.gym.currency,
+              timezone: staff.gym.timezone,
+              status: staff.gym.status,
+            },
+          ]
+        : [],
+    };
+  }
+
   private generateToken(staff: { id: string; email: string; role: string; gymId: string | null; name: string }) {
     const payload: JwtPayload = {
       sub: staff.id,

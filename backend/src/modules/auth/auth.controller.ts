@@ -1,7 +1,9 @@
 import {
   Controller,
+  Get,
   Post,
   Body,
+  Req,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -31,6 +33,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Get('me')
+  @UseGuards(TenantAccessGuard)
+  async getMe(@Req() req: any) {
+    return this.authService.getMe(req.user);
   }
 
   @Post('invite-staff')

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { AuthProviderWrapper } from './AuthProviderWrapper';
 
 export const metadata: Metadata = {
   title: 'GymRetain — Gym Customer Retention, Streaks & Attendance SaaS',
@@ -23,7 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[#09090B] text-zinc-100 antialiased selection:bg-zinc-800 selection:text-white min-h-screen">
-        {children}
+        <AuthProviderWrapper>{children}</AuthProviderWrapper>
       </body>
     </html>
   );

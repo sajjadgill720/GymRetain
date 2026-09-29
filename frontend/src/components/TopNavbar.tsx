@@ -2,26 +2,18 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Users,
   Flame,
-  Award,
-  QrCode,
-  AlertTriangle,
-  UserCheck,
   Building2,
   ChevronDown,
-  ShieldCheck,
   MessageCircle,
   Menu,
   X,
   Send,
-  Sparkles,
-  Trophy,
+  QrCode,
+  UserCheck,
 } from 'lucide-react';
-import { api } from '../lib/api';
+import { useAuth, GymInfo } from '../lib/AuthProvider';
 
 interface TopNavbarProps {
   onOpenQrModal?: () => void;
@@ -29,37 +21,26 @@ interface TopNavbarProps {
   onToggleMobileMenu?: () => void;
 }
 
-const DEMO_GYMS = [
-  {
-    id: '11111111-1111-1111-1111-111111111111',
-    name: 'Iron House Gym & Fitness',
-    slug: 'iron-house-lahore',
-    city: 'Lahore, Pakistan',
-    currency: 'PKR',
-  },
-  {
-    id: '22222222-2222-2222-2222-222222222222',
-    name: 'K-Town Crossfit & Performance',
-    slug: 'ktown-crossfit',
-    city: 'Karachi, Pakistan',
-    currency: 'PKR',
-  },
-  {
-    id: '33333333-3333-3333-3333-333333333333',
-    name: 'Margalla Heights Fitness Club',
-    slug: 'margalla-heights',
-    city: 'Islamabad, Pakistan',
-    currency: 'PKR',
-  },
-];
+const DEMO_FALLBACK_GYM: GymInfo = {
+  id: '11111111-1111-1111-1111-111111111111',
+  name: 'Iron House Gym & Fitness',
+  slug: 'iron-house-lahore',
+  city: 'Lahore, Pakistan',
+  currency: 'PKR',
+};
 
 export const TopNavbar: React.FC<TopNavbarProps> = ({
   onOpenQrModal,
   onOpenCheckInModal,
   onToggleMobileMenu,
 }) => {
-  const pathname = usePathname();
-  const [selectedGym, setSelectedGym] = useState(DEMO_GYMS[0]);
+  const { user, gyms, activeGym, switchGym } = useAuth();
+
+  // Resolved gym: from auth context, or fallback
+  const currentGym = activeGym || DEMO_FALLBACK_GYM;
+  const userGyms = gyms.length > 0 ? gyms : [DEMO_FALLBACK_GYM];
+  const hasMultipleGyms = userGyms.length > 1;
+
   const [showGymDropdown, setShowGymDropdown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -70,9 +51,8 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   const [simResponse, setSimResponse] = useState<string | null>(null);
   const [simLoading, setSimLoading] = useState(false);
 
-  const handleSelectGym = (gym: typeof DEMO_GYMS[0]) => {
-    setSelectedGym(gym);
-    api.setGym(gym);
+  const handleSelectGym = (gym: GymInfo) => {
+    switchGym(gym.id);
     setShowGymDropdown(false);
   };
 
@@ -82,7 +62,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
       const res = await fetch('http://localhost:4000/api/v1/messaging/whatsapp/simulate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: simPhone, message: simText, gymId: selectedGym.id }),
+        body: JSON.stringify({ phone: simPhone, message: simText, gymId: currentGym.id }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -94,11 +74,11 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
       // Fallback demo simulation
       if (simText.toUpperCase().includes('STREAK')) {
         setSimResponse(
-          `🔥 *${selectedGym.name} Member Status*\nSalam Hamza! Here is your attendance summary:\n\n• *Current Streak:* 12 consecutive days 🔥\n• *Personal Best:* 12 days\n• *Active Plan:* Monthly Gold\n• *Next Reward:* 3 more days until the 15-Day Milestone (Free Whey Protein Shake)! 🎁\n\nDrop by today to keep your streak alive! 💪`,
+          `🔥 *${currentGym.name} Member Status*\nSalam Hamza! Here is your attendance summary:\n\n• *Current Streak:* 12 consecutive days 🔥\n• *Personal Best:* 12 days\n• *Active Plan:* Monthly Gold\n• *Next Reward:* 3 more days until the 15-Day Milestone (Free Whey Protein Shake)! 🎁\n\nDrop by today to keep your streak alive! 💪`,
         );
       } else {
         setSimResponse(
-          `Salam! Welcome to *${selectedGym.name}* on WhatsApp.\n\nReply with:\n• *STREAK* — View your active workout streak & badge progress\n• *STATUS* — Check membership expiration date\n• *HELP* — Speak with front-desk reception`,
+          `Salam! Welcome to *${currentGym.name}* on WhatsApp.\n\nReply with:\n• *STREAK* — View your active workout streak & badge progress\n• *STATUS* — Check membership expiration date\n• *HELP* — Speak with front-desk reception`,
         );
       }
     } finally {
@@ -106,52 +86,26 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
     }
   };
 
-  const navItems = [
-    {
-      name: 'Overview',
-      href: '/',
-      icon: LayoutDashboard,
-    },
-    {
-      name: 'At-Risk Members',
-      href: '/retention',
-      icon: AlertTriangle,
-      badge: '6 High',
-      badgeColor: 'bg-[#D9534F]/20 text-[#D9534F] border border-[#D9534F]/30',
-    },
-    {
-      name: 'Members Directory',
-      href: '/members',
-      icon: Users,
-    },
-    {
-      name: 'Check-In Kiosk',
-      href: '/check-in',
-      icon: UserCheck,
-    },
-    {
-      name: 'Reward Rules',
-      href: '/rewards',
-      icon: Award,
-    },
-    {
-      name: 'Streak Winners',
-      href: '/rewards/winners',
-      icon: Trophy,
-      badge: '6 Won',
-      badgeColor: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-    },
-  ];
+  // Resolved user display
+  const userName = user?.name || 'Bilal C.';
+  const userRole = user?.role || 'OWNER';
+  const userInitials =
+    userName
+      .split(' ')
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || 'BC';
 
   return (
     <>
       <header className="sticky top-0 z-40 w-full bg-[#09090B] border-b border-zinc-800 select-none">
         {/* Tier 1: Main Top Bar (Linear / Stripe Style) */}
         <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
-          {/* Left: Brand Logo + Tenant Gym Selector */}
+          {/* Left: Mobile Brand / Gym Location Badge */}
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 shrink-0 group">
+            {/* Logo — visible on mobile or fallback */}
+            <Link href="/" className="flex items-center gap-2 shrink-0 group lg:hidden">
               <div className="w-7 h-7 rounded-md bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white">
                 <Flame className="w-4 h-4 text-zinc-200" />
               </div>
@@ -163,50 +117,71 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
               </div>
             </Link>
 
-            <div className="h-4 w-[1px] bg-zinc-800 hidden md:block" />
-
-            {/* Current Gym Selector */}
+            {/* Gym Location Indicator (Single gym = static badge; Multiple gyms = dropdown switcher) */}
             <div className="relative">
-              <button
-                onClick={() => setShowGymDropdown(!showGymDropdown)}
-                className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#121215] hover:bg-[#18181B] border border-zinc-800 hover:border-zinc-700 transition-all text-left shadow-sm btn-shadow"
-                title="Switch Gym Branch"
-              >
-                <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                <div className="max-w-[170px] truncate">
-                  <div className="text-xs font-medium text-zinc-200 truncate leading-tight">
-                    {selectedGym.name}
-                  </div>
-                  <div className="text-[10px] text-zinc-500 leading-none">{selectedGym.city.split(',')[0]}</div>
-                </div>
-                <ChevronDown className="w-3.5 h-3.5 text-zinc-500 shrink-0 ml-0.5" />
-              </button>
-
-              {/* Gym Switcher Dropdown Menu */}
-              {showGymDropdown && (
-                <div className="absolute left-0 top-full mt-1.5 w-72 bg-[#121215] border border-zinc-800 rounded-lg shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="text-[10px] text-zinc-500 px-2 py-1 uppercase font-medium tracking-wider">
-                    Gym Branch Location
-                  </div>
-                  {DEMO_GYMS.map((gym) => (
-                    <button
-                      key={gym.id}
-                      onClick={() => handleSelectGym(gym)}
-                      className={`w-full text-left p-2 rounded-md text-xs transition-colors flex items-center justify-between shadow-sm btn-shadow my-0.5 ${
-                        selectedGym.id === gym.id
-                          ? 'bg-zinc-800 text-white font-medium border border-zinc-700'
-                          : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-medium text-zinc-200">{gym.name}</div>
-                        <div className="text-[10px] text-zinc-500">{gym.city}</div>
+              {hasMultipleGyms ? (
+                <>
+                  <button
+                    onClick={() => setShowGymDropdown(!showGymDropdown)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#121215] hover:bg-[#18181B] border border-zinc-800 hover:border-zinc-700 transition-all text-left shadow-sm btn-shadow"
+                    title="Switch Gym Branch"
+                  >
+                    <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                    <div className="max-w-[180px] truncate">
+                      <div className="text-xs font-medium text-zinc-200 truncate leading-tight">
+                        {currentGym.name}
                       </div>
-                      {selectedGym.id === gym.id && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      {currentGym.city && (
+                        <div className="text-[10px] text-zinc-500 leading-none truncate">
+                          {currentGym.city.split(',')[0]}
+                        </div>
                       )}
-                    </button>
-                  ))}
+                    </div>
+                    <ChevronDown className="w-3.5 h-3.5 text-zinc-500 shrink-0 ml-0.5" />
+                  </button>
+
+                  {/* Gym Switcher Dropdown Menu (ONLY shows user's actual authorized gyms) */}
+                  {showGymDropdown && (
+                    <div className="absolute left-0 top-full mt-1.5 w-72 bg-[#121215] border border-zinc-800 rounded-lg shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                      <div className="text-[10px] text-zinc-500 px-2 py-1 uppercase font-medium tracking-wider">
+                        Your Gym Locations
+                      </div>
+                      {userGyms.map((gym) => (
+                        <button
+                          key={gym.id}
+                          onClick={() => handleSelectGym(gym)}
+                          className={`w-full text-left p-2 rounded-md text-xs transition-colors flex items-center justify-between shadow-sm btn-shadow my-0.5 ${
+                            currentGym.id === gym.id
+                              ? 'bg-zinc-800 text-white font-medium border border-zinc-700'
+                              : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                          }`}
+                        >
+                          <div>
+                            <div className="font-medium text-zinc-200">{gym.name}</div>
+                            {gym.city && <div className="text-[10px] text-zinc-500">{gym.city}</div>}
+                          </div>
+                          {currentGym.id === gym.id && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* Single-gym user: Clean static badge, NO dropdown, NO unrelated gyms */
+                <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#121215] border border-zinc-800 text-left">
+                  <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                  <div className="max-w-[200px] truncate">
+                    <div className="text-xs font-medium text-zinc-200 truncate leading-tight">
+                      {currentGym.name}
+                    </div>
+                    {currentGym.city && (
+                      <div className="text-[10px] text-zinc-500 leading-none truncate">
+                        {currentGym.city.split(',')[0]}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -239,7 +214,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
               <span>Test WhatsApp</span>
             </button>
 
-            {/* Quick Check-In CTA Button (Clean high-contrast SaaS button) */}
+            {/* Quick Check-In CTA Button */}
             {onOpenCheckInModal && (
               <button
                 onClick={onOpenCheckInModal}
@@ -255,11 +230,11 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
             {/* Staff User Avatar */}
             <div className="flex items-center gap-2 pl-0.5">
               <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-medium text-xs text-zinc-300">
-                BC
+                {userInitials}
               </div>
               <div className="hidden 2xl:block text-left">
-                <div className="text-xs font-medium text-zinc-200 leading-none">Bilal C.</div>
-                <div className="text-[10px] text-zinc-500 font-mono">OWNER</div>
+                <div className="text-xs font-medium text-zinc-200 leading-none">{userName}</div>
+                <div className="text-[10px] text-zinc-500 font-mono">{userRole}</div>
               </div>
             </div>
 

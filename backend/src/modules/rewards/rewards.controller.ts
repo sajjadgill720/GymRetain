@@ -26,6 +26,11 @@ export class RewardsController {
     return this.rewardsService.listRewards(gymId);
   }
 
+  @Get('winners')
+  async listWinners(@CurrentGymId() gymId: string) {
+    return this.rewardsService.listAllRedemptions(gymId);
+  }
+
   @Post()
   @Roles('GYM_OWNER')
   async createReward(

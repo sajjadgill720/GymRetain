@@ -60,87 +60,62 @@ export default function RetentionPage() {
         </div>
 
         <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
-          {/* Rules Configuration & Weight Breakdown Card */}
-          <div className="bg-[#161310] border border-[#2A2520] rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-[#26221E] gap-4">
+          {/* Immediate Action Overview Banner (Clean, Minimalist SaaS) */}
+          <div className="bg-[#161310] border border-[#2A2520] rounded-2xl p-5 sm:p-6 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#26221E]">
               <div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-8 h-8 rounded-xl bg-[#BFA785]/15 text-[#BFA785] flex items-center justify-center border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10">
-                    <Sliders className="w-4 h-4" />
+                <div className="flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-xl bg-[#D9534F]/15 text-[#D9534F] flex items-center justify-center border border-[#D9534F]/30 shadow-sm shadow-[#D9534F]/10">
+                    <AlertTriangle className="w-4 h-4" />
                   </span>
                   <h2 className="text-base font-bold text-[#F7F5F2] tracking-tight">
-                    Rules-Based Churn Risk Weight Model
+                    Immediate Action Required
                   </h2>
                 </div>
-                <p className="text-xs text-[#A39E98] mt-1.5">
-                  Tunable weighting formula from <code className="text-[#BFA785] font-mono bg-[#1C1814] px-1.5 py-0.5 rounded border border-[#2A2520]">risk-score.config.ts</code> calculating member engagement health.
+                <p className="text-xs text-[#A39E98] mt-1.5 max-w-2xl leading-relaxed">
+                  These members haven&apos;t visited in over 12–16 days or missed renewal payments.
+                  Reaching out via WhatsApp re-engages member habits and saves an estimated{' '}
+                  <strong className="text-[#4E9F6E] font-semibold">PKR 35,000/mo</strong> in recurring revenue.
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <div className="text-[11px] text-[#A39E98] font-semibold uppercase tracking-wider">Scoring Scale</div>
-                  <div className="text-xs font-bold text-[#F7F5F2] font-mono mt-0.5">0 (Safe) to 100 (Critical)</div>
-                </div>
+              <div className="flex items-center gap-2 self-start md:self-auto">
+                <span className="text-[11px] font-bold text-[#D9534F] bg-[#D9534F]/15 px-3 py-1 rounded-full border border-[#D9534F]/30">
+                  {highRisk.length} High Priority
+                </span>
               </div>
             </div>
 
-            {/* 4 Weights Breakdown */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
-              {/* Weight 1 */}
+            {/* 3 Clean Summary Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
               <div className="p-4 rounded-xl bg-[#1C1814] border border-[#2A2520]">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-semibold text-[#F7F5F2]">Days Since Last Visit</span>
-                  <span className="font-mono text-[#4E9F6E] font-bold">35% Weight</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A39E98]">
+                  High Risk (Critical)
+                </span>
+                <div className="text-2xl font-extrabold text-[#D9534F] font-mono mt-1">
+                  {highRisk.length} <span className="text-xs font-normal text-[#A39E98]">members</span>
                 </div>
-                <div className="w-full bg-[#26221E] h-2 rounded-full mt-2.5 overflow-hidden">
-                  <div className="bg-[#4E9F6E] h-full rounded-full" style={{ width: '35%' }} />
-                </div>
-                <p className="text-[10px] text-[#A39E98] mt-2">
-                  Thresholds: &gt;3d (low), &gt;7d (moderate), &gt;14d (high), &gt;21d (critical)
-                </p>
+                <p className="text-[10px] text-[#A39E98] mt-1.5">Absent &gt;14 days or overdue payment</p>
               </div>
 
-              {/* Weight 2 */}
               <div className="p-4 rounded-xl bg-[#1C1814] border border-[#2A2520]">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-semibold text-[#F7F5F2]">4-Week Frequency Drop</span>
-                  <span className="font-mono text-[#4E9F6E] font-bold">35% Weight</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A39E98]">
+                  Moderate Attention
+                </span>
+                <div className="text-2xl font-extrabold text-[#E5A13B] font-mono mt-1">
+                  {mediumRisk.length} <span className="text-xs font-normal text-[#A39E98]">members</span>
                 </div>
-                <div className="w-full bg-[#26221E] h-2 rounded-full mt-2.5 overflow-hidden">
-                  <div className="bg-[#4E9F6E] h-full rounded-full" style={{ width: '35%' }} />
-                </div>
-                <p className="text-[10px] text-[#A39E98] mt-2">
-                  Detects weekly visits falling &gt;30% (moderate), &gt;60% (severe), or 100% drop
-                </p>
+                <p className="text-[10px] text-[#A39E98] mt-1.5">Noticeable visit frequency drop</p>
               </div>
 
-              {/* Weight 3 */}
               <div className="p-4 rounded-xl bg-[#1C1814] border border-[#2A2520]">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-semibold text-[#F7F5F2]">Payment Overdue Flag</span>
-                  <span className="font-mono text-[#E5A13B] font-bold">15% Weight</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A39E98]">
+                  Estimated Retrievable Revenue
+                </span>
+                <div className="text-2xl font-extrabold text-[#4E9F6E] font-mono mt-1">
+                  PKR 35,000<span className="text-xs font-normal text-[#A39E98]">/mo</span>
                 </div>
-                <div className="w-full bg-[#26221E] h-2 rounded-full mt-2.5 overflow-hidden">
-                  <div className="bg-[#E5A13B] h-full rounded-full" style={{ width: '15%' }} />
-                </div>
-                <p className="text-[10px] text-[#A39E98] mt-2">
-                  Triggers instant penalty when membership expires or payment is uncollected
-                </p>
-              </div>
-
-              {/* Weight 4 */}
-              <div className="p-4 rounded-xl bg-[#1C1814] border border-[#2A2520]">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-semibold text-[#F7F5F2]">Recently Broken Streak</span>
-                  <span className="font-mono text-[#BFA785] font-bold">15% Weight</span>
-                </div>
-                <div className="w-full bg-[#26221E] h-2 rounded-full mt-2.5 overflow-hidden">
-                  <div className="bg-[#BFA785] h-full rounded-full" style={{ width: '15%' }} />
-                </div>
-                <p className="text-[10px] text-[#A39E98] mt-2">
-                  Flags psychological momentum loss when a streak breaks within past 7 days
-                </p>
+                <p className="text-[10px] text-[#A39E98] mt-1.5">Recovered through proactive check-ins</p>
               </div>
             </div>
           </div>

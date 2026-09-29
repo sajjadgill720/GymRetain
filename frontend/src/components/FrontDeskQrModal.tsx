@@ -37,30 +37,30 @@ export const FrontDeskQrModal: React.FC<FrontDeskQrModalProps> = ({ isOpen, onCl
 
   return (
     <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-[#161310] max-w-lg w-full rounded-2xl p-6 sm:p-8 border border-[#2A2520] shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-[#121215] max-w-lg w-full rounded-lg p-6 sm:p-7 border border-zinc-800 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 p-1.5 rounded-lg text-[#A39E98] hover:text-white hover:bg-[#26221E] shadow-sm btn-shadow"
+          className="absolute right-4 top-4 p-1.5 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 shadow-sm btn-shadow transition-colors"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BFA785]/15 border border-[#BFA785]/30 text-[#BFA785] text-xs font-semibold mb-2 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
+        <div className="text-center mb-5">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-zinc-800/80 border border-zinc-700/80 text-zinc-300 text-xs font-medium mb-2 shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-zinc-400" />
             <span>Front-Desk Attendance Placard</span>
           </div>
-          <h2 className="text-xl font-black text-[#F7F5F2] tracking-tight">{currentGym.name}</h2>
-          <p className="text-xs text-[#A39E98]">{currentGym.city}</p>
+          <h2 className="text-lg font-semibold text-zinc-100 tracking-tight">{currentGym.name}</h2>
+          <p className="text-xs text-zinc-400">{currentGym.city}</p>
         </div>
 
         {/* Printable Placard Container */}
-        <div className="bg-white rounded-2xl p-6 shadow-2xl text-slate-900 text-center border-4 border-slate-900/10">
-          <div className="text-xs uppercase tracking-widest font-black text-slate-500 mb-1">
+        <div className="bg-white rounded-lg p-6 shadow-md text-slate-900 text-center border border-zinc-200">
+          <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1">
             MEMBER ATTENDANCE SCANNER
           </div>
-          <div className="text-sm font-bold text-slate-900 mb-4">
-            Scan to Record Daily Check-In & Streak 🔥
+          <div className="text-sm font-semibold text-slate-900 mb-4">
+            Scan to Record Daily Check-In & Streak
           </div>
 
           {/* QR Code image */}
@@ -68,39 +68,39 @@ export const FrontDeskQrModal: React.FC<FrontDeskQrModalProps> = ({ isOpen, onCl
             <img
               src={qrUrl}
               alt="Gym Front Desk QR Code"
-              className="w-52 h-52 rounded-xl border-2 border-slate-200 p-2 shadow-inner"
+              className="w-48 h-48 rounded-lg border border-slate-200 p-2 shadow-sm"
             />
           </div>
 
-          <div className="text-[11px] text-slate-600 mt-4 leading-relaxed font-medium">
-            Open camera or WhatsApp to scan this QR code when you arrive at reception.
+          <div className="text-xs text-slate-600 mt-4 leading-relaxed">
+            Open camera or WhatsApp to scan this QR code when arriving at reception.
           </div>
-          <div className="text-[10px] text-slate-400 font-mono mt-2">
-            Gym ID: {currentGym.slug} • GymRetain Multi-Tenant Security
+          <div className="text-[11px] text-slate-400 font-mono mt-2">
+            Gym ID: {currentGym.slug} • GymRetain Multi-Tenant
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-between pt-6 border-t border-[#26221E] mt-6">
+        <div className="flex items-center justify-between pt-5 border-t border-zinc-800 mt-5">
           <button
             onClick={handleRotate}
-            className="flex items-center gap-1.5 text-xs text-[#A39E98] hover:text-[#BFA785] transition-colors"
+            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
           >
             <RotateCw className={`w-3.5 h-3.5 ${rotated ? 'animate-spin' : ''}`} />
-            <span>{rotated ? 'Secret Key Rotated!' : 'Rotate QR Secret'}</span>
+            <span>{rotated ? 'Secret Key Rotated!' : 'Rotate Secret'}</span>
           </button>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] border border-[#2A2520] hover:border-[#BFA785]/40 text-xs font-semibold text-[#F7F5F2] transition-all shadow-sm btn-shadow"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#18181B] hover:bg-zinc-800 border border-zinc-700 text-xs font-medium text-zinc-200 transition-all shadow-sm btn-shadow"
             >
-              <Printer className="w-4 h-4 text-[#A39E98]" />
-              <span>Print Placard</span>
+              <Printer className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Print</span>
             </button>
             <button
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl bg-[#BFA785] hover:bg-[#B29976] text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all"
+              className="px-4 py-2 rounded-md bg-white hover:bg-zinc-200 text-xs font-medium text-zinc-950 btn-shadow-primary transition-all"
             >
               Close
             </button>

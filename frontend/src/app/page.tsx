@@ -2,22 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { TopNavbar } from '../components/TopNavbar';
-import { AttendanceChart } from '../components/AttendanceChart';
 import { AtRiskMembersTable } from '../components/AtRiskMembersTable';
+import { AttendanceChart } from '../components/AttendanceChart';
 import { StreakLeaderboard } from '../components/StreakLeaderboard';
 import { QuickCheckInModal } from '../components/QuickCheckInModal';
 import { FrontDeskQrModal } from '../components/FrontDeskQrModal';
 import { api } from '../lib/api';
 import { DashboardSummary, AttendanceTrendPoint } from '../types';
 import {
-  AlertTriangle,
-  Flame,
-  PhoneCall,
   UserCheck,
+  Users,
+  Flame,
+  CheckCircle2,
   TrendingUp,
-  ShieldCheck,
-  ChevronRight,
-  Sparkles,
+  ArrowRight,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -51,131 +49,131 @@ export default function DashboardPage() {
   const topStreak = summary?.streakLeaders[0]?.currentStreak ?? 12;
 
   return (
-    <div className="min-h-screen bg-[#111111] flex flex-col">
-      {/* Top Navigation Bar (Amazon / SaaS Style) */}
+    <div className="min-h-screen bg-[#09090B] text-zinc-100 flex flex-col">
+      {/* 1. Compact Header & Unified Navigation */}
       <TopNavbar
         onOpenQrModal={() => setIsQrModalOpen(true)}
         onOpenCheckInModal={() => setIsCheckInOpen(true)}
       />
 
-      {/* Main Content Area — Full Width */}
-      <main className="flex-1 flex flex-col w-full overflow-x-hidden">
-        {/* Page Context Ribbon */}
-        <div className="border-b border-[#26221E] bg-[#161310]/50 py-4 px-4 sm:px-8">
-          <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F7F5F2]">Owner Retention Hub</h1>
-              <p className="text-xs text-[#A39E98] mt-0.5">30-Second Glance: Who to call today & member habit momentum</p>
+      {/* Main SaaS Dashboard Surface */}
+      <main className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* 2. Top Status Bar & Headline Metric */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-zinc-800/60">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-100">
+                Retention Dashboard
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                {highRiskCount} members require follow-up
+              </span>
             </div>
+            <p className="text-xs text-zinc-400 mt-1">
+              Active gym health, daily check-in volume, and automated member retention workflows.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href="/retention"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#121215] hover:bg-[#18181B] border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-colors btn-shadow"
+            >
+              <span>Full Risk Queue</span>
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+            </Link>
           </div>
         </div>
 
-        <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
-          {/* 1. ONE HEADLINE METRIC HERO (Built for 30-second glance on mobile & desktop) */}
-          <div className="rounded-2xl p-5 sm:p-6 bg-gradient-to-r from-[#261515] via-[#1A1313] to-[#141010] border border-[#D9534F]/35 shadow-xl relative overflow-hidden">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
-              <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D9534F]/15 text-[#D9534F] text-[10px] font-bold uppercase tracking-wider border border-[#D9534F]/30 shadow-sm">
-                  <AlertTriangle className="w-3.5 h-3.5 text-[#D9534F]" />
-                  <span>Immediate Action Required</span>
-                </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#F7F5F2] tracking-tight flex flex-wrap items-baseline gap-2">
-                  <span className="text-[#D9534F] font-mono">{highRiskCount} Members</span>
-                  <span className="text-base sm:text-xl font-bold text-[#F7F5F2]">
-                    at risk of silent drop-out
-                  </span>
-                </div>
-                <p className="text-xs text-[#A39E98] max-w-2xl leading-relaxed">
-                  These members haven&apos;t visited in over 12–16 days or missed renewal payments.
-                  Reaching out today via WhatsApp saves an estimated{' '}
-                  <strong className="text-[#4E9F6E] font-semibold">PKR 35,000/mo</strong> in recurring revenue.
-                </p>
-              </div>
+        {/* 3. Primary Data Above the Fold: At-Risk Members Follow-Up Queue */}
+        <section aria-label="At-Risk Members Queue">
+          <AtRiskMembersTable
+            members={summary?.recentAtRiskPreview || []}
+            limit={5}
+            showFilters={true}
+          />
+        </section>
 
-              {/* Headline Call-To-Action */}
-              <div className="flex items-center gap-3 shrink-0">
-                <Link
-                  href="/retention"
-                  className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#BFA785] hover:bg-[#B29976] text-[#111111] font-bold text-xs sm:text-sm shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 transition-all flex items-center justify-center gap-2 btn-shadow btn-shadow-primary"
-                >
-                  <PhoneCall className="w-4 h-4" />
-                  <span>Review At-Risk Call List</span>
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
+        {/* 4. Compact Secondary Stat Cards Row (Information-Dense SaaS Tiles) */}
+        <section aria-label="Key Performance Metrics">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {/* Stat 1: Today's Attendance */}
+            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 sm:p-4 shadow-sm hover:border-zinc-700/80 transition-colors">
+              <div className="flex items-center justify-between text-xs text-zinc-400">
+                <span className="font-medium">Today&apos;s Attendance</span>
+                <UserCheck className="w-4 h-4 text-zinc-500" />
               </div>
-            </div>
-          </div>
-
-          {/* 2. THREE COMPACT COMPANION METRICS (Bento Grid) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            {/* Metric 1: Today's Front-Desk Check-Ins */}
-            <div className="bg-[#161310] rounded-2xl p-4 sm:p-5 border border-[#2A2520] hover:border-[#38312A] flex items-center justify-between shadow-sm transition-all">
-              <div>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A39E98]">
-                  Today&apos;s Attendance
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100 font-mono">
+                  {todayVisits}
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#F7F5F2] font-mono mt-1">
-                  {todayVisits} <span className="text-xs font-normal text-[#A39E98]">visits</span>
-                </div>
+                <span className="text-xs text-emerald-400 font-medium flex items-center gap-0.5">
+                  <TrendingUp className="w-3 h-3" /> +12%
+                </span>
               </div>
-              <div className="w-11 h-11 rounded-xl bg-[#4E9F6E]/15 text-[#4E9F6E] flex items-center justify-center border border-[#4E9F6E]/30 shadow-sm shadow-[#4E9F6E]/10">
-                <UserCheck className="w-5 h-5" />
-              </div>
+              <p className="text-[11px] text-zinc-500 mt-1">vs same day last week</p>
             </div>
 
-            {/* Metric 2: Top Active Streak */}
-            <div className="bg-[#161310] rounded-2xl p-4 sm:p-5 border border-[#2A2520] hover:border-[#38312A] flex items-center justify-between shadow-sm transition-all">
-              <div>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A39E98]">
-                  Top Workout Streak
-                </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#BFA785] font-mono mt-1">
-                  {topStreak} <span className="text-xs font-normal text-[#A39E98]">Days</span>
-                </div>
+            {/* Stat 2: Active Members */}
+            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 sm:p-4 shadow-sm hover:border-zinc-700/80 transition-colors">
+              <div className="flex items-center justify-between text-xs text-zinc-400">
+                <span className="font-medium">Active Members</span>
+                <Users className="w-4 h-4 text-zinc-500" />
               </div>
-              <div className="w-11 h-11 rounded-xl bg-[#BFA785]/15 text-[#BFA785] flex items-center justify-center border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10">
-                <Flame className="w-5 h-5 animate-flame" />
-              </div>
-            </div>
-
-            {/* Metric 3: Active Members */}
-            <div className="bg-[#161310] rounded-2xl p-4 sm:p-5 border border-[#2A2520] hover:border-[#38312A] flex items-center justify-between shadow-sm transition-all">
-              <div>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A39E98]">
-                  Total Active Members
-                </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#F7F5F2] font-mono mt-1">
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100 font-mono">
                   {activeMembers}
-                </div>
+                </span>
+                <span className="text-xs text-zinc-400 font-normal">enrolled</span>
               </div>
-              <div className="w-11 h-11 rounded-xl bg-[#26221E] text-[#BFA785] flex items-center justify-center border border-[#38312A] shadow-sm">
-                <TrendingUp className="w-5 h-5" />
+              <p className="text-[11px] text-zinc-500 mt-1">Total active gym memberships</p>
+            </div>
+
+            {/* Stat 3: Top Active Streak */}
+            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 sm:p-4 shadow-sm hover:border-zinc-700/80 transition-colors">
+              <div className="flex items-center justify-between text-xs text-zinc-400">
+                <span className="font-medium">Top Active Streak</span>
+                <Flame className="w-4 h-4 text-amber-500" />
               </div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100 font-mono">
+                  {topStreak}d
+                </span>
+                <span className="text-xs text-amber-400/90 font-medium">record</span>
+              </div>
+              <p className="text-[11px] text-zinc-500 mt-1">Consecutive workout record</p>
             </div>
-          </div>
 
-          {/* 3. LEAD WITH AT-RISK MEMBERS CALL LIST (Owner priority) */}
-          <div className="space-y-2">
-            <AtRiskMembersTable
-              members={summary?.recentAtRiskPreview || []}
-              limit={5}
-              showFilters={true}
-            />
+            {/* Stat 4: 30-Day Retention Benchmark */}
+            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 sm:p-4 shadow-sm hover:border-zinc-700/80 transition-colors">
+              <div className="flex items-center justify-between text-xs text-zinc-400">
+                <span className="font-medium">30-Day Retention</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              </div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100 font-mono">
+                  91.4%
+                </span>
+                <span className="text-xs text-emerald-400 font-medium">Healthy</span>
+              </div>
+              <p className="text-[11px] text-zinc-500 mt-1">Target benchmark &gt;85%</p>
+            </div>
           </div>
+        </section>
 
-          {/* 4. SECONDARY SECTION: Attendance Trend & Streak Champions */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
-            <div className="lg:col-span-2">
-              <AttendanceChart data={trends} />
-            </div>
-            <div>
-              <StreakLeaderboard leaders={summary?.streakLeaders || []} />
-            </div>
+        {/* 5. Performance Insights: 30-Day Attendance Trends & Habit Champions */}
+        <section aria-label="Performance Trends and Streaks" className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-1">
+          <div className="lg:col-span-2">
+            <AttendanceChart data={trends} />
           </div>
-        </div>
+          <div>
+            <StreakLeaderboard leaders={summary?.streakLeaders || []} />
+          </div>
+        </section>
       </main>
 
-      {/* Modals */}
+      {/* Contextual Modals */}
       <QuickCheckInModal
         isOpen={isCheckInOpen}
         onClose={() => setIsCheckInOpen(false)}

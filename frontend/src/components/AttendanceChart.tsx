@@ -37,61 +37,59 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
   const avgDaily = (totalCheckIns / displayData.length).toFixed(1);
 
   return (
-    <div className="bg-[#161310] border border-[#2A2520] rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 gap-4 border-b border-[#26221E]">
+    <div className="bg-[#121215] border border-zinc-800 rounded-lg p-4 sm:p-5 shadow-sm relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 gap-3 border-b border-zinc-800/80">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-[#F7F5F2] tracking-tight">
-              Attendance Trends & Member Traffic
+            <h2 className="text-sm font-semibold text-zinc-100 tracking-tight">
+              Attendance Trends
             </h2>
-            <span className="flex items-center gap-1 text-[11px] font-bold text-[#4E9F6E] bg-[#4E9F6E]/10 px-2.5 py-0.5 rounded-full border border-[#4E9F6E]/25">
+            <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
               <TrendingUp className="w-3 h-3" /> +14.2% MoM
             </span>
           </div>
-          <p className="text-xs text-[#A39E98] mt-1">
-            Tracking daily check-in volume to anticipate churn dips before memberships expire.
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Daily check-in volume to anticipate churn dips before memberships expire.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-center">
-          <div className="bg-[#1C1814] rounded-xl p-1 border border-[#2A2520] flex items-center gap-1 shadow-inner">
-            <button
-              onClick={() => setRange(14)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all btn-shadow ${
-                range === 14
-                  ? 'bg-[#BFA785] text-[#111111] shadow-md shadow-[#BFA785]/20 font-bold'
-                  : 'text-[#A39E98] hover:text-[#F7F5F2]'
-              }`}
-            >
-              14D
-            </button>
-            <button
-              onClick={() => setRange(30)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all btn-shadow ${
-                range === 30
-                  ? 'bg-[#BFA785] text-[#111111] shadow-md shadow-[#BFA785]/20 font-bold'
-                  : 'text-[#A39E98] hover:text-[#F7F5F2]'
-              }`}
-            >
-              30D
-            </button>
-          </div>
+        <div className="flex items-center gap-1 bg-zinc-900/80 p-0.5 rounded-md border border-zinc-800">
+          <button
+            onClick={() => setRange(14)}
+            className={`px-2.5 py-1 rounded text-xs font-medium transition-all btn-shadow ${
+              range === 14
+                ? 'bg-zinc-800 text-white shadow-sm font-semibold border border-zinc-700/60'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            14D
+          </button>
+          <button
+            onClick={() => setRange(30)}
+            className={`px-2.5 py-1 rounded text-xs font-medium transition-all btn-shadow ${
+              range === 30
+                ? 'bg-zinc-800 text-white shadow-sm font-semibold border border-zinc-700/60'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            30D
+          </button>
         </div>
       </div>
 
       {/* Quick stats ribbon */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 my-6">
-        <div className="p-3.5 rounded-xl bg-[#1C1814] border border-[#2A2520]">
-          <div className="text-[11px] text-[#A39E98] font-semibold uppercase tracking-wider">Period Total Check-Ins</div>
-          <div className="text-xl font-bold font-mono text-[#F7F5F2] mt-1">{totalCheckIns}</div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 my-4">
+        <div className="p-3 rounded-md bg-zinc-900/60 border border-zinc-800">
+          <div className="text-[11px] text-zinc-400 font-medium uppercase tracking-wider">Total Check-Ins</div>
+          <div className="text-xl font-bold font-mono text-zinc-100 mt-1">{totalCheckIns}</div>
         </div>
-        <div className="p-3.5 rounded-xl bg-[#1C1814] border border-[#2A2520]">
-          <div className="text-[11px] text-[#A39E98] font-semibold uppercase tracking-wider">Daily Average Visits</div>
-          <div className="text-xl font-bold font-mono text-[#4E9F6E] mt-1">{avgDaily} <span className="text-xs font-normal text-[#A39E98]">/ day</span></div>
+        <div className="p-3 rounded-md bg-zinc-900/60 border border-zinc-800">
+          <div className="text-[11px] text-zinc-400 font-medium uppercase tracking-wider">Daily Average Visits</div>
+          <div className="text-xl font-bold font-mono text-emerald-400 mt-1">{avgDaily} <span className="text-xs font-normal text-zinc-500">/ day</span></div>
         </div>
-        <div className="hidden sm:block p-3.5 rounded-xl bg-[#1C1814] border border-[#2A2520]">
-          <div className="text-[11px] text-[#A39E98] font-semibold uppercase tracking-wider">Peak Day Volume</div>
-          <div className="text-xl font-bold font-mono text-[#BFA785] mt-1">{maxVal} <span className="text-xs font-normal text-[#A39E98]">visits</span></div>
+        <div className="hidden sm:block p-3 rounded-md bg-zinc-900/60 border border-zinc-800">
+          <div className="text-[11px] text-zinc-400 font-medium uppercase tracking-wider">Peak Day Volume</div>
+          <div className="text-xl font-bold font-mono text-blue-400 mt-1">{maxVal} <span className="text-xs font-normal text-zinc-500">visits</span></div>
         </div>
       </div>
 
@@ -100,13 +98,13 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
         <div className="min-w-[640px]">
           <svg
             viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-            className="w-full h-56 overflow-visible select-none"
+            className="w-full h-52 overflow-visible select-none"
           >
             <defs>
               <linearGradient id="attendanceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#BFA785" stopOpacity="0.30" />
-                <stop offset="70%" stopColor="#BFA785" stopOpacity="0.04" />
-                <stop offset="100%" stopColor="#BFA785" stopOpacity="0" />
+                <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.20" />
+                <stop offset="70%" stopColor="#3B82F6" stopOpacity="0.02" />
+                <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
               </linearGradient>
             </defs>
 
@@ -120,7 +118,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                   y1={y}
                   x2={chartWidth - paddingX}
                   y2={y}
-                  stroke="rgba(255, 255, 255, 0.05)"
+                  stroke="rgba(255, 255, 255, 0.06)"
                   strokeDasharray="4 4"
                 />
               );
@@ -132,8 +130,8 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
             {/* Line Path */}
             <polyline
               fill="none"
-              stroke="#BFA785"
-              strokeWidth="2.5"
+              stroke="#3B82F6"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
               points={points}
@@ -150,10 +148,10 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                   <circle
                     cx={cx}
                     cy={cy}
-                    r={isHovered ? 6 : 3.5}
-                    fill={isHovered ? '#BFA785' : '#161310'}
-                    stroke="#BFA785"
-                    strokeWidth={isHovered ? 3 : 2}
+                    r={isHovered ? 5 : 3}
+                    fill={isHovered ? '#3B82F6' : '#121215'}
+                    stroke="#3B82F6"
+                    strokeWidth={isHovered ? 2.5 : 1.5}
                     className="transition-all duration-150 cursor-pointer"
                     onMouseEnter={() => setHoveredIndex(i)}
                     onMouseLeave={() => setHoveredIndex(null)}
@@ -166,7 +164,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                       y1={paddingY}
                       x2={cx}
                       y2={chartHeight - paddingY}
-                      stroke="rgba(191, 167, 133, 0.4)"
+                      stroke="rgba(59, 130, 246, 0.4)"
                       strokeWidth="1"
                       strokeDasharray="2 2"
                     />
@@ -179,16 +177,16 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
           {/* Active Hover Tooltip */}
           {hoveredIndex !== null && (
             <div
-              className="absolute pointer-events-none transform -translate-x-1/2 bg-[#1C1814] border border-[#BFA785]/40 px-3.5 py-2 rounded-xl shadow-2xl z-20 text-center"
+              className="absolute pointer-events-none transform -translate-x-1/2 bg-[#18181B] border border-zinc-700 px-3 py-1.5 rounded-md shadow-xl z-20 text-center"
               style={{
                 left: `${(getX(hoveredIndex) / chartWidth) * 100}%`,
                 top: `${(getY(displayData[hoveredIndex].checkIns) / chartHeight) * 100 - 15}%`,
               }}
             >
-              <div className="text-[10px] text-[#A39E98] font-mono">
+              <div className="text-[10px] text-zinc-400 font-mono">
                 {displayData[hoveredIndex].date}
               </div>
-              <div className="text-xs font-bold font-mono text-[#BFA785]">
+              <div className="text-xs font-semibold font-mono text-zinc-100">
                 {displayData[hoveredIndex].checkIns} Check-Ins
               </div>
             </div>

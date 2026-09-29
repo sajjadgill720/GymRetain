@@ -156,6 +156,7 @@ All system guides, audits, and architectural specifications are housed in the `R
 
 | Document | Description |
 |---|---|
+| [`CLEAN_MINIMALIST_REDESIGN.md`](CLEAN_MINIMALIST_REDESIGN.md) | Minimalist dashboard redesign, developer jargon removal & dedicated retention hub |
 | [`TOP_NAVIGATION_REDESIGN.md`](TOP_NAVIGATION_REDESIGN.md) | Full-width Amazon/Stripe 2-tier sticky top navigation bar architecture |
 | [`UI_REBUILD_MYNEXT9TO5.md`](UI_REBUILD_MYNEXT9TO5.md) | Modern SaaS UI redesign, warm charcoal `#111111`, bento surfaces, 30-sec glance |
 | [`DESIGN_SYSTEM_V2.md`](DESIGN_SYSTEM_V2.md) | Design tokens, color system, button shadow utilities (`btn-shadow`), typography |

@@ -32,6 +32,29 @@ export class RewardsService {
   }
 
   /**
+   * List all streak reward winners / redemptions across the gym
+   */
+  async listAllRedemptions(gymId: string) {
+    return this.prisma.rewardRedemption.findMany({
+      where: { gymId },
+      include: {
+        reward: true,
+        member: {
+          select: {
+            id: true,
+            memberCode: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            streak: true,
+          },
+        },
+      },
+      orderBy: { unlockedAt: 'desc' },
+    });
+  }
+
+  /**
    * Create a new configurable reward rule for this gym
    */
   async createReward(gymId: string, dto: CreateRewardDto) {

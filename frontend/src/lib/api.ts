@@ -4,6 +4,7 @@ import {
   MemberRiskDetails,
   Member,
   Reward,
+  RewardRedemption,
   CheckIn,
   User,
 } from '../types';
@@ -175,6 +176,211 @@ const MOCK_REWARDS: Reward[] = [
     badgeIcon: 'percent-circle',
     isActive: true,
     _count: { redemptions: 3 },
+  },
+];
+
+export const MOCK_WINNERS: RewardRedemption[] = [
+  {
+    id: 'red-1',
+    rewardId: 'rew-1',
+    memberId: 'mem-1',
+    status: 'REDEEMED',
+    unlockedAt: '2026-09-25T10:30:00Z',
+    redeemedAt: '2026-09-27T11:15:00Z',
+    reward: {
+      id: 'rew-1',
+      gymId: 'gym-1',
+      title: '10-Day Streak Warrior',
+      description: 'Awarded for checking in 10 consecutive days without missing a day!',
+      rewardType: 'BADGE',
+      triggerType: 'STREAK_MILESTONE',
+      triggerThreshold: 10,
+      badgeIcon: 'flame-gold',
+      isActive: true,
+    },
+    member: {
+      id: 'mem-1',
+      gymId: 'gym-1',
+      memberCode: 'GR-1001',
+      firstName: 'Hamza',
+      lastName: 'Sheikh',
+      phone: '+923001234567',
+      joinDate: '2026-07-28',
+      status: 'ACTIVE',
+      streak: {
+        id: 'st-1',
+        currentStreak: 12,
+        longestStreak: 12,
+      },
+    },
+  },
+  {
+    id: 'red-2',
+    rewardId: 'rew-2',
+    memberId: 'mem-1',
+    status: 'UNLOCKED',
+    unlockedAt: '2026-09-28T09:12:00Z',
+    reward: {
+      id: 'rew-2',
+      gymId: 'gym-1',
+      title: 'Free Whey Protein Shake',
+      description: 'Redeemable at the reception juice bar for hitting a 15-day streak.',
+      rewardType: 'FREE_ITEM',
+      triggerType: 'STREAK_MILESTONE',
+      triggerThreshold: 15,
+      badgeIcon: 'cup-shake',
+      isActive: true,
+    },
+    member: {
+      id: 'mem-1',
+      gymId: 'gym-1',
+      memberCode: 'GR-1001',
+      firstName: 'Hamza',
+      lastName: 'Sheikh',
+      phone: '+923001234567',
+      joinDate: '2026-07-28',
+      status: 'ACTIVE',
+      streak: {
+        id: 'st-1',
+        currentStreak: 12,
+        longestStreak: 12,
+      },
+    },
+  },
+  {
+    id: 'red-3',
+    rewardId: 'rew-1',
+    memberId: 'mem-3',
+    status: 'REDEEMED',
+    unlockedAt: '2026-09-20T14:40:00Z',
+    redeemedAt: '2026-09-21T08:00:00Z',
+    reward: {
+      id: 'rew-1',
+      gymId: 'gym-1',
+      title: '10-Day Streak Warrior',
+      description: 'Awarded for checking in 10 consecutive days without missing a day!',
+      rewardType: 'BADGE',
+      triggerType: 'STREAK_MILESTONE',
+      triggerThreshold: 10,
+      badgeIcon: 'flame-gold',
+      isActive: true,
+    },
+    member: {
+      id: 'mem-3',
+      gymId: 'gym-1',
+      memberCode: 'GR-1003',
+      firstName: 'Zaid',
+      lastName: 'Siddiqui',
+      phone: '+923129988776',
+      joinDate: '2026-08-15',
+      status: 'ACTIVE',
+      streak: {
+        id: 'st-3',
+        currentStreak: 9,
+        longestStreak: 14,
+      },
+    },
+  },
+  {
+    id: 'red-4',
+    rewardId: 'rew-1',
+    memberId: 'mem-4',
+    status: 'UNLOCKED',
+    unlockedAt: '2026-09-28T16:20:00Z',
+    reward: {
+      id: 'rew-1',
+      gymId: 'gym-1',
+      title: '10-Day Streak Warrior',
+      description: 'Awarded for checking in 10 consecutive days without missing a day!',
+      rewardType: 'BADGE',
+      triggerType: 'STREAK_MILESTONE',
+      triggerThreshold: 10,
+      badgeIcon: 'flame-gold',
+      isActive: true,
+    },
+    member: {
+      id: 'mem-4',
+      gymId: 'gym-1',
+      memberCode: 'GR-1004',
+      firstName: 'Fatima',
+      lastName: 'Zahra',
+      phone: '+923214455667',
+      joinDate: '2026-09-01',
+      status: 'ACTIVE',
+      streak: {
+        id: 'st-4',
+        currentStreak: 7,
+        longestStreak: 10,
+      },
+    },
+  },
+  {
+    id: 'red-5',
+    rewardId: 'rew-3',
+    memberId: 'mem-5',
+    status: 'UNLOCKED',
+    unlockedAt: '2026-09-29T08:15:00Z',
+    reward: {
+      id: 'rew-3',
+      gymId: 'gym-1',
+      title: '20% Next Month Discount',
+      description: 'Special 20% discount on renewal for 25 consecutive workout days.',
+      rewardType: 'DISCOUNT_PERCENT',
+      triggerType: 'STREAK_MILESTONE',
+      triggerThreshold: 25,
+      rewardValue: 20,
+      badgeIcon: 'percent-circle',
+      isActive: true,
+    },
+    member: {
+      id: 'mem-5',
+      gymId: 'gym-1',
+      memberCode: 'GR-1005',
+      firstName: 'Bilal',
+      lastName: 'Ahmed',
+      phone: '+923456677889',
+      joinDate: '2026-05-10',
+      status: 'ACTIVE',
+      streak: {
+        id: 'st-5',
+        currentStreak: 6,
+        longestStreak: 25,
+      },
+    },
+  },
+  {
+    id: 'red-6',
+    rewardId: 'rew-2',
+    memberId: 'mem-6',
+    status: 'REDEEMED',
+    unlockedAt: '2026-09-22T12:00:00Z',
+    redeemedAt: '2026-09-23T10:45:00Z',
+    reward: {
+      id: 'rew-2',
+      gymId: 'gym-1',
+      title: 'Free Whey Protein Shake',
+      description: 'Redeemable at the reception juice bar for hitting a 15-day streak.',
+      rewardType: 'FREE_ITEM',
+      triggerType: 'STREAK_MILESTONE',
+      triggerThreshold: 15,
+      badgeIcon: 'cup-shake',
+      isActive: true,
+    },
+    member: {
+      id: 'mem-6',
+      gymId: 'gym-1',
+      memberCode: 'GR-1006',
+      firstName: 'Ali',
+      lastName: 'Raza',
+      phone: '+923157788990',
+      joinDate: '2026-07-01',
+      status: 'ACTIVE',
+      streak: {
+        id: 'st-6',
+        currentStreak: 5,
+        longestStreak: 15,
+      },
+    },
   },
 ];
 
@@ -479,6 +685,33 @@ class ApiClient {
       };
       MOCK_REWARDS.push(newReward);
       return newReward;
+    }
+  }
+
+  // Streak Reward Winners
+  async getRewardWinners(): Promise<RewardRedemption[]> {
+    try {
+      const res = await this.request<RewardRedemption[]>('/rewards/winners');
+      return res && res.length > 0 ? res : MOCK_WINNERS;
+    } catch {
+      return MOCK_WINNERS;
+    }
+  }
+
+  // Redeem Reward
+  async redeemReward(redemptionId: string, notes?: string): Promise<RewardRedemption> {
+    try {
+      return await this.request<RewardRedemption>(`/rewards/redemptions/${redemptionId}/redeem`, {
+        method: 'PATCH',
+        body: JSON.stringify({ notes }),
+      });
+    } catch {
+      const item = MOCK_WINNERS.find((w) => w.id === redemptionId);
+      if (item) {
+        item.status = 'REDEEMED';
+        item.redeemedAt = new Date().toISOString();
+      }
+      return item || ({} as any);
     }
   }
 

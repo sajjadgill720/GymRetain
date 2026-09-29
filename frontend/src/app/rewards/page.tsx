@@ -11,12 +11,14 @@ import {
   Flame,
   Plus,
   Sparkles,
+  Trophy,
   Gift,
   Tag,
-  Clock,
   CheckCircle2,
   X,
+  ArrowRight,
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function RewardsPage() {
   const [rewards, setRewards] = useState<Reward[]>([]);
@@ -72,118 +74,118 @@ export default function RewardsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] flex flex-col">
+    <div className="min-h-screen bg-[#09090B] text-zinc-100 flex flex-col">
       <TopNavbar
         onOpenQrModal={() => setIsQrModalOpen(true)}
         onOpenCheckInModal={() => setIsCheckInOpen(true)}
       />
 
-      <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
-        {/* Page Context Ribbon */}
-        <div className="border-b border-[#26221E] bg-[#161310]/50 py-4 px-4 sm:px-8">
-          <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F7F5F2]">Rewards & Streaks</h1>
-              <p className="text-xs text-[#A39E98] mt-0.5">Configure streak milestones to gamify gym loyalty and celebrate consistent members</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1600px] w-full mx-auto">
-          {/* Header Action Card */}
-          <div className="bg-[#161310] border border-[#2A2520] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+      <main className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Page Context Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-zinc-800/60">
+          <div>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#BFA785]/15 text-[#BFA785] flex items-center justify-center border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10">
-                <Award className="w-6 h-6 animate-flame" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-[#F7F5F2] tracking-tight">
-                  Gym Milestone Rewards Engine
-                </h2>
-                <p className="text-xs text-[#A39E98] mt-0.5">
-                  Automatically unlocks when a member hits consecutive day check-in milestones.
-                </p>
-              </div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-100 flex items-center gap-2">
+                <Award className="w-5 h-5 text-zinc-300" />
+                Streak Reward Rules
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
+                {rewards.length} Active Rules
+              </span>
             </div>
+            <p className="text-xs text-zinc-400 mt-1">
+              Configure streak milestones to gamify gym loyalty, boost attendance consistency, and unlock member rewards.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href="/rewards/winners"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#121215] hover:bg-[#18181B] border border-zinc-800 text-xs font-medium text-amber-400 hover:text-amber-300 transition-colors btn-shadow"
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span>View Streak Winners</span>
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
+            </Link>
 
             <button
               onClick={() => setIsAddRewardOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#BFA785] hover:bg-[#B29976] text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-xs shadow-sm btn-shadow-primary transition-all"
             >
-              <Plus className="w-4 h-4" />
-              <span>Create Milestone Rule</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>Create Rule</span>
             </button>
           </div>
+        </div>
 
-          {/* Active Rewards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {rewards.map((reward) => (
-              <div
-                key={reward.id}
-                className="bg-[#161310] border border-[#2A2520] rounded-2xl p-6 relative overflow-hidden group hover:border-[#BFA785]/40 transition-all flex flex-col justify-between shadow-sm"
-              >
-                <div>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#BFA785]/15 border border-[#BFA785]/30 text-[#BFA785] text-xs font-mono font-bold">
-                      <Flame className="w-3.5 h-3.5 text-[#BFA785] animate-flame" />
-                      <span>{reward.triggerThreshold}-Day Streak</span>
-                    </div>
-
-                    <span className="text-[10px] uppercase font-bold text-[#4E9F6E] bg-[#4E9F6E]/15 px-2.5 py-0.5 rounded-full border border-[#4E9F6E]/30">
-                      {reward.rewardType.replace('_', ' ')}
-                    </span>
+        {/* Milestone Rules Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {rewards.map((reward) => (
+            <div
+              key={reward.id}
+              className="bg-[#121215] border border-zinc-800 rounded-lg p-4 sm:p-5 relative group hover:border-zinc-700/80 transition-all flex flex-col justify-between shadow-sm"
+            >
+              <div>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-zinc-800 text-zinc-200 text-xs font-mono font-medium border border-zinc-700">
+                    <Flame className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{reward.triggerThreshold}-Day Streak</span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-[#F7F5F2] mt-4 tracking-tight group-hover:text-[#BFA785] transition-colors">
-                    {reward.title}
-                  </h3>
-
-                  <p className="text-xs text-[#A39E98] mt-1.5 leading-relaxed">
-                    {reward.description || 'Awarded automatically when member reaches milestone.'}
-                  </p>
-                </div>
-
-                <div className="pt-5 border-t border-[#26221E] mt-6 flex items-center justify-between text-xs">
-                  <div className="text-[#A39E98]">
-                    Redeemed:{' '}
-                    <span className="font-bold text-[#F7F5F2] font-mono">
-                      {reward._count?.redemptions ?? 0} members
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-bold text-[#BFA785] flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Active Rule
+                  <span className="text-[10px] uppercase font-semibold text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded border border-zinc-700/80">
+                    {reward.rewardType.replace('_', ' ')}
                   </span>
                 </div>
+
+                <h2 className="text-base font-semibold text-zinc-100 mt-3 tracking-tight">
+                  {reward.title}
+                </h2>
+
+                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                  {reward.description || 'Awarded automatically when a member hits this streak threshold.'}
+                </p>
               </div>
-            ))}
-          </div>
+
+              <div className="pt-4 border-t border-zinc-800/80 mt-5 flex items-center justify-between text-xs">
+                <div className="text-zinc-500">
+                  Redeemed:{' '}
+                  <span className="font-semibold text-zinc-300 font-mono">
+                    {reward._count?.redemptions ?? 0} members
+                  </span>
+                </div>
+                <span className="text-[11px] font-medium text-emerald-400 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Active Rule
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </main>
 
       {/* Add Reward Modal */}
       {isAddRewardOpen && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#161310] max-w-md w-full rounded-2xl p-6 border border-[#2A2520] shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#121215] max-w-md w-full rounded-lg p-5 sm:p-6 border border-zinc-800 shadow-2xl relative animate-in fade-in zoom-in-95 duration-100">
             <button
               onClick={() => setIsAddRewardOpen(false)}
-              className="absolute right-4 top-4 p-1.5 rounded-lg text-[#A39E98] hover:text-white hover:bg-[#26221E] shadow-sm btn-shadow"
+              className="absolute right-4 top-4 p-1.5 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 shadow-sm btn-shadow"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-[#BFA785]/15 text-[#BFA785] flex items-center justify-center border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10">
-                <Sparkles className="w-5 h-5" />
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-8 h-8 rounded-md bg-zinc-800 border border-zinc-700 text-zinc-200 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-amber-400" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#F7F5F2]">Create Streak Milestone</h3>
-                <p className="text-xs text-[#A39E98]">Configurable per gym tenant</p>
+                <h3 className="text-sm font-semibold text-zinc-100">Create Streak Milestone</h3>
+                <p className="text-[11px] text-zinc-500">Tenant-isolated retention rule</p>
               </div>
             </div>
 
-            <form onSubmit={handleCreateReward} className="space-y-4">
+            <form onSubmit={handleCreateReward} className="space-y-3.5">
               <div>
-                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
+                <label className="text-[11px] font-medium text-zinc-400 block mb-1">
                   Milestone Title *
                 </label>
                 <input
@@ -192,12 +194,12 @@ export default function RewardsPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. 21-Day Habit Master"
-                  className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] focus:outline-none"
+                  className="w-full bg-[#18181B] border border-zinc-700 rounded-md px-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
+                <label className="text-[11px] font-medium text-zinc-400 block mb-1">
                   Required Streak (Consecutive Days) *
                 </label>
                 <input
@@ -206,18 +208,18 @@ export default function RewardsPage() {
                   required
                   value={triggerThreshold}
                   onChange={(e) => setTriggerThreshold(parseInt(e.target.value, 10))}
-                  className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] font-mono focus:outline-none"
+                  className="w-full bg-[#18181B] border border-zinc-700 rounded-md px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
+                <label className="text-[11px] font-medium text-zinc-400 block mb-1">
                   Reward Type
                 </label>
                 <select
                   value={rewardType}
                   onChange={(e) => setRewardType(e.target.value as any)}
-                  className="w-full bg-[#1C1814] border border-[#2A2520] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] focus:outline-none focus:border-[#BFA785]"
+                  className="w-full bg-[#18181B] border border-zinc-700 rounded-md px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-500"
                 >
                   <option value="BADGE">Digital Badge & Profile Flair</option>
                   <option value="FREE_ITEM">Free Item / Smoothie / Shake</option>
@@ -226,7 +228,7 @@ export default function RewardsPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-[#A39E98] block mb-1">
+                <label className="text-[11px] font-medium text-zinc-400 block mb-1">
                   Description / Redemptions Notes
                 </label>
                 <textarea
@@ -234,22 +236,22 @@ export default function RewardsPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                   placeholder="e.g. Show badge at reception juice bar to claim free whey protein shake."
-                  className="w-full bg-[#1C1814] border border-[#2A2520] focus:border-[#BFA785] rounded-xl px-3 py-2 text-xs text-[#F7F5F2] placeholder-[#6B6661] focus:outline-none resize-none"
+                  className="w-full bg-[#18181B] border border-zinc-700 rounded-md px-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 resize-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#26221E]">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsAddRewardOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#A39E98] hover:text-white hover:bg-[#26221E] transition-all btn-shadow"
+                  className="px-3 py-1.5 rounded-md text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors btn-shadow"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2.5 rounded-xl bg-[#BFA785] hover:bg-[#B29976] disabled:opacity-50 text-xs font-bold text-[#111111] shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all"
+                  className="px-4 py-1.5 rounded-md bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-xs shadow-sm btn-shadow-primary disabled:opacity-50 transition-all"
                 >
                   {submitting ? 'Saving...' : 'Save Milestone'}
                 </button>

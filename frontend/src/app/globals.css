@@ -4,119 +4,82 @@
 
 @layer base {
   :root {
-    --background: #111111;
-    --foreground: #F7F5F2;
+    --background: #09090B;
+    --foreground: #FAFAFA;
   }
 }
 
 body {
-  background-color: #111111;
-  color: #F7F5F2;
+  background-color: #09090B;
+  color: #FAFAFA;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   min-height: 100vh;
 }
 
-/* Custom warm scrollbars */
+/* Custom neutral cool scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #111111;
+  background: #09090B;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2A2520;
+  background: #27272A;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3D352E;
+  background: #3F3F46;
 }
 
-/* mynext9to5-inspired Glass & Bento Card Helpers */
-.bento-card {
-  background: #161310;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 1.25rem;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Linear & Stripe Style Neutral Card Helpers */
+.saas-card {
+  background: #121215;
+  border: 1px solid #27272A;
+  border-radius: 0.5rem; /* 8px modest radius */
+  transition: border-color 0.15s ease;
 }
 
-.bento-card:hover {
-  border-color: rgba(191, 167, 133, 0.25);
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 15px 0 rgba(191, 167, 133, 0.04);
-}
-
-.bento-card-interactive {
-  background: #161310;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 1.25rem;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.bento-card-interactive:hover {
-  border-color: rgba(191, 167, 133, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 14px 35px -10px rgba(0, 0, 0, 0.6), 0 0 20px 0 rgba(191, 167, 133, 0.06);
+.saas-card:hover {
+  border-color: #3F3F46;
 }
 
 /* All clickable buttons have shadow and tactile depth (code-style.md) */
 button,
 [role="button"],
 .btn-shadow {
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.35), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.15s ease;
 }
 
 button:hover:not(:disabled),
 [role="button"]:hover,
 .btn-shadow:hover {
-  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.45), 0 2px 4px 0 rgba(0, 0, 0, 0.25);
-  transform: translateY(-1px);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
 }
 
 button:active:not(:disabled),
 [role="button"]:active,
 .btn-shadow:active {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  transform: translateY(0);
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.6);
 }
 
-/* mynext9to5 Champagne Gold Button Shadow (#BFA785) */
+/* High-Contrast Primary Button Shadow */
 .btn-shadow-primary {
-  box-shadow: 0 4px 16px 0 rgba(191, 167, 133, 0.28), 0 1px 2px 0 rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.25) !important;
 }
 .btn-shadow-primary:hover:not(:disabled) {
-  box-shadow: 0 6px 22px 0 rgba(191, 167, 133, 0.42), 0 2px 4px 0 rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.3) !important;
 }
 
 .btn-shadow-danger {
-  box-shadow: 0 4px 14px 0 rgba(217, 83, 79, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.4) !important;
-}
-.btn-shadow-danger:hover:not(:disabled) {
-  box-shadow: 0 6px 20px 0 rgba(217, 83, 79, 0.42), 0 2px 4px 0 rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 1px 2px 0 rgba(239, 68, 68, 0.25) !important;
 }
 
 .btn-shadow-success {
-  box-shadow: 0 4px 14px 0 rgba(78, 159, 110, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.4) !important;
-}
-.btn-shadow-success:hover:not(:disabled) {
-  box-shadow: 0 6px 20px 0 rgba(78, 159, 110, 0.42), 0 2px 4px 0 rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 1px 2px 0 rgba(16, 185, 129, 0.25) !important;
 }
 
-/* Subtle champagne flame pulse */
-@keyframes champagne-pulse {
-  0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 4px rgba(191, 167, 133, 0.5));
-  }
-  50% {
-    transform: scale(1.08);
-    filter: drop-shadow(0 0 12px rgba(215, 200, 178, 0.7));
-  }
-}
-
-.animate-champagne-flame {
-  animation: champagne-pulse 2.2s infinite ease-in-out;
-}

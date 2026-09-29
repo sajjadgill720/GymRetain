@@ -4,65 +4,73 @@
 
 @layer base {
   /* ============================================================
-     1. BRIGHT / LIGHT THEME (Default)
+     1. LIGHT THEME (Foxstocks Reference: Image 1)
      ============================================================ */
   :root {
-    --bg-canvas: #F4F6FA;
+    --bg-canvas: #F5F6FC;
     --bg-surface: #FFFFFF;
     --bg-card: #FFFFFF;
-    --bg-card-elevated: #F8FAFC;
-    --bg-subtle: #F1F4F9;
+    --bg-card-elevated: #F8F9FE;
+    --bg-subtle: #EEF0F9;
     --bg-sidebar: #FFFFFF;
-    --border-color: #E2E8F0;
-    --border-hover: #CBD5E1;
+    --border-color: #E6E8F2;
+    --border-hover: #D5D8E8;
 
-    --text-primary: #0F172A;
-    --text-secondary: #64748B;
-    --text-tertiary: #94A3B8;
+    --text-primary: #111827;
+    --text-secondary: #4B5563;
+    --text-tertiary: #9CA3AF;
+
+    --accent-brand: #6D28D9;
+    --accent-brand-bg: #EDE9FE;
+    --accent-brand-light: #F5F3FF;
 
     --status-success-bg: #ECFDF5;
     --status-warning-bg: #FFFBEB;
     --status-danger-bg: #FEF2F2;
     --status-info-bg: #EFF6FF;
 
-    --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
-    --shadow-card-hover: 0 4px 12px 0 rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+    --shadow-card: 0 1px 3px 0 rgba(20, 24, 40, 0.04), 0 1px 2px -1px rgba(20, 24, 40, 0.03);
+    --shadow-card-hover: 0 6px 16px 0 rgba(20, 24, 40, 0.07), 0 2px 4px -1px rgba(20, 24, 40, 0.04);
     
-    --shadow-btn: 0 1px 2px 0 rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.06);
-    --shadow-btn-hover: 0 2px 4px 0 rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.1);
-    --shadow-btn-primary: 0 2px 6px 0 rgba(37, 99, 235, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
-    --shadow-btn-primary-hover: 0 4px 12px 0 rgba(37, 99, 235, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+    --shadow-btn: 0 1px 2px 0 rgba(20, 24, 40, 0.06), 0 0 0 1px rgba(20, 24, 40, 0.05);
+    --shadow-btn-hover: 0 2px 5px 0 rgba(20, 24, 40, 0.1), 0 0 0 1px rgba(20, 24, 40, 0.08);
+    --shadow-btn-primary: 0 2px 6px 0 rgba(109, 40, 217, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+    --shadow-btn-primary-hover: 0 4px 12px 0 rgba(109, 40, 217, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
   }
 
   /* ============================================================
-     2. RICH HIGH-END DARK THEME (Sophisticated Midnight Sapphire)
+     2. DARK THEME (Vision Reference: Image 2)
      ============================================================ */
   .dark {
-    --bg-canvas: #090D16;
-    --bg-surface: #0E1422;
-    --bg-card: #12192B;
-    --bg-card-elevated: #172138;
-    --bg-subtle: #1C2742;
-    --bg-sidebar: #0C111E;
-    --border-color: #1E293D;
-    --border-hover: #2B3A56;
+    --bg-canvas: #0A0C10;
+    --bg-surface: #10141D;
+    --bg-card: #131722;
+    --bg-card-elevated: #181E2B;
+    --bg-subtle: #1D2333;
+    --bg-sidebar: #0D1017;
+    --border-color: #1F2536;
+    --border-hover: #2B344B;
 
     --text-primary: #F8FAFC;
     --text-secondary: #94A3B8;
     --text-tertiary: #64748B;
 
-    --status-success-bg: rgba(16, 185, 129, 0.12);
-    --status-warning-bg: rgba(245, 158, 11, 0.12);
-    --status-danger-bg: rgba(239, 68, 68, 0.12);
-    --status-info-bg: rgba(59, 130, 246, 0.12);
+    --accent-brand: #00F2FE;
+    --accent-brand-bg: rgba(0, 242, 254, 0.12);
+    --accent-brand-light: rgba(0, 242, 254, 0.06);
 
-    --shadow-card: 0 2px 8px 0 rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.03);
-    --shadow-card-hover: 0 8px 24px 0 rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(59, 130, 246, 0.2);
+    --status-success-bg: rgba(5, 213, 170, 0.14);
+    --status-warning-bg: rgba(255, 176, 32, 0.14);
+    --status-danger-bg: rgba(255, 77, 77, 0.14);
+    --status-info-bg: rgba(59, 130, 246, 0.14);
 
-    --shadow-btn: 0 1px 2px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
-    --shadow-btn-hover: 0 2px 6px 0 rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
-    --shadow-btn-primary: 0 2px 10px 0 rgba(59, 130, 246, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
-    --shadow-btn-primary-hover: 0 4px 18px 0 rgba(59, 130, 246, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+    --shadow-card: 0 2px 10px 0 rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.03);
+    --shadow-card-hover: 0 8px 24px 0 rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 242, 254, 0.2);
+
+    --shadow-btn: 0 1px 3px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    --shadow-btn-hover: 0 2px 6px 0 rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+    --shadow-btn-primary: 0 2px 10px 0 rgba(0, 242, 254, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    --shadow-btn-primary-hover: 0 4px 18px 0 rgba(0, 242, 254, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -93,16 +101,16 @@ body {
   background: var(--border-hover);
 }
 
-/* Card utility */
-.shopeers-card {
+/* Card utility matching reference */
+.app-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 1.25rem; /* 20px modern rounded cards */
+  border-radius: 1.25rem; /* 20px rounded cards */
   box-shadow: var(--shadow-card);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.shopeers-card:hover {
+.app-card:hover {
   box-shadow: var(--shadow-card-hover);
   border-color: var(--border-hover);
 }
@@ -130,54 +138,75 @@ button:active:not(:disabled),
 
 /* High-Contrast Primary Button Shadow */
 .btn-shadow-primary {
-  background-color: #2563EB !important;
+  background-color: var(--accent-brand) !important;
   color: #FFFFFF !important;
   box-shadow: var(--shadow-btn-primary) !important;
 }
 
 .dark .btn-shadow-primary {
-  background-color: #3B82F6 !important;
-  box-shadow: var(--shadow-btn-primary) !important;
+  color: #0A0C10 !important;
+  font-weight: 700 !important;
 }
 
 .btn-shadow-primary:hover:not(:disabled) {
   box-shadow: var(--shadow-btn-primary-hover) !important;
-  filter: brightness(1.06);
+  filter: brightness(1.08);
 }
 
-/* 3D Orb Animations for AI Assistant */
-.ai-orb-1 {
-  background: radial-gradient(circle at 35% 30%, #60A5FA 0%, #2563EB 50%, #1D4ED8 100%);
-  box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.5), inset -4px -4px 8px rgba(0, 0, 0, 0.3), inset 4px 4px 8px rgba(255, 255, 255, 0.6);
+/* Pastel Cards for Light Theme (Foxstocks) */
+.pastel-card-mint {
+  background: linear-gradient(135deg, #E6FBF5 0%, #D4F7EE 100%);
+  border: 1px solid #B8EFE2;
 }
 
-.ai-orb-2 {
-  background: radial-gradient(circle at 35% 30%, #818CF8 0%, #4F46E5 50%, #3730A3 100%);
-  box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.5), inset -4px -4px 8px rgba(0, 0, 0, 0.3), inset 4px 4px 8px rgba(255, 255, 255, 0.6);
+.pastel-card-purple {
+  background: linear-gradient(135deg, #F0ECFD 0%, #E3DAFC 100%);
+  border: 1px solid #D1C4FA;
 }
 
-.ai-orb-3 {
-  background: radial-gradient(circle at 35% 30%, #38BDF8 0%, #0284C7 50%, #0369A1 100%);
-  box-shadow: 0 8px 24px -4px rgba(2, 132, 199, 0.5), inset -4px -4px 8px rgba(0, 0, 0, 0.3), inset 4px 4px 8px rgba(255, 255, 255, 0.6);
+.pastel-card-gold {
+  background: linear-gradient(135deg, #FEF7E5 0%, #FDEFCB 100%);
+  border: 1px solid #F9DF9E;
 }
 
-.ai-orb-4 {
-  background: radial-gradient(circle at 35% 30%, #A78BFA 0%, #6366F1 40%, #3B4261 100%);
-  box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.5), inset -4px -4px 8px rgba(0, 0, 0, 0.3), inset 4px 4px 8px rgba(255, 255, 255, 0.6);
+.pastel-card-lime {
+  background: linear-gradient(135deg, #F0FBDC 0%, #E4F7C3 100%);
+  border: 1px solid #CEEFA4;
 }
 
-/* Semi-circular gauge animation */
-@keyframes gauge-draw {
-  from {
-    stroke-dashoffset: 280;
-  }
-  to {
-    stroke-dashoffset: 89;
-  }
+.pastel-card-magenta {
+  background: linear-gradient(135deg, #FDF0F8 0%, #F9DCED 100%);
+  border: 1px solid #F4BFDF;
 }
 
-.gauge-progress-animated {
-  stroke-dasharray: 280;
-  stroke-dashoffset: 89;
-  animation: gauge-draw 1.4s ease-out forwards;
+/* Dark mode overrides for top cards (Vision reference: sleek high-contrast matte) */
+.dark .pastel-card-mint {
+  background: #141824;
+  border-color: #1F283B;
+}
+
+.dark .pastel-card-purple {
+  background: #141824;
+  border-color: #1F283B;
+}
+
+.dark .pastel-card-gold {
+  background: #141824;
+  border-color: #1F283B;
+}
+
+.dark .pastel-card-lime {
+  background: #141824;
+  border-color: #1F283B;
+}
+
+.dark .pastel-card-magenta {
+  background: #141824;
+  border-color: #1F283B;
+}
+
+/* 3D Orb Animation */
+.vision-dark-orb {
+  background: radial-gradient(circle at 35% 30%, #374151 0%, #181E29 45%, #0A0C10 90%);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.7), inset -4px -4px 10px rgba(0, 0, 0, 0.5), inset 4px 4px 10px rgba(255, 255, 255, 0.2);
 }

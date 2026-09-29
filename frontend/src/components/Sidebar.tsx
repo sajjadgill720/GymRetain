@@ -11,19 +11,16 @@ import {
   UserCheck,
   Building2,
   ChevronDown,
-  ChevronRight,
   Trophy,
   X,
   MessageCircle,
   QrCode,
   Sparkles,
   Dumbbell,
-  Settings,
-  HelpCircle,
-  FileText,
-  LogOut,
   PanelLeftClose,
   PanelLeftOpen,
+  Lightbulb,
+  LogOut,
 } from 'lucide-react';
 import { useAuth, GymInfo } from '../lib/AuthProvider';
 import { ThemeToggle } from './ThemeToggle';
@@ -59,9 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const [showGymDropdown, setShowGymDropdown] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const [operationsOpen, setOperationsOpen] = useState(true);
 
-  // Resolved user display
   const userName = user?.name || 'Bilal C.';
   const userRole = user?.role || 'OWNER';
   const userInitials =
@@ -118,13 +113,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-surface-sidebar border-r border-surface-border select-none transition-colors duration-200">
-      {/* Brand Logo & Collapse Toggle (Matching Image 1 & 2) */}
+      {/* Brand Logo & Collapse Toggle */}
       <div className="p-4 sm:p-5 flex items-center justify-between border-b border-surface-border">
         <Link href="/" className="flex items-center gap-3 group">
           <GymLogo size={32} />
           {!collapsed && (
             <div className="flex items-center gap-1.5">
-              <span className="text-lg font-bold tracking-tight text-content-primary font-sans">
+              <span className="text-lg font-extrabold tracking-tight text-content-primary font-sans">
                 GymRetain
               </span>
             </div>
@@ -151,7 +146,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      {/* Single-Gym Branch Indicator (or Multi-gym Switcher if authorized) */}
+      {/* Gym Branch Location Badge */}
       {!collapsed && (
         <div className="px-4 py-3 border-b border-surface-border/60">
           {hasMultipleGyms ? (
@@ -161,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-surface-subtle hover:bg-surface-elevated border border-surface-border text-xs font-medium text-content-primary transition-colors btn-shadow text-left"
               >
                 <div className="flex items-center gap-2 truncate">
-                  <Building2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <Building2 className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400 shrink-0" />
                   <span className="truncate">{currentGym.name}</span>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-content-tertiary shrink-0 ml-1" />
@@ -181,7 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       }}
                       className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col ${
                         currentGym.id === gym.id
-                          ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold'
+                          ? 'bg-purple-500/15 dark:bg-cyan-500/15 text-purple-700 dark:text-cyan-400 font-semibold'
                           : 'text-content-secondary hover:text-content-primary hover:bg-surface-subtle'
                       }`}
                     >
@@ -198,15 +193,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ) : (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-subtle/80 border border-surface-border text-xs font-medium text-content-secondary">
-              <Building2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+              <Building2 className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400 shrink-0" />
               <span className="truncate text-content-primary font-medium">{currentGym.name}</span>
             </div>
           )}
         </div>
       )}
 
-      {/* Navigation Links */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      {/* Navigation Items (Light: Foxstocks Lavender Pill | Dark: Vision High-Contrast White Pill) */}
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1.5">
+        {!collapsed && (
+          <div className="px-3 py-1 text-[10px] font-semibold text-content-tertiary uppercase tracking-wider">
+            User Panel
+          </div>
+        )}
+
         {navItems.map((item) => {
           const isActive =
             item.href === '/'
@@ -218,21 +219,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.name}
               href={item.href}
               onClick={onCloseMobile}
-              className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 relative ${
+              className={`group flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-150 ${
                 isActive
-                  ? 'bg-blue-600/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-semibold'
+                  ? 'bg-[#EDE9FE] text-[#6D28D9] dark:bg-white dark:text-black shadow-sm'
                   : 'text-content-secondary hover:text-content-primary hover:bg-surface-subtle'
               }`}
             >
               <div className="flex items-center gap-3">
-                {/* Active Indicator Bar on Left (Matching Image 1 Shopeers style) */}
-                {isActive && (
-                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-blue-600 dark:bg-blue-400 rounded-r-full" />
-                )}
                 <item.icon
                   className={`w-4 h-4 transition-colors ${
                     isActive
-                      ? 'text-blue-600 dark:text-blue-400'
+                      ? 'text-[#6D28D9] dark:text-black'
                       : 'text-content-tertiary group-hover:text-content-primary'
                   }`}
                 />
@@ -250,64 +247,58 @@ export const Sidebar: React.FC<SidebarProps> = ({
           );
         })}
 
-        {/* Quick Tools & Settings Section */}
+        {/* Quick Tools */}
         {!collapsed && (
           <div className="pt-4 mt-2 border-t border-surface-border/60 space-y-1">
             <div className="px-3 py-1 text-[10px] font-semibold text-content-tertiary uppercase tracking-wider">
-              Management
+              Front Desk
             </div>
             <button
               onClick={onOpenCheckInModal}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-content-secondary hover:text-content-primary hover:bg-surface-subtle transition-colors"
+              className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-content-secondary hover:text-content-primary hover:bg-surface-subtle transition-colors"
             >
               <UserCheck className="w-4 h-4 text-emerald-500" />
               <span>+ Quick Check-In</span>
             </button>
             <button
               onClick={onOpenQrModal}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-content-secondary hover:text-content-primary hover:bg-surface-subtle transition-colors"
+              className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-content-secondary hover:text-content-primary hover:bg-surface-subtle transition-colors"
             >
-              <QrCode className="w-4 h-4 text-blue-500" />
+              <QrCode className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
               <span>Front-Desk QR</span>
             </button>
           </div>
         )}
-      </div>
 
-      {/* Bottom Promo Card (Matching Image 1 Shopeers "Upgrade to Premium" style) */}
-      {!collapsed && (
-        <div className="p-3">
-          <div className="relative rounded-2xl p-4 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg btn-shadow">
-            <div className="relative z-10 space-y-2">
-              <div className="w-7 h-7 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+        {/* Pastel "Thoughts Time" Card from Foxstocks (Image 1) */}
+        {!collapsed && (
+          <div className="pt-4">
+            <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-50 to-lime-100 dark:from-[#131722] dark:to-[#171D2B] border border-emerald-200/60 dark:border-surface-border text-content-primary transition-all">
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="w-6 h-6 rounded-full bg-white dark:bg-emerald-500/20 flex items-center justify-center shadow-sm">
+                  <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+                </div>
+                <span className="text-xs font-bold text-emerald-900 dark:text-emerald-400">
+                  Retention Tip
+                </span>
               </div>
-              <div>
-                <h4 className="text-xs font-bold leading-tight">Pro Retention Suite</h4>
-                <p className="text-[11px] text-blue-100/90 leading-snug mt-0.5">
-                  Automated WhatsApp flows &amp; AI retention predictions.
-                </p>
-              </div>
-              <button
-                onClick={onOpenCheckInModal}
-                className="w-full py-1.5 px-3 rounded-xl bg-white hover:bg-blue-50 text-blue-700 text-xs font-semibold shadow transition-all btn-shadow flex items-center justify-center gap-1.5"
-              >
-                <span>Launch Kiosk</span>
-              </button>
+              <p className="text-[11px] text-emerald-800/90 dark:text-zinc-300 leading-snug">
+                80% of silent member churn happens when a member goes 14+ days without checking in.
+              </p>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* User Profile & Theme Toggle Footer */}
+      {/* Footer User Profile & Theme Toggle */}
       <div className="p-3 border-t border-surface-border flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-full bg-blue-600/10 text-blue-600 dark:text-blue-400 font-semibold text-xs flex items-center justify-center shrink-0 border border-blue-500/20">
+          <div className="w-8 h-8 rounded-full bg-purple-600/10 dark:bg-cyan-500/10 text-purple-700 dark:text-cyan-400 font-bold text-xs flex items-center justify-center shrink-0 border border-purple-500/20 dark:border-cyan-500/20">
             {userInitials}
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <div className="text-xs font-semibold text-content-primary truncate">
+              <div className="text-xs font-bold text-content-primary truncate">
                 {userName}
               </div>
               <div className="text-[10px] text-content-tertiary font-mono">{userRole}</div>
@@ -321,7 +312,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <aside
         className={`hidden lg:block shrink-0 h-screen sticky top-0 transition-all duration-200 z-30 ${
           collapsed ? 'w-20' : 'w-64'
@@ -330,7 +320,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {sidebarContent}
       </aside>
 
-      {/* Mobile Drawer Overlay */}
       {isOpenMobile && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"

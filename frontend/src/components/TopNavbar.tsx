@@ -37,7 +37,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   onOpenCheckInModal,
   onToggleMobileMenu,
 }) => {
-  const { user, gyms, activeGym } = useAuth();
+  const { user, activeGym } = useAuth();
   const currentGym = activeGym || DEMO_FALLBACK_GYM;
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,7 +48,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   const [simLoading, setSimLoading] = useState(false);
 
   const userName = user?.name || 'Bilal C.';
-  const userRole = user?.role || 'OWNER';
+  const firstName = userName.split(' ')[0] || 'Bilal';
   const userInitials =
     userName
       .split(' ')
@@ -90,9 +90,8 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
     <>
       <header className="sticky top-0 z-20 w-full bg-surface/90 backdrop-blur-md border-b border-surface-border select-none transition-colors duration-200">
         <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
-          {/* Left: Mobile Brand & Global Search Bar (Matching Image 1 Shopeers style) */}
-          <div className="flex items-center gap-3 flex-1 max-w-xl">
-            {/* Mobile Hamburger & Logo */}
+          {/* Left: Greeting matching Foxstocks "Hello Matt," */}
+          <div className="flex items-center gap-3 sm:gap-4">
             <button
               onClick={onToggleMobileMenu}
               className="lg:hidden p-2 rounded-xl text-content-secondary hover:text-content-primary hover:bg-surface-subtle border border-surface-border btn-shadow"
@@ -106,8 +105,16 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
               <span className="font-bold text-sm text-content-primary">GymRetain</span>
             </Link>
 
-            {/* Shopeers-style Search Input with ⌘K badge */}
-            <div className="relative w-full hidden sm:block">
+            <div className="hidden sm:block">
+              <h1 className="text-base sm:text-lg font-extrabold text-content-primary tracking-tight font-sans">
+                Hello {firstName},
+              </h1>
+            </div>
+          </div>
+
+          {/* Center: Search pill matching Foxstocks Image 1 */}
+          <div className="flex-1 max-w-md hidden md:block">
+            <div className="relative w-full">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-content-tertiary">
                 <Search className="w-4 h-4" />
               </div>
@@ -115,28 +122,23 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search anything..."
-                className="w-full pl-9 pr-12 py-1.5 rounded-full bg-surface-subtle/80 hover:bg-surface-subtle focus:bg-surface border border-surface-border focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-xs text-content-primary placeholder-content-tertiary outline-none transition-all"
+                placeholder="Search for members, check-ins, streaks..."
+                className="w-full pl-9 pr-4 py-2 rounded-2xl bg-surface-subtle hover:bg-surface focus:bg-surface border border-surface-border focus:border-purple-500 dark:focus:border-cyan-400 focus:ring-2 focus:ring-purple-500/20 text-xs text-content-primary placeholder-content-tertiary outline-none transition-all shadow-inner"
               />
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <span className="text-[10px] font-medium font-mono text-content-tertiary bg-surface px-1.5 py-0.5 rounded border border-surface-border">
-                  ⌘K
-                </span>
-              </div>
             </div>
           </div>
 
-          {/* Right: Theme Toggle, Notifications, Actions, Profile (Matching Image 1) */}
+          {/* Right: Actions, Theme Toggle, Bell, Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Front Desk QR trigger */}
             {onOpenQrModal && (
               <button
                 onClick={onOpenQrModal}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-medium text-content-secondary hover:text-content-primary transition-all btn-shadow"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-content-secondary hover:text-content-primary transition-all btn-shadow"
                 title="Printable QR kiosk placard"
               >
-                <QrCode className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span className="hidden xl:inline">Front-Desk QR</span>
+                <QrCode className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400" />
+                <span>Front-Desk QR</span>
               </button>
             )}
 
@@ -146,14 +148,14 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 setIsSimulatorOpen(true);
                 setSimResponse(null);
               }}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-medium text-content-secondary hover:text-content-primary transition-all btn-shadow"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-content-secondary hover:text-content-primary transition-all btn-shadow"
               title="Test WhatsApp member response"
             >
               <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
-              <span>WhatsApp Test</span>
+              <span className="hidden lg:inline">WhatsApp Simulator</span>
             </button>
 
-            {/* Theme Toggle (Sun / Moon) matching Image 1 */}
+            {/* Theme Toggle (Sun / Moon) */}
             <ThemeToggle />
 
             {/* Notification Bell matching Image 1 */}
@@ -165,9 +167,9 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-surface" />
             </button>
 
-            {/* User Profile Avatar with Image 1 styling */}
-            <div className="flex items-center gap-2.5 pl-1">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white font-bold text-xs flex items-center justify-center shadow-sm">
+            {/* User Profile Avatar matching Image 1 */}
+            <div className="flex items-center gap-2 pl-0.5">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 dark:from-cyan-400 dark:to-blue-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm">
                 {userInitials}
               </div>
             </div>
@@ -191,7 +193,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 <MessageCircle className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-content-primary">WhatsApp Simulation</h3>
+                <h3 className="text-sm font-semibold text-content-primary">WhatsApp Simulator</h3>
                 <p className="text-[11px] text-content-tertiary">Inbound retention keywords</p>
               </div>
             </div>

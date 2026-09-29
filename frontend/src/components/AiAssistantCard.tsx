@@ -5,9 +5,10 @@ import { Paperclip, Mic, ArrowUp, Maximize2, Sparkles, CheckCircle2, Bot } from 
 
 interface AiAssistantCardProps {
   className?: string;
+  onOpenModal?: () => void;
 }
 
-export const AiAssistantCard: React.FC<AiAssistantCardProps> = ({ className = '' }) => {
+export const AiAssistantCard: React.FC<AiAssistantCardProps> = ({ className = '', onOpenModal }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
@@ -40,28 +41,53 @@ export const AiAssistantCard: React.FC<AiAssistantCardProps> = ({ className = ''
     },
   ];
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const q = textToSend || query;
     if (!q.trim()) return;
 
     setLoading(true);
     setResponse(null);
 
-    setTimeout(() => {
-      // Find matching prompt or generic intelligent retention assistant reply
-      const matched = quickPrompts.find(
-        (p) => p.prompt.toLowerCase().includes(q.toLowerCase()) || q.toLowerCase().includes(p.title.toLowerCase()),
-      );
+    // Check quick prompt matches first
+    const matched = quickPrompts.find(
+      (p) => p.prompt.toLowerCase().includes(q.toLowerCase()) || q.toLowerCase().includes(p.title.toLowerCase()),
+    );
 
-      if (matched) {
+    if (matched) {
+      setTimeout(() => {
         setResponse(matched.reply);
+        setLoading(false);
+      }, 300);
+      return;
+    }
+
+    try {
+      // Connect to the backend Groq / Privacy-Guarded AI inference endpoint
+      const aiData = await (await import('../lib/api')).api.askAiAssistant({
+        query: q,
+        anonymizedData: {
+          missingDays: 8,
+          currentStreak: 2,
+          longestStreak: 12,
+          frequencyDrop: 60,
+          planType: 'MONTHLY_STANDARD',
+        },
+      });
+
+      if (aiData?.insight) {
+        setResponse(`✨ ${aiData.insight}${aiData.recommendedWhatsAppNudge ? `\n\n💬 WhatsApp Nudge: "${aiData.recommendedWhatsAppNudge}"` : ''}`);
       } else {
         setResponse(
           `✨ GymRetain AI Analysis for "${q}": Based on current check-in patterns, overall gym attendance is up 12% week-over-week. Member retention stability is at 91.4% with 6 flagged at-risk members recommended for WhatsApp re-engagement.`,
         );
       }
+    } catch {
+      setResponse(
+        `✨ GymRetain AI Analysis for "${q}": Based on current check-in patterns, overall gym attendance is up 12% week-over-week. Member retention stability is at 91.4% with 6 flagged at-risk members recommended for WhatsApp re-engagement.`,
+      );
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   const handleOrbClick = (promptObj: (typeof quickPrompts)[0], index: number) => {
@@ -81,8 +107,9 @@ export const AiAssistantCard: React.FC<AiAssistantCardProps> = ({ className = ''
           <h3 className="text-sm font-semibold text-content-primary tracking-tight">AI Assistant</h3>
         </div>
         <button
-          className="p-1 rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-subtle transition-colors"
-          title="Expand AI Assistant"
+          onClick={onOpenModal}
+          className="p-1 rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-subtle transition-colors cursor-pointer"
+          title="Expand AI Retention Analytics & Reasoning"
         >
           <Maximize2 className="w-3.5 h-3.5" />
         </button>

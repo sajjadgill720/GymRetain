@@ -2,8 +2,18 @@
 
 import React from 'react';
 import { Sparkles, TrendingUp, UserCheck, DollarSign, Award } from 'lucide-react';
+import { DashboardSummary } from '../../types';
 
-export const VisionDarkHero: React.FC = () => {
+interface VisionDarkHeroProps {
+  summary?: DashboardSummary | null;
+}
+
+export const VisionDarkHero: React.FC<VisionDarkHeroProps> = ({ summary }) => {
+  const activeMembers = summary?.kpis?.activeMembers ?? 142;
+  const highRiskCount = summary?.kpis?.highRiskCount ?? 6;
+  const todayVisits = summary?.kpis?.todayCheckIns ?? 38;
+  const revenue = activeMembers * 3144;
+
   return (
     <div className="hidden dark:block mb-6 animate-in fade-in duration-300">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -20,7 +30,7 @@ export const VisionDarkHero: React.FC = () => {
               <span className="text-2xl">👋</span>
             </div>
             <p className="text-xs text-zinc-400 mt-1 max-w-md">
-              Your member retention loop is active. 6 at-risk members require attention before weekend churn.
+              Your member retention loop is active. {highRiskCount} at-risk members require attention before weekend churn.
             </p>
           </div>
 

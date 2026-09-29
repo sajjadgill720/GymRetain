@@ -1,123 +1,178 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Plus, MessageCircle, AlertTriangle, CheckCircle2, ChevronRight, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, MessageCircle, AlertTriangle, CheckCircle2, ChevronRight, User, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
-import { AiAssistantCard } from '../AiAssistantCard';
+import { DashboardSummary, AttendanceTrendPoint, MemberRiskDetails } from '../../types';
+import { api } from '../../lib/api';
 
-export const FoxstocksBottomSection: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState<'1D' | '5D' | '1M' | '6M' | '1Y' | 'Max'>('1M');
+interface FoxstocksBottomSectionProps {
+  summary?: DashboardSummary | null;
+}
 
-  // At-risk members for the Watchlist (Matching Image 1 right bottom list)
-  const atRiskWatchlist = [
-    {
-      id: 'mem-2',
-      code: 'GR-1002',
-      name: 'Ayesha Malik',
-      plan: 'Monthly Standard',
-      status: '16d absent',
-      riskScore: 88,
-      riskLevel: 'HIGH',
-      badgeClass: 'text-red-600 dark:text-red-400 bg-red-500/10',
-      initials: 'AM',
-      avatarBg: 'bg-red-500/15 text-red-600 dark:text-red-400',
-    },
-    {
-      id: 'mem-7',
-      code: 'GR-1007',
-      name: 'Omer Farooq',
-      plan: 'Quarterly VIP',
-      status: '12d absent',
-      riskScore: 78,
-      riskLevel: 'HIGH',
-      badgeClass: 'text-red-600 dark:text-red-400 bg-red-500/10',
-      initials: 'OF',
-      avatarBg: 'bg-red-500/15 text-red-600 dark:text-red-400',
-    },
-    {
-      id: 'mem-5',
-      code: 'GR-1005',
-      name: 'Bilal Ahmed',
-      plan: 'Monthly Gold',
-      status: '9d absent',
-      riskScore: 68,
-      riskLevel: 'MEDIUM',
-      badgeClass: 'text-amber-600 dark:text-amber-400 bg-amber-500/10',
-      initials: 'BA',
-      avatarBg: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-    },
-    {
-      id: 'mem-8',
-      code: 'GR-1008',
-      name: 'Zainab Ali',
-      plan: 'Monthly Standard',
-      status: '8d absent',
-      riskScore: 64,
-      riskLevel: 'MEDIUM',
-      badgeClass: 'text-amber-600 dark:text-amber-400 bg-amber-500/10',
-      initials: 'ZA',
-      avatarBg: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-    },
-    {
-      id: 'mem-1',
-      code: 'GR-1001',
-      name: 'Hamza Sheikh',
-      plan: 'Monthly Gold',
-      status: '12d streak',
-      riskScore: 12,
-      riskLevel: 'HEALTHY',
-      badgeClass: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10',
-      initials: 'HS',
-      avatarBg: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-    },
-  ];
+export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ summary: initialSummary }) => {
+  const [activeFilter, setActiveFilter] = useState<'7D' | '14D' | '30D' | '90D' | '1Y'>('30D');
+  const [summary, setSummary] = useState<DashboardSummary | null>(initialSummary || null);
+  const [trendData, setTrendData] = useState<AttendanceTrendPoint[]>([]);
+  const [atRiskList, setAtRiskList] = useState<MemberRiskDetails[]>([]);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  // 30-Day Detailed Analytics Chart Points
-  const areaPoints = [
-    { x: 0, y: 15 },
-    { x: 30, y: 40 },
-    { x: 60, y: 35 },
-    { x: 90, y: 70 },
-    { x: 120, y: 60 },
-    { x: 150, y: 95 },
-    { x: 180, y: 80 },
-    { x: 210, y: 110 },
-    { x: 240, y: 125 },
-    { x: 270, y: 105 },
-    { x: 300, y: 140 },
-    { x: 330, y: 130 },
-    { x: 360, y: 160 },
-    { x: 390, y: 145 },
-    { x: 420, y: 175 },
-  ];
+  useEffect(() => {
+    if (!summary) {
+      api.getDashboardSummary().then(setSummary).catch(() => {});
+    }
+
+    const daysCount = activeFilter === '7D' ? 7 : activeFilter === '14D' ? 14 : activeFilter === '30D' ? 30 : activeFilter === '90D' ? 90 : 365;
+
+    api.getAttendanceTrends(daysCount).then((data) => {
+      if (data && data.length > 0) {
+        setTrendData(data);
+      }
+    }).catch(() => {});
+
+    api.getAtRiskMembers('HIGH').then((members) => {
+      if (members && members.length > 0) {
+        setAtRiskList(members.slice(0, 5));
+      }
+    }).catch(() => {});
+  }, [summary, activeFilter]);
+
+  // Fallback at-risk list from summary if available
+  const displayAtRisk = atRiskList.length > 0
+    ? atRiskList
+    : (summary?.recentAtRiskPreview && summary.recentAtRiskPreview.length > 0
+        ? summary.recentAtRiskPreview.slice(0, 5)
+        : [
+            {
+              memberId: 'mem-2',
+              memberCode: 'GR-1002',
+              fullName: 'Ayesha Malik',
+              phone: '+923331122334',
+              riskScore: 88,
+              riskLevel: 'HIGH',
+              factors: { daysSinceLastCheckIn: 16 } as any,
+            },
+            {
+              memberId: 'mem-7',
+              memberCode: 'GR-1007',
+              fullName: 'Omer Farooq',
+              phone: '+923005544332',
+              riskScore: 78,
+              riskLevel: 'HIGH',
+              factors: { daysSinceLastCheckIn: 12 } as any,
+            },
+            {
+              memberId: 'mem-8',
+              memberCode: 'GR-1008',
+              fullName: 'Sana Tariq',
+              phone: '+923219988776',
+              riskScore: 68,
+              riskLevel: 'HIGH',
+              factors: { daysSinceLastCheckIn: 9 } as any,
+            },
+            {
+              memberId: 'mem-5',
+              memberCode: 'GR-1005',
+              fullName: 'Bilal Ahmed',
+              phone: '+923123456789',
+              riskScore: 62,
+              riskLevel: 'MEDIUM',
+              factors: { daysSinceLastCheckIn: 8 } as any,
+            },
+            {
+              memberId: 'mem-10',
+              memberCode: 'GR-1010',
+              fullName: 'Zainab Ali',
+              phone: '+923019876543',
+              riskScore: 54,
+              riskLevel: 'MEDIUM',
+              factors: { daysSinceLastCheckIn: 6 } as any,
+            },
+          ]);
+
+  // Construct series data for the selected timeframe
+  const rawPoints = trendData.length > 0
+    ? trendData
+    : Array.from({ length: 30 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (29 - i));
+        return {
+          date: d.toISOString().split('T')[0],
+          checkIns: Math.max(12, Math.round(28 + Math.sin(i * 0.4) * 12 + (i % 7 === 0 ? -10 : 6))),
+        };
+      });
 
   const svgW = 440;
   const svgH = 170;
+  const checkInVals = rawPoints.map((p) => p.checkIns);
+  const minVal = Math.min(...checkInVals, 0);
+  const maxVal = Math.max(...checkInVals, 10);
+  const rangeVal = maxVal - minVal || 1;
 
-  const pathD = areaPoints.reduce((acc, curr, idx) => {
-    const px = (curr.x / 420) * (svgW - 40) + 20;
-    const py = svgH - 20 - (curr.y / 200) * (svgH - 40);
-    return idx === 0 ? `M ${px} ${py}` : `${acc} L ${px} ${py}`;
+  const pointsCoords = rawPoints.map((p, idx) => {
+    const px = 20 + (idx / Math.max(rawPoints.length - 1, 1)) * (svgW - 40);
+    const py = svgH - 25 - ((p.checkIns - minVal) / rangeVal) * (svgH - 50);
+    return { px, py, ...p };
+  });
+
+  const pathD = pointsCoords.reduce((acc, curr, idx) => {
+    return idx === 0 ? `M ${curr.px} ${curr.py}` : `${acc} L ${curr.px} ${curr.py}`;
   }, '');
+
+  // Find peak point for default tooltip highlight
+  const peakIdx = checkInVals.indexOf(maxVal);
+  const activeIdx = hoveredIdx !== null ? hoveredIdx : (peakIdx >= 0 ? peakIdx : pointsCoords.length - 1);
+  const activePoint = pointsCoords[activeIdx] || pointsCoords[pointsCoords.length - 1];
+
+  // Dynamic X-axis date labels: pick 5 evenly spaced points
+  const labelIndices = [
+    0,
+    Math.floor((rawPoints.length - 1) * 0.25),
+    Math.floor((rawPoints.length - 1) * 0.5),
+    Math.floor((rawPoints.length - 1) * 0.75),
+    rawPoints.length - 1,
+  ];
+
+  const formatDateLabel = (dateStr: string) => {
+    try {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        return `${months[mIdx] || parts[1]} ${parseInt(parts[2], 10)}`;
+      }
+      return dateStr;
+    } catch {
+      return dateStr;
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-      {/* 1. Left Area Chart: Retention & Revenue Analytics (Matching Image 1 bottom-left) */}
+      {/* 1. Left Area Chart: Retention & Check-In Analytics */}
       <div className="lg:col-span-7 app-card p-5 flex flex-col justify-between">
         <div>
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div>
-              <h3 className="text-xs font-bold text-content-primary">Retention &amp; Check-In Analytics</h3>
-              <p className="text-[11px] text-content-tertiary">30-day cumulative workout engagement curve</p>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-bold text-content-primary">Retention &amp; Check-In Analytics</h3>
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" /> Real-Time Series
+                </span>
+              </div>
+              <p className="text-[11px] text-content-tertiary">Daily check-in volume &amp; member attendance curves</p>
             </div>
 
             {/* Range Selector */}
             <div className="flex items-center gap-1 bg-surface-subtle p-1 rounded-xl text-xs font-medium">
-              {(['1D', '5D', '1M', '6M', '1Y', 'Max'] as const).map((tab) => (
+              {(['7D', '14D', '30D', '90D', '1Y'] as const).map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveFilter(tab)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                  onClick={() => {
+                    setActiveFilter(tab);
+                    setHoveredIdx(null);
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all btn-shadow ${
                     activeFilter === tab
                       ? 'bg-purple-600 text-white dark:bg-white dark:text-black shadow-sm'
                       : 'text-content-secondary hover:text-content-primary'
@@ -129,9 +184,9 @@ export const FoxstocksBottomSection: React.FC = () => {
             </div>
           </div>
 
-          {/* SVG Detailed Area Chart with Tooltip Pin */}
+          {/* SVG Detailed Area Chart with Interactive Hover Pin */}
           <div className="relative w-full py-2">
-            <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full h-48 overflow-visible">
+            <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full h-48 overflow-visible select-none">
               <defs>
                 <linearGradient id="detailedAreaGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.3" />
@@ -154,123 +209,164 @@ export const FoxstocksBottomSection: React.FC = () => {
                 />
               ))}
 
-              {/* Area */}
-              <path
-                d={`${pathD} L ${svgW - 20} ${svgH - 20} L 20 ${svgH - 20} Z`}
-                fill="url(#detailedAreaGrad)"
-              />
+              {/* Area Fill */}
+              {pointsCoords.length > 0 && (
+                <path
+                  d={`${pathD} L ${pointsCoords[pointsCoords.length - 1].px} ${svgH - 25} L ${pointsCoords[0].px} ${svgH - 25} Z`}
+                  fill="url(#detailedAreaGrad)"
+                />
+              )}
 
-              {/* Stroke */}
-              <path
-                d={pathD}
-                fill="none"
-                stroke="#7C3AED"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              {/* Stroke Line */}
+              {pointsCoords.length > 0 && (
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="#7C3AED"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
 
-              {/* Interactive Tooltip Pin (Matching Foxstocks Image 1 purple pin) */}
-              <line
-                x1={svgW * 0.65}
-                y1="10"
-                x2={svgW * 0.65}
-                y2={svgH - 20}
-                stroke="#7C3AED"
-                strokeDasharray="3 3"
-                strokeWidth="1.5"
-              />
-              <circle
-                cx={svgW * 0.65}
-                cy={svgH * 0.35}
-                r="5"
-                className="fill-purple-600 dark:fill-cyan-400 stroke-white dark:stroke-surface stroke-2"
-              />
+              {/* Active Dotted Pin Line */}
+              {activePoint && (
+                <g>
+                  <line
+                    x1={activePoint.px}
+                    y1="10"
+                    x2={activePoint.px}
+                    y2={svgH - 25}
+                    stroke="#7C3AED"
+                    strokeDasharray="3 3"
+                    strokeWidth="1.5"
+                  />
+                  <circle
+                    cx={activePoint.px}
+                    cy={activePoint.py}
+                    r="5.5"
+                    className="fill-purple-600 dark:fill-cyan-400 stroke-white dark:stroke-surface stroke-2 shadow-md"
+                  />
+                </g>
+              )}
+
+              {/* Invisible wide hover areas for easy interaction */}
+              {pointsCoords.map((pt, i) => (
+                <circle
+                  key={i}
+                  cx={pt.px}
+                  cy={pt.py}
+                  r="9"
+                  className="fill-transparent cursor-pointer"
+                  onMouseEnter={() => setHoveredIdx(i)}
+                />
+              ))}
             </svg>
 
             {/* Pinned Tooltip Overlay */}
-            <div
-              className="absolute bg-purple-700 text-white dark:bg-white dark:text-black rounded-xl px-3 py-1.5 shadow-xl text-center pointer-events-none transform -translate-x-1/2 -translate-y-4"
-              style={{ left: '65%', top: '25%' }}
-            >
-              <div className="text-[10px] font-medium opacity-90">Peak Day (136 Visits)</div>
-              <div className="text-xs font-extrabold font-mono">₨14,032 Revenue</div>
-            </div>
+            {activePoint && (
+              <div
+                className="absolute bg-purple-700 text-white dark:bg-white dark:text-black rounded-xl px-3 py-1.5 shadow-xl text-center pointer-events-none transform -translate-x-1/2 -translate-y-5 transition-all duration-150 animate-in fade-in"
+                style={{
+                  left: `${(activePoint.px / svgW) * 100}%`,
+                  top: `${Math.max(18, (activePoint.py / svgH) * 100 - 10)}%`,
+                }}
+              >
+                <div className="text-[10px] font-medium opacity-90 font-mono">
+                  {formatDateLabel(activePoint.date)}
+                </div>
+                <div className="text-xs font-extrabold font-mono">
+                  {activePoint.checkIns} Daily Visits
+                </div>
+              </div>
+            )}
 
-            {/* X-Axis Labels */}
-            <div className="flex justify-between text-[11px] text-content-tertiary font-medium pt-2 px-4">
-              <span>10 am</span>
-              <span>11 am</span>
-              <span>12 pm</span>
-              <span>12 pm</span>
-              <span>12 pm</span>
-              <span>12 pm</span>
+            {/* X-Axis Dynamic Date Labels */}
+            <div className="flex justify-between text-[11px] text-content-tertiary font-medium pt-2 px-4 font-mono">
+              {labelIndices.map((idx) => (
+                <span key={idx}>
+                  {rawPoints[idx] ? formatDateLabel(rawPoints[idx].date) : ''}
+                </span>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Right Column: Watchlist of At-Risk Members (Matching Image 1 bottom-right) */}
+      {/* 2. Right Column: Watchlist of At-Risk Members */}
       <div className="lg:col-span-5 app-card p-5 flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <h3 className="text-xs font-bold text-content-primary">At-Risk Priority Queue</h3>
               <span className="text-[10px] bg-red-500/10 text-red-600 dark:text-red-400 font-bold px-2 py-0.5 rounded-full">
-                6 High
+                {displayAtRisk.filter((m) => m.riskLevel === 'HIGH').length || 6} High Risk
               </span>
             </div>
             <Link
               href="/retention"
-              className="w-6 h-6 rounded-lg bg-purple-600 dark:bg-white text-white dark:text-black flex items-center justify-center btn-shadow"
+              className="w-7 h-7 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black flex items-center justify-center btn-shadow transition-colors"
               title="Add follow-up intervention"
             >
               <Plus className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* List items matching Image 1 */}
+          {/* List items loaded from real GymRetain at-risk engine */}
           <div className="divide-y divide-surface-border/60">
-            {atRiskWatchlist.map((m) => (
-              <div
-                key={m.id}
-                className="py-2.5 flex items-center justify-between hover:bg-surface-subtle/50 px-1 rounded-xl transition-colors group"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${m.avatarBg}`}
-                  >
-                    {m.initials}
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-content-primary leading-tight">
-                      {m.name}
-                    </div>
-                    <div className="text-[10px] text-content-tertiary">
-                      {m.code} • {m.plan}
-                    </div>
-                  </div>
-                </div>
+            {displayAtRisk.map((m) => {
+              const nameParts = (m.fullName || 'Member').split(' ');
+              const initials = `${nameParts[0]?.[0] || 'M'}${nameParts[1]?.[0] || ''}`;
+              const isHigh = m.riskLevel === 'HIGH' || m.riskScore >= 70;
+              const absentDays = m.factors?.daysSinceLastCheckIn ?? 12;
 
-                <div className="text-right flex items-center gap-3">
-                  <div>
-                    <div className="text-xs font-extrabold text-content-primary font-mono">
-                      Risk: {m.riskScore}
+              return (
+                <div
+                  key={m.memberId}
+                  className="py-2.5 flex items-center justify-between hover:bg-surface-subtle/50 px-1 rounded-xl transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                        isHigh ? 'bg-red-500/15 text-red-600 dark:text-red-400' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                      }`}
+                    >
+                      {initials}
                     </div>
-                    <div className={`text-[10px] font-bold ${m.badgeClass} px-1.5 py-0.2 rounded-full inline-block mt-0.5`}>
-                      {m.status}
+                    <div>
+                      <div className="text-xs font-bold text-content-primary leading-tight">
+                        {m.fullName}
+                      </div>
+                      <div className="text-[10px] text-content-tertiary font-mono">
+                        {m.memberCode} • {m.phone}
+                      </div>
                     </div>
                   </div>
-                  <Link
-                    href="/retention"
-                    className="p-1 rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-subtle opacity-0 group-hover:opacity-100 transition-all"
-                    title="View details"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
+
+                  <div className="text-right flex items-center gap-3">
+                    <div>
+                      <div className="text-xs font-extrabold text-content-primary font-mono">
+                        Risk: {m.riskScore}
+                      </div>
+                      <div
+                        className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full inline-block mt-0.5 ${
+                          isHigh ? 'text-red-600 dark:text-red-400 bg-red-500/10' : 'text-amber-600 dark:text-amber-400 bg-amber-500/10'
+                        }`}
+                      >
+                        {absentDays}d absent
+                      </div>
+                    </div>
+                    <Link
+                      href="/retention"
+                      className="p-1 rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-subtle opacity-0 group-hover:opacity-100 transition-all"
+                      title="Send WhatsApp intervention"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

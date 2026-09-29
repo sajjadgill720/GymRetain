@@ -3,55 +3,65 @@
 import React from 'react';
 import { UserCheck, Users, AlertTriangle, Flame, Award, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { DashboardSummary } from '../../types';
 
-export const RetentionSparklineRow: React.FC = () => {
+interface RetentionSparklineRowProps {
+  summary?: DashboardSummary | null;
+}
+
+export const RetentionSparklineRow: React.FC<RetentionSparklineRowProps> = ({ summary }) => {
+  const activeMembers = summary?.kpis?.activeMembers ?? 142;
+  const todayCheckIns = summary?.kpis?.todayCheckIns ?? 38;
+  const highRiskCount = summary?.kpis?.highRiskCount ?? 6;
+  const topStreak = summary?.streakLeaders?.[0]?.currentStreak ?? 12;
+
   const cards = [
     {
       id: 'checkins',
       title: 'Today Check-Ins',
       code: 'ATTENDANCE',
-      value: '38 Visits',
+      value: `${todayCheckIns} Visits`,
       change: '+12.4%',
       isPositive: true,
       cardClass: 'pastel-card-mint',
       strokeColor: '#059669',
-      points: [12, 18, 14, 24, 22, 38],
+      points: [12, 18, 14, 24, 22, todayCheckIns],
       icon: UserCheck,
     },
     {
       id: 'members',
       title: 'Active Members',
       code: 'UTILIZATION',
-      value: '142 Enrolled',
+      value: `${activeMembers} Enrolled`,
       change: '+8.2%',
       isPositive: true,
       cardClass: 'pastel-card-purple',
       strokeColor: '#7C3AED',
-      points: [120, 128, 134, 130, 138, 142],
+      points: [120, 128, 134, 130, 138, activeMembers],
       icon: Users,
     },
     {
       id: 'atrisk',
       title: 'At-Risk Alerts',
       code: 'CHURN RISK',
-      value: '6 High Risk',
+      value: `${highRiskCount} High Risk`,
       change: 'Needs Nudge',
       isPositive: false,
       cardClass: 'pastel-card-gold',
       strokeColor: '#D97706',
-      points: [14, 11, 9, 8, 7, 6],
+      points: [14, 11, 9, 8, 7, highRiskCount],
       icon: AlertTriangle,
     },
     {
       id: 'streak',
       title: 'Top Streak',
       code: 'CHAMPIONS',
-      value: '12 Days',
+      value: `${topStreak} Days`,
       change: '+4.4%',
       isPositive: true,
       cardClass: 'pastel-card-lime',
       strokeColor: '#16A34A',
-      points: [5, 7, 8, 10, 11, 12],
+      points: [5, 7, 8, 10, 11, topStreak],
       icon: Flame,
     },
     {

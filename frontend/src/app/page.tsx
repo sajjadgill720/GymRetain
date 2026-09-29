@@ -45,7 +45,7 @@ export default function DashboardPage() {
     <AppLayout onRefreshData={loadData}>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1700px] w-full mx-auto animate-in fade-in duration-300">
         {/* Dark Mode Specific Vision Hero Section (Image 2) */}
-        <VisionDarkHero />
+        <VisionDarkHero summary={summary} />
 
         {/* Top Header Controls (Light & Dark) */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -86,13 +86,13 @@ export default function DashboardPage() {
         </div>
 
         {/* 1. Top Sparkline Cards (Foxstocks Pastel in Light Mode, Vision Dark Matte in Dark Mode) */}
-        <RetentionSparklineRow />
+        <RetentionSparklineRow summary={summary} />
 
         {/* 2. Middle Section: Revenue Card + Workout Trends Chart + Retention Snapshot Sliders */}
-        <FoxstocksMiddleSection />
+        <FoxstocksMiddleSection summary={summary} />
 
         {/* 3. Bottom Section: Detailed Retention Analytics Area Chart + At-Risk Watchlist */}
-        <FoxstocksBottomSection />
+        <FoxstocksBottomSection summary={summary} />
 
         {/* 4. AI Retention Assistant Section */}
         <div className="pt-2">

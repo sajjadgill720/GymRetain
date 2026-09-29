@@ -21,7 +21,23 @@ enum GymStatus {
 enum StaffRole {
   SUPER_ADMIN
   GYM_OWNER
+  GYM_MANAGER
   GYM_STAFF
+  TRAINER
+}
+
+enum DietGoal {
+  WEIGHT_LOSS
+  MUSCLE_GAIN
+  MAINTENANCE
+  CUSTOM
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
 }
 
 enum Gender {
@@ -142,6 +158,9 @@ model Gym {
   whatsappLogs        WhatsAppMessageLog[]
   whatsappTemplates   WhatsAppTemplate[]
   auditLogs           AuditLog[]
+  trainerAssignments  TrainerAssignment[]
+  dietPlans           DietPlan[]
+  dietPlanTemplates   DietPlanTemplate[]
 
   @@map("gyms")
 }
@@ -160,8 +179,10 @@ model GymStaff {
   updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relations
-  gym             Gym?        @relation(fields: [gymId], references: [id], onDelete: Cascade)
-  manualCheckIns  CheckIn[]   @relation("StaffManualCheckIns")
+  gym                 Gym?                @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  manualCheckIns      CheckIn[]           @relation("StaffManualCheckIns")
+  trainerAssignments  TrainerAssignment[] @relation("StaffTrainerAssignments")
+  createdDietPlans    DietPlan[]          @relation("DietPlanCreatedBy")
 
   @@index([gymId])
   @@index([gymId, role])
@@ -192,9 +213,11 @@ model Member {
   memberships       Membership[]
   checkIns          CheckIn[]
   streak            Streak?
-  rewardRedemptions RewardRedemption[]
-  payments          Payment[]
-  whatsappLogs      WhatsAppMessageLog[]
+  rewardRedemptions   RewardRedemption[]
+  payments            Payment[]
+  whatsappLogs        WhatsAppMessageLog[]
+  trainerAssignments  TrainerAssignment[]
+  dietPlans           DietPlan[]
 
   @@unique([gymId, memberCode])
   @@index([gymId, phone])
@@ -415,4 +438,82 @@ model WhatsAppTemplate {
   @@index([gymId, isActive])
   @@map("whatsapp_templates")
 }
+
+model TrainerAssignment {
+  id          String    @id @default(uuid()) @db.Uuid
+  gymId       String    @map("gym_id") @db.Uuid
+  memberId    String    @map("member_id") @db.Uuid
+  trainerId   String    @map("trainer_id") @db.Uuid
+  assignedAt  DateTime  @default(now()) @map("assigned_at") @db.Timestamptz(6)
+  isActive    Boolean   @default(true) @map("is_active")
+
+  // Relations
+  gym         Gym       @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member      Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  trainer     GymStaff  @relation("StaffTrainerAssignments", fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@index([gymId, memberId, isActive])
+  @@index([gymId, trainerId, isActive])
+  @@map("trainer_assignments")
+}
+
+model DietPlan {
+  id          String          @id @default(uuid()) @db.Uuid
+  gymId       String          @map("gym_id") @db.Uuid
+  memberId    String          @map("member_id") @db.Uuid
+  createdById String          @map("created_by_id") @db.Uuid
+  title       String          @db.VarChar(255)
+  goal        DietGoal        @default(MAINTENANCE)
+  customGoal  String?         @map("custom_goal") @db.VarChar(100)
+  notes       String?         @db.Text
+  isActive    Boolean         @default(true) @map("is_active")
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym         Gym             @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member      Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  createdBy   GymStaff        @relation("DietPlanCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  meals       DietPlanMeal[]
+
+  @@index([gymId, memberId, isActive])
+  @@map("diet_plans")
+}
+
+model DietPlanMeal {
+  id          String    @id @default(uuid()) @db.Uuid
+  dietPlanId  String    @map("diet_plan_id") @db.Uuid
+  mealType    MealType  @map("meal_type")
+  description String    @db.Text
+  calories    Int?
+  proteinG    Float?    @map("protein_g")
+  carbsG      Float?    @map("carbs_g")
+  fatG        Float?    @map("fat_g")
+  orderIndex  Int       @default(0) @map("order_index")
+
+  // Relations
+  dietPlan    DietPlan  @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  @@index([dietPlanId, orderIndex])
+  @@map("diet_plan_meals")
+}
+
+model DietPlanTemplate {
+  id          String    @id @default(uuid()) @db.Uuid
+  gymId       String?   @map("gym_id") @db.Uuid
+  title       String    @db.VarChar(255)
+  goal        DietGoal  @default(MAINTENANCE)
+  description String?   @db.Text
+  mealsJson   Json      @map("meals_json") @db.JsonB
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym         Gym?      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@index([gymId, isActive])
+  @@map("diet_plan_templates")
+}
+
 

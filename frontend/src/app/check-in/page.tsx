@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TopNavbar } from '../../components/TopNavbar';
-import { FrontDeskQrModal } from '../../components/FrontDeskQrModal';
+import { AppLayout } from '../../components/AppLayout';
 import { api } from '../../lib/api';
 import {
   UserCheck,
@@ -45,7 +44,6 @@ export default function CheckInKioskPage() {
       isMilestone: false,
     },
   ]);
-  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
   const handleCheckIn = async (codeToUse?: string) => {
     const target = codeToUse || identifier;
@@ -82,201 +80,187 @@ export default function CheckInKioskPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] flex flex-col">
-      <TopNavbar
-        onOpenQrModal={() => setIsQrModalOpen(true)}
-      />
-
-      <main className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
-        {/* Page Context Ribbon */}
-        <div className="border-b border-[#26221E] bg-[#161310]/50 py-4 px-4 sm:px-8">
-          <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F7F5F2]">Front-Desk Check-In Kiosk</h1>
-              <p className="text-xs text-[#A39E98] mt-0.5">Front reception terminal: scan member QR code, barcode, or enter member ID</p>
-            </div>
+    <AppLayout>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1400px] w-full mx-auto">
+        {/* Page Context Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-zinc-800/60">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-100 flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-zinc-300" />
+              Front-Desk Check-In Kiosk
+            </h1>
+            <p className="text-xs text-zinc-400 mt-1">
+              Front reception terminal: scan member QR code, barcode, or enter member ID.
+            </p>
           </div>
         </div>
 
-        <div className="p-4 sm:p-8 space-y-6 flex-1 max-w-[1400px] w-full mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left: Check-in Terminal Input */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="bg-[#161310] rounded-2xl p-6 sm:p-8 border border-[#2A2520] shadow-sm relative overflow-hidden">
-                <div className="flex items-center justify-between pb-6 border-b border-[#26221E]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-[#BFA785]/15 text-[#BFA785] flex items-center justify-center border border-[#BFA785]/30 shadow-sm shadow-[#BFA785]/10">
-                      <QrCode className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-[#F7F5F2] tracking-tight">
-                        Reception Terminal
-                      </h2>
-                      <p className="text-xs text-[#A39E98]">Barcode scanner / Member code entry</p>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column: Interactive Check-In Terminal (7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-5 sm:p-6 shadow-sm">
+              <h2 className="text-sm font-semibold text-zinc-100 mb-1">
+                Record Member Attendance
+              </h2>
+              <p className="text-xs text-zinc-400 mb-5">
+                Type Member Code (e.g. GR-1001) or WhatsApp Phone Number (+923001234567)
+              </p>
 
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCheckIn();
+                }}
+                className="space-y-4"
+              >
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="Enter GR-1001 or +923..."
+                    autoFocus
+                    className="w-full bg-[#18181B] border-2 border-zinc-700 focus:border-zinc-400 rounded-lg px-4 py-3.5 text-base sm:text-lg font-mono text-zinc-100 placeholder-zinc-500 tracking-wider shadow-inner outline-none transition-all"
+                  />
                   <button
-                    onClick={() => setIsQrModalOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] border border-[#2A2520] hover:border-[#BFA785]/40 text-xs font-semibold text-[#F7F5F2] hover:text-[#BFA785] transition-colors shadow-sm btn-shadow"
+                    type="submit"
+                    disabled={loading}
+                    className="absolute right-2 top-2 bottom-2 px-5 rounded-md bg-white hover:bg-zinc-200 text-zinc-950 font-semibold text-xs shadow-sm btn-shadow-primary disabled:opacity-50 transition-all flex items-center gap-1.5"
                   >
-                    <QrCode className="w-4 h-4 text-[#4E9F6E]" />
-                    <span>View QR Placard</span>
+                    <UserCheck className="w-4 h-4" />
+                    <span>{loading ? 'Logging...' : 'Check In'}</span>
                   </button>
                 </div>
 
                 {error && (
-                  <div className="p-4 rounded-xl bg-[#D9534F]/15 border border-[#D9534F]/30 text-[#D9534F] text-xs flex items-center gap-2 mt-6">
+                  <div className="flex items-center gap-2 p-3 rounded-md bg-red-500/10 border border-red-500/25 text-red-400 text-xs animate-in fade-in">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{error}</span>
                   </div>
                 )}
+              </form>
 
-                <div className="mt-6 space-y-4">
-                  <div>
-                    <label className="text-xs font-semibold text-[#A39E98] block mb-2">
-                      Scan QR or Enter Member ID / Phone:
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={identifier}
-                        onChange={(e) => {
-                          setIdentifier(e.target.value);
-                          setError(null);
-                        }}
-                        onKeyDown={(e) => e.key === 'Enter' && handleCheckIn()}
-                        placeholder="e.g. GR-1001 or +923001234567"
-                        className="w-full bg-[#1C1814] border-2 border-[#2A2520] focus:border-[#BFA785] rounded-2xl px-5 py-4 text-lg text-[#F7F5F2] font-mono placeholder-[#6B6661] focus:outline-none transition-colors shadow-inner"
-                        autoFocus
-                      />
-                      <Search className="w-5 h-5 text-[#6B6661] absolute right-4 top-5" />
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleCheckIn()}
-                    disabled={loading}
-                    className="w-full py-4 rounded-2xl bg-[#BFA785] hover:bg-[#B29976] disabled:opacity-50 text-[#111111] font-bold text-sm tracking-wide shadow-md shadow-[#BFA785]/25 hover:shadow-lg hover:shadow-[#BFA785]/35 btn-shadow-primary transition-all flex items-center justify-center gap-2"
-                  >
-                    <UserCheck className="w-5 h-5" />
-                    <span>{loading ? 'Validating...' : 'Record Check-In (Enter)'}</span>
-                  </button>
-
-                  <div className="pt-2">
-                    <div className="text-[11px] text-[#A39E98] uppercase font-semibold mb-2">
-                      Quick Test Members:
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { code: 'GR-1001', name: 'Hamza Sheikh (12d streak)' },
-                        { code: 'GR-1003', name: 'Zaid Siddiqui (9d streak)' },
-                        { code: 'GR-1004', name: 'Fatima Zahra (7d streak)' },
-                      ].map((t) => (
-                        <button
-                          key={t.code}
-                          onClick={() => {
-                            setIdentifier(t.code);
-                            handleCheckIn(t.code);
-                          }}
-                          className="px-3 py-1.5 rounded-xl bg-[#1C1814] hover:bg-[#26221E] text-xs text-[#A39E98] hover:text-[#BFA785] font-mono border border-[#2A2520] hover:border-[#BFA785]/40 transition-colors shadow-sm btn-shadow"
-                        >
-                          {t.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Live result banner */}
-              {lastCheckIn && (
-                <div className="bg-[#161310] rounded-2xl p-6 border border-[#4E9F6E]/40 shadow-sm animate-in fade-in zoom-in-95 duration-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-[#4E9F6E]/15 text-[#4E9F6E] flex items-center justify-center border border-[#4E9F6E]/30">
-                        <CheckCircle2 className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <div className="text-xs uppercase font-bold tracking-wider text-[#4E9F6E]">
-                          Verified & Checked In
-                        </div>
-                        <h3 className="text-lg font-black text-[#F7F5F2]">{lastCheckIn.member.name}</h3>
-                        <p className="text-xs text-[#A39E98] font-mono">{lastCheckIn.member.code}</p>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="text-xs text-[#BFA785] font-bold flex items-center justify-end gap-1">
-                        <Flame className="w-4 h-4 animate-flame" />
-                        Streak Active
-                      </div>
-                      <div className="text-3xl font-black text-[#F7F5F2] font-mono">
-                        {lastCheckIn.streak.current}{' '}
-                        <span className="text-xs font-normal text-[#A39E98]">Days</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {lastCheckIn.unlockedRewards && lastCheckIn.unlockedRewards.length > 0 && (
-                    <div className="mt-4 p-3.5 rounded-xl bg-[#BFA785]/15 border border-[#BFA785]/30 flex items-center gap-3 text-[#F7F5F2] text-xs">
-                      <Sparkles className="w-5 h-5 text-[#BFA785] shrink-0" />
-                      <div>
-                        <span className="font-bold text-[#BFA785]">Milestone Unlocked!</span>{' '}
-                        {lastCheckIn.unlockedRewards[0].title}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Right: Live Attendance Stream */}
-            <div className="lg:col-span-5">
-              <div className="bg-[#161310] rounded-2xl p-6 border border-[#2A2520] h-full flex flex-col shadow-sm">
-                <div className="flex items-center justify-between pb-4 border-b border-[#26221E] mb-4">
-                  <div className="flex items-center gap-2">
-                    <History className="w-4 h-4 text-[#BFA785]" />
-                    <h3 className="text-sm font-bold text-[#F7F5F2]">Live Attendance Stream</h3>
-                  </div>
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#4E9F6E] animate-ping" />
-                </div>
-
-                <div className="space-y-3 flex-1 overflow-y-auto">
-                  {recentLog.map((log, i) => (
-                    <div
-                      key={i}
-                      className="p-3.5 rounded-xl bg-[#1C1814] border border-[#2A2520] flex items-center justify-between"
+              {/* Quick Preset Buttons for Front-Desk Demo */}
+              <div className="pt-5 border-t border-zinc-800/80 mt-6">
+                <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider block mb-2.5">
+                  Demo Quick Taps:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { code: 'GR-1001', name: 'Hamza S.', streak: '12d' },
+                    { code: 'GR-1003', name: 'Zaid S.', streak: '9d' },
+                    { code: 'GR-1004', name: 'Fatima Z.', streak: '7d' },
+                    { code: 'GR-1005', name: 'Bilal A.', streak: '6d' },
+                  ].map((m) => (
+                    <button
+                      key={m.code}
+                      type="button"
+                      onClick={() => handleCheckIn(m.code)}
+                      className="px-3 py-1.5 rounded-md bg-[#18181B] hover:bg-zinc-800 border border-zinc-700 text-xs text-zinc-300 hover:text-white transition-all shadow-sm btn-shadow flex items-center gap-2"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#26221E] flex items-center justify-center text-xs font-bold text-[#F7F5F2]">
-                          {log.name.split(' ').map((n: string) => n[0]).join('')}
-                        </div>
-                        <div>
-                          <div className="text-xs font-semibold text-[#F7F5F2]">{log.name}</div>
-                          <div className="text-[10px] text-[#A39E98] font-mono">
-                            {log.code} • {log.time}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#BFA785]/15 border border-[#BFA785]/30 text-[#BFA785] text-xs font-mono font-bold">
-                        <Flame className="w-3.5 h-3.5" />
-                        <span>{log.streak}d</span>
-                      </div>
-                    </div>
+                      <span className="font-mono text-zinc-200">{m.code}</span>
+                      <span className="text-zinc-500">({m.name})</span>
+                      <span className="text-[10px] text-amber-400 font-mono flex items-center gap-0.5">
+                        <Flame className="w-3 h-3 text-amber-400" />
+                        {m.streak}
+                      </span>
+                    </button>
                   ))}
                 </div>
               </div>
             </div>
+
+            {/* Success Feedback Card */}
+            {lastCheckIn && (
+              <div className="bg-[#121215] border-2 border-emerald-500/40 rounded-lg p-5 sm:p-6 relative shadow-lg animate-in zoom-in-95 duration-150">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-md bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                      <CheckCircle2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-medium uppercase tracking-wider text-emerald-400">
+                        Check-In Recorded Successfully
+                      </span>
+                      <h3 className="text-lg font-bold text-zinc-100">
+                        {lastCheckIn.member.name}
+                      </h3>
+                      <p className="text-xs text-zinc-400 font-mono">
+                        {lastCheckIn.member.code} • {lastCheckIn.member.phone}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Streak Increment Pill */}
+                  <div className="text-right">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/10 border border-amber-500/25 text-amber-400 text-sm font-mono font-bold">
+                      <Flame className="w-4 h-4 text-amber-400" />
+                      <span>{lastCheckIn.streak.current} Days</span>
+                    </div>
+                    <div className="text-[10px] text-zinc-500 mt-1">
+                      Longest: {lastCheckIn.streak.longest}d
+                    </div>
+                  </div>
+                </div>
+
+                {/* Milestone Reward Announcement */}
+                {lastCheckIn.unlockedRewards && lastCheckIn.unlockedRewards.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-zinc-800 flex items-center gap-3 p-3 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-300">
+                    <Award className="w-5 h-5 shrink-0 text-amber-400" />
+                    <div className="text-xs">
+                      <span className="font-bold">Milestone Reward Unlocked! </span>
+                      <span>{lastCheckIn.unlockedRewards[0].title} — {lastCheckIn.unlockedRewards[0].description}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Today's Live Attendance Feed (5 cols) */}
+          <div className="lg:col-span-5">
+            <div className="bg-[#121215] border border-zinc-800 rounded-lg p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <div className="flex items-center gap-2">
+                  <History className="w-4 h-4 text-zinc-400" />
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-200">
+                    Recent Check-Ins
+                  </h3>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono font-medium border border-emerald-500/20">
+                  Live Terminal
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                {recentLog.map((log, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-3 rounded-md bg-[#18181B] border border-zinc-800/80 hover:border-zinc-700 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-semibold text-zinc-300">
+                        {log.name[0]}
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium text-zinc-200">{log.name}</div>
+                        <div className="text-[10px] text-zinc-500 font-mono">
+                          {log.code} • {log.time}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono">
+                      <Flame className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{log.streak}d</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </main>
-
-      <FrontDeskQrModal
-        isOpen={isQrModalOpen}
-        onClose={() => setIsQrModalOpen(false)}
-      />
-    </div>
+      </div>
+    </AppLayout>
   );
 }

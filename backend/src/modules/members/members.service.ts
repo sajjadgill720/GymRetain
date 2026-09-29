@@ -24,13 +24,23 @@ export class MembersService {
    */
   async listMembers(
     gymId: string,
-    options?: { status?: string; search?: string; skip?: number; take?: number },
+    options?: { status?: string; search?: string; skip?: number; take?: number; trainerId?: string },
   ) {
-    const { status, search, skip = 0, take = 50 } = options || {};
+    const { status, search, skip = 0, take = 50, trainerId } = options || {};
 
     const where: any = {
       gymId,
       ...(status ? { status: status as any } : {}),
+      ...(trainerId
+        ? {
+            trainerAssignments: {
+              some: {
+                trainerId,
+                isActive: true,
+              },
+            },
+          }
+        : {}),
       ...(search
         ? {
             OR: [
@@ -51,6 +61,19 @@ export class MembersService {
           memberships: {
             where: { status: 'ACTIVE' },
             orderBy: { endDate: 'desc' },
+            take: 1,
+          },
+          trainerAssignments: {
+            where: { isActive: true },
+            include: {
+              trainer: {
+                select: { id: true, name: true, email: true },
+              },
+            },
+            take: 1,
+          },
+          dietPlans: {
+            where: { isActive: true },
             take: 1,
           },
           _count: {
@@ -75,17 +98,49 @@ export class MembersService {
   }
 
   /**
-   * Get single member details by ID, strictly scoped to gymId
+   * Get single member details by ID, strictly scoped to gymId and optional trainerId
    */
-  async getMemberById(gymId: string, memberId: string) {
+  async getMemberById(gymId: string, memberId: string, trainerId?: string) {
+    const where: any = {
+      id: memberId,
+      gymId,
+      ...(trainerId
+        ? {
+            trainerAssignments: {
+              some: {
+                trainerId,
+                isActive: true,
+              },
+            },
+          }
+        : {}),
+    };
+
     const member = await this.prisma.member.findFirst({
-      where: { id: memberId, gymId },
+      where,
       include: {
         streak: true,
         memberships: { orderBy: { createdAt: 'desc' } },
         checkIns: { orderBy: { checkInTime: 'desc' }, take: 10 },
         rewardRedemptions: { include: { reward: true } },
         payments: { orderBy: { createdAt: 'desc' }, take: 10 },
+        trainerAssignments: {
+          where: { isActive: true },
+          include: {
+            trainer: {
+              select: { id: true, name: true, email: true },
+            },
+          },
+        },
+        dietPlans: {
+          where: { isActive: true },
+          include: {
+            meals: {
+              orderBy: { orderIndex: 'asc' },
+            },
+          },
+          take: 1,
+        },
       },
     });
 

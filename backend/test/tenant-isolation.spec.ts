@@ -3,6 +3,8 @@ import { TenantAccessGuard } from '../src/common/guards/tenant-access.guard';
 import { MembersService } from '../src/modules/members/members.service';
 import { CheckInsService } from '../src/modules/check-ins/check-ins.service';
 import { SuperAdminPrismaService } from '../src/prisma/super-admin-prisma.service';
+import { TrainersService } from '../src/modules/trainers/trainers.service';
+import { DietPlansService } from '../src/modules/diet-plans/diet-plans.service';
 
 describe('GymRetain Tenant Isolation Security Test Suite (Adversarial & Canary)', () => {
   const GYM_A_ID = '11111111-1111-1111-1111-111111111111';
@@ -277,6 +279,8 @@ describe('GymRetain Tenant Isolation Security Test Suite (Adversarial & Canary)'
   describe('5. Automated Canary Test Gym Regression Verification', () => {
     let membersService: MembersService;
     let checkInsService: CheckInsService;
+    let trainersService: TrainersService;
+    let dietPlansService: DietPlansService;
     let mockPrisma: any;
     let mockTenantPrisma: any;
 
@@ -284,11 +288,17 @@ describe('GymRetain Tenant Isolation Security Test Suite (Adversarial & Canary)'
       mockPrisma = {
         member: { findFirst: jest.fn().mockResolvedValue(null) },
         gym: { findUnique: jest.fn().mockResolvedValue({ qrCodeSecret: 'canary-secret' }) },
+        gymStaff: { findFirst: jest.fn().mockResolvedValue(null) },
+        trainerAssignment: { findFirst: jest.fn().mockResolvedValue(null) },
+        dietPlan: { findFirst: jest.fn().mockResolvedValue(null) },
+        dietPlanTemplate: { findFirst: jest.fn().mockResolvedValue(null) },
       };
       mockTenantPrisma = { runWithTenantRLS: jest.fn() };
 
       membersService = new MembersService(mockPrisma, mockTenantPrisma);
       checkInsService = new CheckInsService(mockPrisma, mockTenantPrisma, {} as any, {} as any);
+      trainersService = new TrainersService(mockPrisma);
+      dietPlansService = new DietPlansService(mockPrisma, {} as any);
     });
 
     it('CANARY REGRESSION CHECK: Attacker gym cannot read, write, or check-in canary member', async () => {
@@ -318,6 +328,33 @@ describe('GymRetain Tenant Isolation Security Test Suite (Adversarial & Canary)'
           qrPayload: canaryQrPayload,
         }),
       ).rejects.toThrow(ForbiddenException);
+
+      // 4. Cross-tenant trainer assignment must fail (404)
+      await expect(
+        trainersService.assignTrainer(GYM_A_ID, {
+          memberId: canaryMemberId,
+          trainerId: 'trainer-in-gym-a',
+        }),
+      ).rejects.toThrow(NotFoundException);
+
+      // 5. Cross-tenant diet plan creation must fail (404)
+      await expect(
+        dietPlansService.createDietPlan(GYM_A_ID, 'staff-in-gym-a', 'GYM_OWNER', {
+          memberId: canaryMemberId,
+          title: 'Canary Malicious Plan',
+          goal: 'WEIGHT_LOSS',
+          meals: [],
+          sendWhatsAppNotification: false,
+        }),
+      ).rejects.toThrow(NotFoundException);
+
+      // 6. Cross-tenant diet plan template clone must fail (404)
+      await expect(
+        dietPlansService.cloneFromTemplate(GYM_A_ID, 'staff-in-gym-a', 'GYM_OWNER', {
+          templateId: 'canary-secret-template',
+          memberId: 'member-in-gym-a',
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

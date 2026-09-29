@@ -154,6 +154,62 @@ export class TenantPrismaService {
             return query(args);
           },
         },
+        trainerAssignment: {
+          async findMany({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+          async findFirst({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+          async create({ args, query }) {
+            args.data = { ...args.data, gymId: tenantGymId } as any;
+            return query(args);
+          },
+          async updateMany({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+        },
+        dietPlan: {
+          async findMany({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+          async findFirst({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+          async create({ args, query }) {
+            args.data = { ...args.data, gymId: tenantGymId } as any;
+            return query(args);
+          },
+          async updateMany({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+        },
+        dietPlanTemplate: {
+          async findMany({ args, query }) {
+            args.where = {
+              ...args.where,
+              OR: [{ gymId: tenantGymId }, { gymId: null }],
+            };
+            return query(args);
+          },
+          async findFirst({ args, query }) {
+            args.where = {
+              ...args.where,
+              OR: [{ gymId: tenantGymId }, { gymId: null }],
+            };
+            return query(args);
+          },
+          async create({ args, query }) {
+            args.data = { ...args.data, gymId: tenantGymId } as any;
+            return query(args);
+          },
+        },
       },
     });
   }

@@ -1,4 +1,4 @@
-export type Role = 'SUPER_ADMIN' | 'GYM_OWNER' | 'GYM_STAFF';
+export type Role = 'SUPER_ADMIN' | 'GYM_OWNER' | 'GYM_MANAGER' | 'GYM_STAFF' | 'TRAINER';
 
 export interface JwtPayload {
   sub: string;         // staff user ID

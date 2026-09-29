@@ -1,4 +1,4 @@
-export type Role = 'SUPER_ADMIN' | 'GYM_OWNER' | 'GYM_STAFF';
+export type Role = 'SUPER_ADMIN' | 'GYM_OWNER' | 'GYM_MANAGER' | 'GYM_STAFF' | 'TRAINER';
 
 export interface Gym {
   id: string;
@@ -23,6 +23,74 @@ export interface User {
   gymSlug?: string | null;
 }
 
+export interface TrainerStaff {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: 'TRAINER';
+  isActive: boolean;
+  assignedMembersCount?: number;
+  createdAt?: string;
+}
+
+export interface TrainerAssignment {
+  id: string;
+  gymId: string;
+  memberId: string;
+  trainerId: string;
+  assignedAt: string;
+  isActive: boolean;
+  trainer?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  member?: Member;
+}
+
+export interface DietMeal {
+  id?: string;
+  dietPlanId?: string;
+  mealType: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK';
+  description: string;
+  calories?: number;
+  proteinG?: number;
+  carbsG?: number;
+  fatG?: number;
+  orderIndex?: number;
+}
+
+export interface DietPlan {
+  id: string;
+  gymId: string;
+  memberId: string;
+  createdById: string;
+  title: string;
+  goal: 'WEIGHT_LOSS' | 'MUSCLE_GAIN' | 'MAINTENANCE' | 'CUSTOM';
+  customGoal?: string;
+  notes?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  meals: DietMeal[];
+  createdBy?: {
+    id: string;
+    name: string;
+    role: string;
+  };
+}
+
+export interface DietTemplate {
+  id: string;
+  gymId?: string | null;
+  title: string;
+  goal: 'WEIGHT_LOSS' | 'MUSCLE_GAIN' | 'MAINTENANCE' | 'CUSTOM';
+  description?: string;
+  mealsJson: DietMeal[];
+  isActive: boolean;
+}
+
 export interface Member {
   id: string;
   gymId: string;
@@ -37,6 +105,8 @@ export interface Member {
   status: 'ACTIVE' | 'INACTIVE' | 'FROZEN';
   streak?: Streak;
   memberships?: Membership[];
+  trainerAssignments?: TrainerAssignment[];
+  dietPlans?: DietPlan[];
   _count?: {
     checkIns: number;
   };

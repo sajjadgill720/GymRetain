@@ -16,6 +16,8 @@ import { RetentionModule } from './modules/retention/retention.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { MessagingModule } from './modules/messaging/messaging.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { TrainersModule } from './modules/trainers/trainers.module';
+import { DietPlansModule } from './modules/diet-plans/diet-plans.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -38,6 +40,8 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     AnalyticsModule,
     MessagingModule,
     PaymentsModule,
+    TrainersModule,
+    DietPlansModule,
   ],
   providers: [
     {

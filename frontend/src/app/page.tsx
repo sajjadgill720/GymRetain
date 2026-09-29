@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { TopNavbar } from '../components/TopNavbar';
+import { AppLayout } from '../components/AppLayout';
 import { AtRiskMembersTable } from '../components/AtRiskMembersTable';
 import { AttendanceChart } from '../components/AttendanceChart';
 import { StreakLeaderboard } from '../components/StreakLeaderboard';
-import { QuickCheckInModal } from '../components/QuickCheckInModal';
-import { FrontDeskQrModal } from '../components/FrontDeskQrModal';
 import { api } from '../lib/api';
 import { DashboardSummary, AttendanceTrendPoint } from '../types';
 import {
@@ -23,8 +21,6 @@ export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [trends, setTrends] = useState<AttendanceTrendPoint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isCheckInOpen, setIsCheckInOpen] = useState(false);
-  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
   const loadData = async () => {
     try {
@@ -49,15 +45,9 @@ export default function DashboardPage() {
   const topStreak = summary?.streakLeaders[0]?.currentStreak ?? 12;
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100 flex flex-col">
-      {/* 1. Compact Header & Unified Navigation */}
-      <TopNavbar
-        onOpenQrModal={() => setIsQrModalOpen(true)}
-        onOpenCheckInModal={() => setIsCheckInOpen(true)}
-      />
-
+    <AppLayout onRefreshData={loadData}>
       {/* Main SaaS Dashboard Surface */}
-      <main className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
         {/* 2. Top Status Bar & Headline Metric */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-zinc-800/60">
           <div>
@@ -171,19 +161,7 @@ export default function DashboardPage() {
             <StreakLeaderboard leaders={summary?.streakLeaders || []} />
           </div>
         </section>
-      </main>
-
-      {/* Contextual Modals */}
-      <QuickCheckInModal
-        isOpen={isCheckInOpen}
-        onClose={() => setIsCheckInOpen(false)}
-        onCheckInSuccess={() => loadData()}
-      />
-
-      <FrontDeskQrModal
-        isOpen={isQrModalOpen}
-        onClose={() => setIsQrModalOpen(false)}
-      />
-    </div>
+      </div>
+    </AppLayout>
   );
 }

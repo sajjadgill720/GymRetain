@@ -88,6 +88,11 @@ export class MessagingService {
       category: 'UTILITY' as MessageCategory,
       metaId: 'meta_reward_unlocked_v1',
     },
+    DIET_PLAN_ASSIGNED: {
+      name: 'diet_plan_assigned',
+      category: 'UTILITY' as MessageCategory,
+      metaId: 'meta_diet_plan_v1',
+    },
   };
 
   private readonly fallbackProvider: MessagingProvider;

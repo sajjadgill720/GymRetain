@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { TopNavbar } from '../../../components/TopNavbar';
-import { QuickCheckInModal } from '../../../components/QuickCheckInModal';
-import { FrontDeskQrModal } from '../../../components/FrontDeskQrModal';
-import { api, MOCK_WINNERS } from '../../../lib/api';
+import { AppLayout } from '../../../components/AppLayout';
+import { api } from '../../../lib/api';
 import { RewardRedemption } from '../../../types';
 import {
   Trophy,
@@ -304,15 +302,8 @@ export default function StreakWinnersPage() {
   }, winners[0]);
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100 flex flex-col">
-      {/* 1. Unified Navigation */}
-      <TopNavbar
-        onOpenQrModal={() => setIsQrModalOpen(true)}
-        onOpenCheckInModal={() => setIsCheckInOpen(true)}
-      />
-
-      {/* Main SaaS Content Container */}
-      <main className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <AppLayout onRefreshData={fetchWinners}>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
         {/* Toast Alert */}
         {successToast && (
           <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between animate-in fade-in duration-200">
@@ -683,7 +674,7 @@ export default function StreakWinnersPage() {
             </div>
           )}
         </div>
-      </main>
+      </div>
 
       {/* 6. Front-Desk Reward Fulfillment Modal */}
       {activeFulfillTarget && (
@@ -770,18 +761,6 @@ export default function StreakWinnersPage() {
           </div>
         </div>
       )}
-
-      {/* Global Modals */}
-      <QuickCheckInModal
-        isOpen={isCheckInOpen}
-        onClose={() => setIsCheckInOpen(false)}
-        onCheckInSuccess={() => fetchWinners()}
-      />
-
-      <FrontDeskQrModal
-        isOpen={isQrModalOpen}
-        onClose={() => setIsQrModalOpen(false)}
-      />
-    </div>
+    </AppLayout>
   );
 }

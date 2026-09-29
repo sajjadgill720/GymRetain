@@ -156,6 +156,9 @@ All system guides, audits, and architectural specifications are housed in the `R
 
 | Document | Description |
 |---|---|
+| [`DIET_PLANS_AND_TRAINERS.md`](DIET_PLANS_AND_TRAINERS.md) | Structured diet plan builder, trainer assignment, query scoping & WhatsApp utility delivery |
+| [`SIDEBAR_NAVIGATION_MIGRATION.md`](SIDEBAR_NAVIGATION_MIGRATION.md) | Modern SaaS vertical sidebar migration and top bar simplification |
+| [`STREAK_REWARD_WINNERS.md`](STREAK_REWARD_WINNERS.md) | Dedicated streak reward fulfillment hub and front-desk handoff workflow |
 | [`CLEAN_MINIMALIST_REDESIGN.md`](CLEAN_MINIMALIST_REDESIGN.md) | Minimalist dashboard redesign, developer jargon removal & dedicated retention hub |
 | [`TOP_NAVIGATION_REDESIGN.md`](TOP_NAVIGATION_REDESIGN.md) | Full-width Amazon/Stripe 2-tier sticky top navigation bar architecture |
 | [`UI_REBUILD_MYNEXT9TO5.md`](UI_REBUILD_MYNEXT9TO5.md) | Modern SaaS UI redesign, warm charcoal `#111111`, bento surfaces, 30-sec glance |
@@ -166,4 +169,5 @@ All system guides, audits, and architectural specifications are housed in the `R
 | [`CODE_STYLE.md`](CODE_STYLE.md) | Workspace rules on button shadows, industry styling, and markdown organization |
 | [`BACKEND_README.md`](BACKEND_README.md) | Backend NestJS quickstart, environment variables, and Prisma commands |
 | [`FRONTEND_README.md`](FRONTEND_README.md) | Next.js frontend setup, port configuration, and mock API mode |
+
 

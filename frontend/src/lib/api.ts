@@ -794,6 +794,397 @@ class ApiClient {
       };
     }
   }
+
+  // --- TRAINER ASSIGNMENT API METHODS ---
+
+  async getTrainers(): Promise<any[]> {
+    try {
+      const res = await this.request<any>('/trainers');
+      return res.data || res;
+    } catch {
+      return [
+        {
+          id: 'trainer-1',
+          name: 'Coach Tariq Mehmood',
+          email: 'tariq@ironhouse.pk',
+          phone: '+923001234567',
+          role: 'TRAINER',
+          isActive: true,
+          assignedMembersCount: 4,
+          createdAt: '2026-08-01T10:00:00Z',
+        },
+        {
+          id: 'trainer-2',
+          name: 'Coach Sarah Batool',
+          email: 'sarah@ironhouse.pk',
+          phone: '+923002345678',
+          role: 'TRAINER',
+          isActive: true,
+          assignedMembersCount: 3,
+          createdAt: '2026-08-15T10:00:00Z',
+        },
+        {
+          id: 'trainer-3',
+          name: 'Coach Kamran Gill',
+          email: 'kamran@ironhouse.pk',
+          phone: '+923003456789',
+          role: 'TRAINER',
+          isActive: true,
+          assignedMembersCount: 2,
+          createdAt: '2026-09-01T10:00:00Z',
+        },
+      ];
+    }
+  }
+
+  async assignTrainer(memberId: string, trainerId: string): Promise<any> {
+    try {
+      return await this.request('/trainers/assign', {
+        method: 'POST',
+        body: JSON.stringify({ memberId, trainerId }),
+      });
+    } catch {
+      return { success: true, memberId, trainerId, isActive: true };
+    }
+  }
+
+  async reassignTrainer(memberId: string, newTrainerId: string): Promise<any> {
+    try {
+      return await this.request('/trainers/reassign', {
+        method: 'POST',
+        body: JSON.stringify({ memberId, newTrainerId }),
+      });
+    } catch {
+      return { success: true, memberId, newTrainerId, isActive: true };
+    }
+  }
+
+  async getTrainerMembers(trainerId?: string): Promise<any[]> {
+    try {
+      const endpoint = trainerId ? `/trainers/${trainerId}/members` : '/trainers/my-members';
+      const res = await this.request<any>(endpoint);
+      return res.data || res;
+    } catch {
+      // Return mock assigned members with streak & diet status
+      return [
+        {
+          assignmentId: 'assign-1',
+          assignedAt: '2026-09-10T10:00:00Z',
+          member: {
+            id: 'mem-1',
+            firstName: 'Hamza',
+            lastName: 'Sheikh',
+            memberCode: 'GR-1001',
+            phone: '+923001234567',
+            status: 'ACTIVE',
+            currentStreak: 12,
+            longestStreak: 12,
+            totalCheckIns: 28,
+          },
+          dietPlan: {
+            id: 'dp-1',
+            title: 'Hypertrophy Power Surplus',
+            goal: 'MUSCLE_GAIN',
+            customGoal: null,
+            mealsCount: 4,
+            updatedAt: '2026-09-25T14:30:00Z',
+            status: 'ACTIVE_PLAN',
+          },
+        },
+        {
+          assignmentId: 'assign-2',
+          assignedAt: '2026-09-15T11:00:00Z',
+          member: {
+            id: 'mem-3',
+            firstName: 'Zaid',
+            lastName: 'Siddiqui',
+            memberCode: 'GR-1003',
+            phone: '+923003456789',
+            status: 'ACTIVE',
+            currentStreak: 9,
+            longestStreak: 14,
+            totalCheckIns: 22,
+          },
+          dietPlan: {
+            id: 'dp-2',
+            title: 'Calorie Deficit Starter',
+            goal: 'WEIGHT_LOSS',
+            customGoal: null,
+            mealsCount: 3,
+            updatedAt: '2026-09-16T09:00:00Z',
+            status: 'ACTIVE_PLAN',
+          },
+        },
+        {
+          assignmentId: 'assign-3',
+          assignedAt: '2026-09-20T12:00:00Z',
+          member: {
+            id: 'mem-4',
+            firstName: 'Fatima',
+            lastName: 'Zahra',
+            memberCode: 'GR-1004',
+            phone: '+923214567890',
+            status: 'ACTIVE',
+            currentStreak: 7,
+            longestStreak: 7,
+            totalCheckIns: 16,
+          },
+          dietPlan: {
+            id: null,
+            title: null,
+            goal: null,
+            customGoal: null,
+            mealsCount: 0,
+            updatedAt: null,
+            status: 'NO_PLAN',
+          },
+        },
+      ];
+    }
+  }
+
+  // --- DIET PLAN BUILDER API METHODS ---
+
+  async getDietTemplates(): Promise<any[]> {
+    try {
+      const res = await this.request<any>('/diet-plans/templates/all');
+      return res.data || res;
+    } catch {
+      return [
+        {
+          id: 'tpl-1',
+          title: 'High-Protein Calorie Deficit (1,800 kcal)',
+          goal: 'WEIGHT_LOSS',
+          description: 'Optimized for steady fat loss while preserving lean muscle mass.',
+          mealsJson: [
+            {
+              mealType: 'BREAKFAST',
+              description: '3 boiled eggs, 1 brown toast, black coffee',
+              calories: 320,
+              proteinG: 22,
+              carbsG: 18,
+              fatG: 14,
+              orderIndex: 0,
+            },
+            {
+              mealType: 'LUNCH',
+              description: '160g grilled chicken breast, 1 cup brown rice, cucumber salad',
+              calories: 460,
+              proteinG: 45,
+              carbsG: 38,
+              fatG: 8,
+              orderIndex: 1,
+            },
+            {
+              mealType: 'DINNER',
+              description: '200g white fish fillet, steamed broccoli & carrots',
+              calories: 380,
+              proteinG: 42,
+              carbsG: 14,
+              fatG: 7,
+              orderIndex: 2,
+            },
+            {
+              mealType: 'SNACK',
+              description: '1 green apple, 10 raw almonds, green tea',
+              calories: 160,
+              proteinG: 4,
+              carbsG: 20,
+              fatG: 9,
+              orderIndex: 3,
+            },
+          ],
+        },
+        {
+          id: 'tpl-2',
+          title: 'Hypertrophy Muscle Surplus (2,800 kcal)',
+          goal: 'MUSCLE_GAIN',
+          description: 'High-carb, nutrient-dense protocol for progressive athletic overload.',
+          mealsJson: [
+            {
+              mealType: 'BREAKFAST',
+              description: '4 whole eggs, 2 slices oatmeal bread, 1 banana',
+              calories: 520,
+              proteinG: 32,
+              carbsG: 55,
+              fatG: 18,
+              orderIndex: 0,
+            },
+            {
+              mealType: 'LUNCH',
+              description: '200g chicken breast, 1.5 cups basmati rice, lentils (daal)',
+              calories: 720,
+              proteinG: 58,
+              carbsG: 85,
+              fatG: 12,
+              orderIndex: 1,
+            },
+            {
+              mealType: 'DINNER',
+              description: '200g lean beef mince, 2 baked sweet potatoes, mixed greens',
+              calories: 680,
+              proteinG: 50,
+              carbsG: 65,
+              fatG: 16,
+              orderIndex: 2,
+            },
+            {
+              mealType: 'SNACK',
+              description: 'Whey protein shake with 30g peanut butter & rolled oats',
+              calories: 440,
+              proteinG: 36,
+              carbsG: 32,
+              fatG: 18,
+              orderIndex: 3,
+            },
+          ],
+        },
+        {
+          id: 'tpl-3',
+          title: 'Clean Performance Maintenance (2,200 kcal)',
+          goal: 'MAINTENANCE',
+          description: 'Balanced macronutrient distribution for consistent gym performance.',
+          mealsJson: [
+            {
+              mealType: 'BREAKFAST',
+              description: '2 whole eggs + 2 egg whites, 1 multigrain paratha/roti',
+              calories: 400,
+              proteinG: 26,
+              carbsG: 35,
+              fatG: 14,
+              orderIndex: 0,
+            },
+            {
+              mealType: 'LUNCH',
+              description: '180g chicken curry, 2 whole wheat rotis, fresh cucumber salad',
+              calories: 550,
+              proteinG: 44,
+              carbsG: 50,
+              fatG: 15,
+              orderIndex: 1,
+            },
+            {
+              mealType: 'DINNER',
+              description: '180g grilled fish or chicken, vegetable stir fry with olive oil',
+              calories: 450,
+              proteinG: 40,
+              carbsG: 22,
+              fatG: 16,
+              orderIndex: 2,
+            },
+            {
+              mealType: 'SNACK',
+              description: 'Greek yogurt with fresh berries and chia seeds',
+              calories: 220,
+              proteinG: 18,
+              carbsG: 20,
+              fatG: 6,
+              orderIndex: 3,
+            },
+          ],
+        },
+      ];
+    }
+  }
+
+  async getMemberDietPlans(memberId: string): Promise<any[]> {
+    try {
+      const res = await this.request<any>(`/diet-plans/member/${memberId}`);
+      return res.data || res;
+    } catch {
+      return [
+        {
+          id: 'dp-mock-1',
+          gymId: this.currentGym.id,
+          memberId,
+          createdById: 'trainer-1',
+          title: 'Phase 1: Hypertrophy Split Diet',
+          goal: 'MUSCLE_GAIN',
+          customGoal: null,
+          notes: 'Drink minimum 3.5L water daily. Have post-workout meal within 45 mins.',
+          isActive: true,
+          createdAt: '2026-09-25T14:30:00Z',
+          updatedAt: '2026-09-25T14:30:00Z',
+          createdBy: { name: 'Coach Tariq Mehmood', role: 'TRAINER' },
+          meals: [
+            {
+              id: 'm-1',
+              mealType: 'BREAKFAST',
+              description: '4 eggs (3 whites, 1 whole), 2 slices bran bread, 1 banana',
+              calories: 410,
+              proteinG: 28,
+              carbsG: 42,
+              fatG: 11,
+              orderIndex: 0,
+            },
+            {
+              mealType: 'LUNCH',
+              description: '180g grilled chicken breast, 1 cup steamed rice, greens',
+              calories: 520,
+              proteinG: 48,
+              carbsG: 45,
+              fatG: 9,
+              orderIndex: 1,
+            },
+            {
+              mealType: 'DINNER',
+              description: '200g white fish fillet with steamed vegetables',
+              calories: 380,
+              proteinG: 42,
+              carbsG: 15,
+              fatG: 8,
+              orderIndex: 2,
+            },
+            {
+              mealType: 'SNACK',
+              description: '1 scoop whey protein with water + 10 soaked almonds',
+              calories: 190,
+              proteinG: 26,
+              carbsG: 4,
+              fatG: 7,
+              orderIndex: 3,
+            },
+          ],
+        },
+      ];
+    }
+  }
+
+  async createDietPlan(payload: any): Promise<any> {
+    try {
+      const res = await this.request<any>('/diet-plans', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      return res.data || res;
+    } catch {
+      return {
+        id: `dp-${Date.now()}`,
+        ...payload,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  }
+
+  async cloneDietTemplate(payload: any): Promise<any> {
+    try {
+      const res = await this.request<any>('/diet-plans/clone', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      return res.data || res;
+    } catch {
+      return {
+        id: `dp-cloned-${Date.now()}`,
+        memberId: payload.memberId,
+        title: payload.customTitle || 'Cloned Template Plan',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+      };
+    }
+  }
 }
 
 export const api = new ApiClient();

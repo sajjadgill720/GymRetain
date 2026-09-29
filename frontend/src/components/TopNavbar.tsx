@@ -26,6 +26,7 @@ import { api } from '../lib/api';
 interface TopNavbarProps {
   onOpenQrModal?: () => void;
   onOpenCheckInModal?: () => void;
+  onToggleMobileMenu?: () => void;
 }
 
 const DEMO_GYMS = [
@@ -55,6 +56,7 @@ const DEMO_GYMS = [
 export const TopNavbar: React.FC<TopNavbarProps> = ({
   onOpenQrModal,
   onOpenCheckInModal,
+  onToggleMobileMenu,
 }) => {
   const pathname = usePathname();
   const [selectedGym, setSelectedGym] = useState(DEMO_GYMS[0]);
@@ -263,133 +265,14 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
 
             {/* Mobile Hamburger Menu Toggle */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={onToggleMobileMenu || (() => setIsMobileMenuOpen(!isMobileMenuOpen))}
               className="lg:hidden p-1.5 rounded-md bg-[#121215] text-zinc-400 hover:text-zinc-200 border border-zinc-800 shadow-sm btn-shadow"
               aria-label="Toggle navigation menu"
             >
-              {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              <Menu className="w-4 h-4" />
             </button>
           </div>
         </div>
-
-        {/* Tier 2: Horizontal Navigation Strip (Linear / Stripe Tabs) */}
-        <div className="border-t border-zinc-800/80 bg-[#0C0C0E] overflow-x-auto scrollbar-none">
-          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-1 flex items-center justify-between gap-4 min-w-max sm:min-w-0">
-            {/* Horizontal Nav Tabs */}
-            <nav className="flex items-center gap-1">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all btn-shadow ${
-                      isActive
-                        ? 'bg-zinc-800 text-white font-medium border border-zinc-700/60 shadow-sm'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
-                    }`}
-                  >
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-zinc-200' : 'text-zinc-500'}`} />
-                    <span>{item.name}</span>
-                    {item.badge && (
-                      <span className={`text-[10px] font-medium px-1.5 py-0.2 rounded-full ${item.badgeColor || 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* Right: Domain & Status Badge */}
-            <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-400 shrink-0">
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              <span>{selectedGym.slug}.gymretain.app</span>
-              <span className="text-[9px] bg-emerald-500/10 text-emerald-400 px-1 py-0.2 rounded font-medium">
-                ACTIVE
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Slide-Down Menu Drawer */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-zinc-800 bg-[#0C0C0E] p-3 space-y-2 animate-in slide-in-from-top-1 duration-100">
-            {/* Gym Selector inside mobile drawer */}
-            <div className="p-2.5 rounded-md bg-[#121215] border border-zinc-800">
-              <label className="text-[10px] uppercase font-medium text-zinc-500 block mb-1">
-                Current Gym Location
-              </label>
-              <div className="flex items-center justify-between text-xs font-medium text-zinc-200">
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>{selectedGym.name}</span>
-                </div>
-                <span className="text-[10px] text-zinc-500 font-mono">{selectedGym.city.split(',')[0]}</span>
-              </div>
-            </div>
-
-            {/* Mobile Nav Links */}
-            <div className="space-y-0.5 pt-1">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-all btn-shadow ${
-                      isActive
-                        ? 'bg-zinc-800 text-white font-medium border border-zinc-700'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-zinc-200' : 'text-zinc-500'}`} />
-                      <span>{item.name}</span>
-                    </div>
-                    {item.badge && (
-                      <span className={`text-[10px] font-medium px-1.5 py-0.2 rounded-full ${item.badgeColor || 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Mobile Utilities */}
-            <div className="pt-2 border-t border-zinc-800 grid grid-cols-2 gap-2">
-              {onOpenQrModal && (
-                <button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenQrModal();
-                  }}
-                  className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-md bg-[#121215] text-xs font-medium text-zinc-300 border border-zinc-800 btn-shadow"
-                >
-                  <QrCode className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>QR Placard</span>
-                </button>
-              )}
-              <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  setIsSimulatorOpen(true);
-                  setSimResponse(null);
-                }}
-                className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-md bg-[#121215] text-xs font-medium text-emerald-400 border border-zinc-800 btn-shadow"
-              >
-                <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Test WhatsApp</span>
-              </button>
-            </div>
-          </div>
-        )}
       </header>
 
       {/* WhatsApp Inbound Keyword Simulator Modal */}

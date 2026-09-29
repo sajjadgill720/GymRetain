@@ -13,6 +13,8 @@ import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 import { TenantAccessGuard } from '../../common/guards/tenant-access.guard';
 import { CurrentGymId } from '../../common/decorators/current-gym.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { JwtPayload } from '../../common/interfaces/jwt-payload.interface';
 
 @Controller('members')
 @UseGuards(TenantAccessGuard)
@@ -22,16 +24,19 @@ export class MembersController {
   @Get()
   async listMembers(
     @CurrentGymId() gymId: string,
+    @CurrentUser() user: JwtPayload,
     @Query('status') status?: string,
     @Query('search') search?: string,
     @Query('skip') skip?: string,
     @Query('take') take?: string,
   ) {
+    const trainerId = user?.role === 'TRAINER' ? user.sub : undefined;
     return this.membersService.listMembers(gymId, {
       status,
       search,
       skip: skip ? parseInt(skip, 10) : 0,
       take: take ? parseInt(take, 10) : 50,
+      trainerId,
     });
   }
 
@@ -39,8 +44,10 @@ export class MembersController {
   async getMemberById(
     @CurrentGymId() gymId: string,
     @Param('id') memberId: string,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.membersService.getMemberById(gymId, memberId);
+    const trainerId = user?.role === 'TRAINER' ? user.sub : undefined;
+    return this.membersService.getMemberById(gymId, memberId, trainerId);
   }
 
   @Post()

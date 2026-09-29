@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { TopNavbar } from '../../components/TopNavbar';
-import { QuickCheckInModal } from '../../components/QuickCheckInModal';
-import { FrontDeskQrModal } from '../../components/FrontDeskQrModal';
+import { AppLayout } from '../../components/AppLayout';
 import { api } from '../../lib/api';
 import { Reward } from '../../types';
 import {
@@ -24,8 +22,6 @@ export default function RewardsPage() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddRewardOpen, setIsAddRewardOpen] = useState(false);
-  const [isCheckInOpen, setIsCheckInOpen] = useState(false);
-  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
   // New Reward Rule form state
   const [title, setTitle] = useState('');
@@ -74,13 +70,8 @@ export default function RewardsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100 flex flex-col">
-      <TopNavbar
-        onOpenQrModal={() => setIsQrModalOpen(true)}
-        onOpenCheckInModal={() => setIsCheckInOpen(true)}
-      />
-
-      <main className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <AppLayout onRefreshData={fetchRewards}>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
         {/* Page Context Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-zinc-800/60">
           <div>
@@ -160,7 +151,7 @@ export default function RewardsPage() {
             </div>
           ))}
         </div>
-      </main>
+      </div>
 
       {/* Add Reward Modal */}
       {isAddRewardOpen && (
@@ -260,17 +251,6 @@ export default function RewardsPage() {
           </div>
         </div>
       )}
-
-      <QuickCheckInModal
-        isOpen={isCheckInOpen}
-        onClose={() => setIsCheckInOpen(false)}
-        onCheckInSuccess={() => fetchRewards()}
-      />
-
-      <FrontDeskQrModal
-        isOpen={isQrModalOpen}
-        onClose={() => setIsQrModalOpen(false)}
-      />
-    </div>
+    </AppLayout>
   );
 }

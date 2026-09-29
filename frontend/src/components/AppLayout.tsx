@@ -17,8 +17,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, onRefreshData })
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100 flex">
-      {/* 1. Left Sidebar with All Navigation Page Buttons */}
+    <div className="min-h-screen bg-canvas text-content-primary flex transition-colors duration-200">
+      {/* 1. Left Sidebar matching Shopeers style */}
       <Sidebar
         isOpenMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
@@ -26,7 +26,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, onRefreshData })
         onOpenCheckInModal={() => setIsCheckInOpen(true)}
       />
 
-      {/* 2. Main Viewport & Compact Top Header */}
+      {/* 2. Main Viewport & Top Header */}
       <div className="flex-1 flex flex-col min-w-0">
         <TopNavbar
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -34,9 +34,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, onRefreshData })
           onOpenCheckInModal={() => setIsCheckInOpen(true)}
         />
 
-        <div className="flex-1 flex flex-col w-full overflow-x-hidden">
+        <main className="flex-1 flex flex-col w-full overflow-x-hidden">
           {children}
-        </div>
+        </main>
       </div>
 
       {/* Modals */}

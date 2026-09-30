@@ -1,10 +1,11 @@
-import { ForbiddenException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { TenantAccessGuard } from '../src/common/guards/tenant-access.guard';
 import { MembersService } from '../src/modules/members/members.service';
 import { CheckInsService } from '../src/modules/check-ins/check-ins.service';
 import { SuperAdminPrismaService } from '../src/prisma/super-admin-prisma.service';
 import { TrainersService } from '../src/modules/trainers/trainers.service';
 import { DietPlansService } from '../src/modules/diet-plans/diet-plans.service';
+import { AuthService } from '../src/modules/auth/auth.service';
 
 describe('GymRetain Tenant Isolation Security Test Suite (Adversarial & Canary)', () => {
   const GYM_A_ID = '11111111-1111-1111-1111-111111111111';
@@ -427,6 +428,220 @@ describe('GymRetain Tenant Isolation Security Test Suite (Adversarial & Canary)'
       expect(auditExecuted).toBe(true);
       expect(rawSqlExecuted).toContain("SET LOCAL app.is_super_admin = 'true';");
       expect(result.aggregateGyms).toBe(5);
+    });
+  });
+
+  describe('7. Gym-Switcher & Multi-Gym Tenant Scoping Canary Tests (Permanent Regression Suite)', () => {
+    let authService: AuthService;
+    let mockPrisma: any;
+    let mockJwtService: any;
+
+    const gymAGym = {
+      id: GYM_A_ID,
+      name: 'Iron House Gym & Fitness',
+      slug: 'iron-house-lahore',
+      address: 'Gulberg III, Lahore',
+      currency: 'PKR',
+      timezone: 'Asia/Karachi',
+      status: 'ACTIVE',
+    };
+
+    const gymBGym = {
+      id: GYM_B_ID,
+      name: 'K-Town Crossfit & Performance',
+      slug: 'ktown-crossfit',
+      address: 'Clifton, Karachi',
+      currency: 'PKR',
+      timezone: 'Asia/Karachi',
+      status: 'ACTIVE',
+    };
+
+    beforeEach(() => {
+      mockPrisma = {
+        gymStaff: {
+          findMany: jest.fn(),
+          findUnique: jest.fn(),
+          findFirst: jest.fn(),
+          update: jest.fn(),
+        },
+      };
+      mockJwtService = {
+        sign: jest.fn((payload) => `mock-signed-jwt-for-${payload.gymId}`),
+      };
+      authService = new AuthService(mockPrisma, mockJwtService);
+    });
+
+    it('PART 4.1: User account linked only to Gym A: getMe() and login() never return Gym B or Canary Gym', async () => {
+      const singleGymStaff = {
+        id: 'staff-a-1',
+        email: 'owner@gyma.pk',
+        name: 'Gym A Owner',
+        role: 'GYM_OWNER',
+        isActive: true,
+        gymId: GYM_A_ID,
+        gym: gymAGym,
+      };
+
+      mockPrisma.gymStaff.findUnique.mockResolvedValue(singleGymStaff);
+      mockPrisma.gymStaff.findMany.mockResolvedValue([singleGymStaff]);
+
+      const meResult = await authService.getMe({
+        sub: 'staff-a-1',
+        email: 'owner@gyma.pk',
+        role: 'GYM_OWNER',
+        gymId: GYM_A_ID,
+        name: 'Gym A Owner',
+      });
+
+      expect(meResult.gyms).toHaveLength(1);
+      expect(meResult.gyms[0].id).toBe(GYM_A_ID);
+      expect(meResult.gyms.some((g) => g.id === GYM_B_ID)).toBe(false);
+      expect(meResult.gyms.some((g) => g.id === CANARY_GYM_ID)).toBe(false);
+      expect(meResult.activeGym?.id).toBe(GYM_A_ID);
+    });
+
+    it('PART 4.2: User account linked to NO gym (edge case mid-invite): graceful handling, returns gyms: [] and activeGym: null without crash or full unscoped list', async () => {
+      const unassignedStaff = {
+        id: 'unassigned-staff-1',
+        email: 'invitee@pending.pk',
+        name: 'New Invitee',
+        role: 'GYM_STAFF',
+        isActive: true,
+        gymId: null,
+        gym: null,
+      };
+
+      mockPrisma.gymStaff.findUnique.mockResolvedValue(unassignedStaff);
+      mockPrisma.gymStaff.findMany.mockResolvedValue([unassignedStaff]);
+
+      const result = await authService.getMe({
+        sub: 'unassigned-staff-1',
+        email: 'invitee@pending.pk',
+        role: 'GYM_STAFF',
+        gymId: null,
+        name: 'New Invitee',
+      });
+
+      expect(result.gyms).toEqual([]);
+      expect(result.activeGym).toBeNull();
+      expect(result.user.gymId).toBeNull();
+    });
+
+    it('PART 4.3: Adversarial Gym Switching: User at Gym A attempting to switch to Gym B or Canary Gym is REJECTED (403 Forbidden)', async () => {
+      const currentStaffA = {
+        id: 'staff-a-1',
+        email: 'owner@gyma.pk',
+        isActive: true,
+        gymId: GYM_A_ID,
+      };
+
+      mockPrisma.gymStaff.findUnique.mockResolvedValue(currentStaffA);
+      // findFirst returns null because user has no staff record at GYM_B_ID
+      mockPrisma.gymStaff.findFirst.mockResolvedValue(null);
+
+      await expect(
+        authService.switchGym(
+          {
+            sub: 'staff-a-1',
+            email: 'owner@gyma.pk',
+            role: 'GYM_OWNER',
+            gymId: GYM_A_ID,
+            name: 'Gym A Owner',
+          },
+          GYM_B_ID,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+
+      // Verify no new token was signed
+      expect(mockJwtService.sign).not.toHaveBeenCalled();
+    });
+
+    it('PART 4.4: Legitimate Multi-Gym Owner Switch: Switching gyms updates server-side tenant context and token with zero stale data leakage', async () => {
+      const multiOwnerStaffA = {
+        id: 'owner-multi-a',
+        email: 'boss@chain.pk',
+        name: 'Chain Boss',
+        role: 'GYM_OWNER',
+        isActive: true,
+        gymId: GYM_A_ID,
+        gym: gymAGym,
+      };
+
+      const multiOwnerStaffB = {
+        id: 'owner-multi-b',
+        email: 'boss@chain.pk',
+        name: 'Chain Boss',
+        role: 'GYM_OWNER',
+        isActive: true,
+        gymId: GYM_B_ID,
+        gym: gymBGym,
+      };
+
+      mockPrisma.gymStaff.findUnique.mockResolvedValue(multiOwnerStaffA);
+      mockPrisma.gymStaff.findFirst.mockResolvedValue(multiOwnerStaffB);
+      mockPrisma.gymStaff.update.mockResolvedValue(multiOwnerStaffB);
+
+      const switchResult = await authService.switchGym(
+        {
+          sub: 'owner-multi-a',
+          email: 'boss@chain.pk',
+          role: 'GYM_OWNER',
+          gymId: GYM_A_ID,
+          name: 'Chain Boss',
+        },
+        GYM_B_ID,
+      );
+
+      // 1. Verifies token is newly generated with GYM_B_ID
+      expect(switchResult.activeGym.id).toBe(GYM_B_ID);
+      expect(switchResult.user.gymId).toBe(GYM_B_ID);
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sub: 'owner-multi-b',
+          gymId: GYM_B_ID,
+          email: 'boss@chain.pk',
+        }),
+      );
+
+      // 2. Now verify that subsequent requests with this new token set TenantAccessGuard strictly to Gym B
+      const guard = new TenantAccessGuard();
+      const mockRequestWithNewSession: any = {
+        user: {
+          sub: 'owner-multi-b',
+          email: 'boss@chain.pk',
+          role: 'GYM_OWNER',
+          gymId: GYM_B_ID, // Switched session
+        },
+        headers: {},
+        query: {},
+        body: {},
+        params: {},
+      };
+
+      const mockExecutionContext = {
+        switchToHttp: () => ({
+          getRequest: () => mockRequestWithNewSession,
+        }),
+      } as any;
+
+      guard.canActivate(mockExecutionContext);
+      expect(mockRequestWithNewSession.tenantContext.gymId).toBe(GYM_B_ID);
+
+      // 3. And if any request tries to read Gym A member data, it is rejected with 404
+      const mockMembersPrisma = {
+        member: {
+          findFirst: jest.fn().mockImplementation(({ where }) => {
+            if (where.gymId === GYM_A_ID) {
+              return { id: 'leaked-member-from-gym-a', gymId: GYM_A_ID };
+            }
+            return null; // Not found in Gym B
+          }),
+        },
+      };
+      const membersService = new MembersService(mockMembersPrisma as any, {} as any);
+      await expect(
+        membersService.getMemberById(mockRequestWithNewSession.tenantContext.gymId, 'member-of-gym-a'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

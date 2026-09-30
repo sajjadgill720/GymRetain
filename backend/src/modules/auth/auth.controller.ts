@@ -36,9 +36,17 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(TenantAccessGuard)
   async getMe(@Req() req: any) {
     return this.authService.getMe(req.user);
+  }
+
+  @Post('switch-gym')
+  @HttpCode(HttpStatus.OK)
+  async switchGym(
+    @Req() req: any,
+    @Body('gymId') gymId: string,
+  ) {
+    return this.authService.switchGym(req.user, gymId);
   }
 
   @Post('invite-staff')

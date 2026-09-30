@@ -116,17 +116,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(meData.user));
       }
 
-      if (meData.gyms && meData.gyms.length > 0) {
+      if (meData.gyms) {
         setGyms(meData.gyms);
         localStorage.setItem(STORAGE_KEY_GYMS, JSON.stringify(meData.gyms));
+      }
 
-        // If no active gym set yet, default to first
+      if (meData.activeGym) {
+        setActiveGym(meData.activeGym);
+        localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(meData.activeGym));
+        api.setGym(meData.activeGym);
+      } else if (meData.gyms && meData.gyms.length > 0) {
         const currentActive = localStorage.getItem(STORAGE_KEY_ACTIVE_GYM);
-        if (!currentActive) {
-          setActiveGym(meData.gyms[0]);
-          localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(meData.gyms[0]));
-          api.setGym(meData.gyms[0]);
+        let selected = meData.gyms[0];
+        if (currentActive) {
+          try {
+            const parsed = JSON.parse(currentActive);
+            const found = meData.gyms.find((g: GymInfo) => g.id === parsed.id);
+            if (found) selected = found;
+          } catch {
+            // Ignore
+          }
         }
+        setActiveGym(selected);
+        localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(selected));
+        api.setGym(selected);
+      } else {
+        setActiveGym(null);
+        localStorage.removeItem(STORAGE_KEY_ACTIVE_GYM);
       }
     } catch {
       // Backend not reachable — stay with localStorage data or demo defaults
@@ -134,34 +150,108 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const switchGym = useCallback(
-    (gymId: string) => {
+    async (gymId: string) => {
+      try {
+        const token = localStorage.getItem('gymretain_token');
+        if (token) {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/auth/switch-gym`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ gymId }),
+            },
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+            const payload = data.data || data;
+
+            if (payload.token) {
+              api.setToken(payload.token);
+              localStorage.setItem('gymretain_token', payload.token);
+            }
+            if (payload.activeGym) {
+              setActiveGym(payload.activeGym);
+              localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(payload.activeGym));
+              api.setGym(payload.activeGym);
+            }
+            if (payload.user) {
+              setUser(payload.user);
+              localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(payload.user));
+            }
+
+            // Immediately reload view so no stale tenant data from previous gym is retained
+            if (typeof window !== 'undefined') {
+              window.location.reload();
+            }
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Server switchGym failed, falling back:', err);
+      }
+
+      // Offline / demo fallback
       const target = gyms.find((g) => g.id === gymId);
       if (target) {
         setActiveGym(target);
         localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(target));
         api.setGym(target);
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
       }
     },
     [gyms],
   );
 
   const setAuthFromLogin = useCallback(
-    (data: { user: UserInfo; gymId: string; gymName: string; gymSlug: string }) => {
+    (data: {
+      user: UserInfo;
+      gymId: string;
+      gymName: string;
+      gymSlug: string;
+      token?: string;
+      gyms?: GymInfo[];
+    }) => {
+      if (data.token) {
+        api.setToken(data.token);
+        localStorage.setItem('gymretain_token', data.token);
+      }
+
       setUser(data.user);
       localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(data.user));
 
-      const gymInfo: GymInfo = {
-        id: data.gymId,
-        name: data.gymName,
-        slug: data.gymSlug,
-        city: '',
-        currency: 'PKR',
-      };
-      setGyms([gymInfo]);
-      setActiveGym(gymInfo);
-      localStorage.setItem(STORAGE_KEY_GYMS, JSON.stringify([gymInfo]));
-      localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(gymInfo));
-      api.setGym(gymInfo);
+      const gymList: GymInfo[] =
+        data.gyms && data.gyms.length > 0
+          ? data.gyms
+          : data.gymId
+          ? [
+              {
+                id: data.gymId,
+                name: data.gymName,
+                slug: data.gymSlug,
+                city: '',
+                currency: 'PKR',
+              },
+            ]
+          : [];
+
+      setGyms(gymList);
+      localStorage.setItem(STORAGE_KEY_GYMS, JSON.stringify(gymList));
+
+      if (gymList.length > 0) {
+        setActiveGym(gymList[0]);
+        localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(gymList[0]));
+        api.setGym(gymList[0]);
+      } else {
+        setActiveGym(null);
+        localStorage.removeItem(STORAGE_KEY_ACTIVE_GYM);
+      }
     },
     [],
   );

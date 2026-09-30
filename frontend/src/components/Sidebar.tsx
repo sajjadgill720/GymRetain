@@ -74,6 +74,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: LayoutDashboard,
     },
     {
+      name: 'AI Insights Chat',
+      href: '/chat',
+      icon: Sparkles,
+      badge: 'Groq',
+      badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-cyan-400 font-mono',
+    },
+    {
       name: 'Members',
       href: '/members',
       icon: Users,

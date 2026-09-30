@@ -18,6 +18,7 @@ import { MessagingModule } from './modules/messaging/messaging.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { TrainersModule } from './modules/trainers/trainers.module';
 import { DietPlansModule } from './modules/diet-plans/diet-plans.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -42,6 +43,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     PaymentsModule,
     TrainersModule,
     DietPlansModule,
+    ChatModule,
   ],
   providers: [
     {

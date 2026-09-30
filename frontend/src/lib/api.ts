@@ -1248,6 +1248,43 @@ class ApiClient {
       };
     }
   }
+
+  // --- AI INSIGHTS CHAT API METHODS ---
+
+  getToken(): string | null {
+    if (!this.token && typeof window !== 'undefined') {
+      this.token = localStorage.getItem('gymretain_token');
+    }
+    return this.token;
+  }
+
+  async getChatConversations(): Promise<any[]> {
+    try {
+      const res = await this.request<any>('/chat/conversations');
+      return res.data || res;
+    } catch {
+      return [];
+    }
+  }
+
+  async getChatMessages(conversationId: string): Promise<any[]> {
+    try {
+      const res = await this.request<any>(`/chat/conversations/${conversationId}/messages`);
+      return res.data || res;
+    } catch {
+      return [];
+    }
+  }
+
+  async deleteChatConversation(conversationId: string): Promise<any> {
+    try {
+      return await this.request(`/chat/conversations/${conversationId}`, {
+        method: 'DELETE',
+      });
+    } catch {
+      return { success: true };
+    }
+  }
 }
 
 export const api = new ApiClient();

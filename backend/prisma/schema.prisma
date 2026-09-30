@@ -161,6 +161,7 @@ model Gym {
   trainerAssignments  TrainerAssignment[]
   dietPlans           DietPlan[]
   dietPlanTemplates   DietPlanTemplate[]
+  chatConversations   ChatConversation[]
 
   @@map("gyms")
 }
@@ -514,6 +515,38 @@ model DietPlanTemplate {
 
   @@index([gymId, isActive])
   @@map("diet_plan_templates")
+}
+
+model ChatConversation {
+  id        String        @id @default(uuid()) @db.Uuid
+  gymId     String        @map("gym_id") @db.Uuid
+  userId    String        @map("user_id") @db.Uuid
+  title     String        @default("New Conversation") @db.VarChar(255)
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym       Gym           @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+
+  @@index([gymId, userId])
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id             String           @id @default(uuid()) @db.Uuid
+  conversationId String           @map("conversation_id") @db.Uuid
+  gymId          String           @map("gym_id") @db.Uuid
+  role           String           @db.VarChar(20) // 'user' | 'assistant'
+  content        String           @db.Text
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([gymId])
+  @@map("chat_messages")
 }
 
 

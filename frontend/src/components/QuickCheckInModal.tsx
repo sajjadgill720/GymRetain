@@ -11,7 +11,7 @@ import {
   Search,
   Sparkles,
   AlertCircle,
-} from 'lucide-react';
+} from '@/components/icons';
 
 interface QuickCheckInModalProps {
   isOpen: boolean;

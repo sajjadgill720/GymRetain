@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MoreHorizontal, TrendingUp, Store, Users, Building } from 'lucide-react';
+import { MoreHorizontal, TrendingUp, Store, Users, Building } from '@/components/icons';
 
 export const ProfitAreaChart: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);

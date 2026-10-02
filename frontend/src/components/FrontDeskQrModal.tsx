@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { api } from '../lib/api';
-import { QrCode, Printer, RotateCw, X, ShieldAlert, Sparkles, Building2 } from 'lucide-react';
+import { QrCode, Printer, RotateCw, X, ShieldAlert, Sparkles, Building2 } from '@/components/icons';
 
 interface FrontDeskQrModalProps {
   isOpen: boolean;

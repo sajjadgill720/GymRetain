@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Paperclip, Mic, ArrowUp, Maximize2, Sparkles, CheckCircle2, Bot } from 'lucide-react';
+import { Paperclip, Mic, ArrowUp, Maximize2, Sparkles, CheckCircle2, Bot } from '@/components/icons';
 
 interface AiAssistantCardProps {
   className?: string;

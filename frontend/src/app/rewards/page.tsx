@@ -15,7 +15,7 @@ import {
   CheckCircle2,
   X,
   ArrowRight,
-} from 'lucide-react';
+} from '@/components/icons';
 import Link from 'next/link';
 
 export default function RewardsPage() {

@@ -12,7 +12,7 @@ import {
   Send,
   CheckCircle2,
   X,
-} from 'lucide-react';
+} from '@/components/icons';
 
 interface AtRiskMembersTableProps {
   members: MemberRiskDetails[];

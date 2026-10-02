@@ -22,7 +22,7 @@ import {
   PanelLeftOpen,
   Lightbulb,
   LogOut,
-} from 'lucide-react';
+} from '@/components/icons';
 import { useAuth, GymInfo } from '../lib/AuthProvider';
 import { ThemeToggle } from './ThemeToggle';
 import { GymLogo } from './GymLogo';

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Flame, Trophy, Award, ArrowRight } from 'lucide-react';
+import { Flame, Trophy, Award, ArrowRight } from '@/components/icons';
 import Link from 'next/link';
 
 interface StreakLeaderboardProps {

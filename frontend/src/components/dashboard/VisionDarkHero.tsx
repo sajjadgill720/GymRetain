@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, TrendingUp, UserCheck, DollarSign, Award } from 'lucide-react';
+import { Sparkles, TrendingUp, UserCheck, DollarSign, Award } from '@/components/icons';
 import { DashboardSummary } from '../../types';
 
 interface VisionDarkHeroProps {

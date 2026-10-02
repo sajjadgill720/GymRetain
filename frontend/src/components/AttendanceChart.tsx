@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { AttendanceTrendPoint } from '../types';
-import { TrendingUp, Users, Calendar } from 'lucide-react';
+import { TrendingUp, Users, Calendar } from '@/components/icons';
 
 interface AttendanceChartProps {
   data: AttendanceTrendPoint[];

@@ -23,7 +23,7 @@ import {
   Sparkles,
   AlertCircle,
   Copy,
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);

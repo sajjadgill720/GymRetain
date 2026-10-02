@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UserCheck, Plus, ShieldCheck, Menu, MessageCircle, X, Send, Sparkles } from 'lucide-react';
+import { UserCheck, Plus, ShieldCheck, Menu, MessageCircle, X, Send, Sparkles } from '@/components/icons';
 import { api } from '../lib/api';
 
 interface HeaderProps {

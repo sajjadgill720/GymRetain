@@ -28,7 +28,7 @@ import {
   User,
   Shield,
   MessageCircle,
-} from 'lucide-react';
+} from '@/components/icons';
 
 interface MemberDietItem {
   id: string;

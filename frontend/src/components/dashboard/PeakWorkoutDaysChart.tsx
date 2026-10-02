@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal } from '@/components/icons';
 
 export const PeakWorkoutDaysChart: React.FC = () => {
   const [activeDay, setActiveDay] = useState<string>('Tue');

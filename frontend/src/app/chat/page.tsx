@@ -19,7 +19,7 @@ import {
   DollarSign,
   Loader2,
   StopCircle,
-} from 'lucide-react';
+} from '@/components/icons';
 
 interface ChatMessageItem {
   id: string;

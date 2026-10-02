@@ -14,7 +14,7 @@ import {
   QrCode,
   Clock,
   History,
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function CheckInKioskPage() {
   const [identifier, setIdentifier] = useState('');

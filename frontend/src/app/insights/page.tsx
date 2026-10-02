@@ -28,7 +28,7 @@ import {
   Layers,
   ArrowUpRight,
   ArrowDownRight,
-} from 'lucide-react';
+} from '@/components/icons';
 
 interface ChatMessageItem {
   id: string;

@@ -19,7 +19,7 @@ import {
   X,
   User,
   Sparkles,
-} from 'lucide-react';
+} from '@/components/icons';
 import Link from 'next/link';
 
 const DEFAULT_WINNERS: RewardRedemption[] = [

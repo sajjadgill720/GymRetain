@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { UserCheck, Users, AlertTriangle, Flame, Award, ChevronRight } from 'lucide-react';
+import { UserCheck, Users, AlertTriangle, Flame, Award, ChevronRight } from '@/components/icons';
 import Link from 'next/link';
 import { DashboardSummary } from '../../types';
 

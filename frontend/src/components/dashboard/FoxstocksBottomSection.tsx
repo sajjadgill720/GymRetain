@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, MessageCircle, AlertTriangle, CheckCircle2, ChevronRight, User, TrendingUp } from 'lucide-react';
+import { Plus, MessageCircle, AlertTriangle, CheckCircle2, ChevronRight, User, TrendingUp } from '@/components/icons';
 import Link from 'next/link';
 import { DashboardSummary, AttendanceTrendPoint, MemberRiskDetails } from '../../types';
 import { api } from '../../lib/api';

@@ -16,7 +16,7 @@ import {
   MessageCircle,
   BrainCircuit,
   Sliders,
-} from 'lucide-react';
+} from '@/components/icons';
 import { api } from '../../lib/api';
 
 interface AiRetentionIntelligenceModalProps {

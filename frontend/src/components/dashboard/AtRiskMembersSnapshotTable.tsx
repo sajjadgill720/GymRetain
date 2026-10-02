@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MoreHorizontal, AlertTriangle, CheckCircle2, MessageCircle, ArrowRight, User } from 'lucide-react';
+import { MoreHorizontal, AlertTriangle, CheckCircle2, MessageCircle, ArrowRight, User } from '@/components/icons';
 import Link from 'next/link';
 
 export const AtRiskMembersSnapshotTable: React.FC = () => {

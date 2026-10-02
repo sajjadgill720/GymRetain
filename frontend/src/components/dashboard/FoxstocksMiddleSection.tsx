@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, TrendingUp, UserCheck, Flame, Calendar, Clock, Sparkles } from 'lucide-react';
+import { ArrowRight, TrendingUp, UserCheck, Flame, Calendar, Clock, Sparkles } from '@/components/icons';
 import Link from 'next/link';
 import { DashboardSummary, AttendanceTrendPoint } from '../../types';
 import { api } from '../../lib/api';

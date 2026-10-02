@@ -11,7 +11,7 @@ import {
   Clock,
   DollarSign,
   TrendingUp,
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function RetentionPage() {
   const [atRiskList, setAtRiskList] = useState<MemberRiskDetails[]>([]);

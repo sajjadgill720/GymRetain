@@ -19,7 +19,7 @@ import {
   QrCode,
   UserCheck,
   Sparkles,
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);

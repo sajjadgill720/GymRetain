@@ -25,7 +25,7 @@ import {
   Edit2,
   RefreshCw,
   Eye,
-} from 'lucide-react';
+} from '@/components/icons';
 
 interface AssignedClient {
   assignmentId: string;

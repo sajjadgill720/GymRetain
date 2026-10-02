@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MoreHorizontal, Star, Headphones, Watch, Smartphone, Dumbbell, ShieldCheck } from 'lucide-react';
+import { MoreHorizontal, Star, Headphones, Watch, Smartphone, Dumbbell, ShieldCheck } from '@/components/icons';
 import Link from 'next/link';
 
 export const BestSellingProductsTable: React.FC = () => {

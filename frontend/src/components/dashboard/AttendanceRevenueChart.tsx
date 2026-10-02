@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MoreHorizontal, TrendingUp, Dumbbell, Award, Flame } from 'lucide-react';
+import { MoreHorizontal, TrendingUp, Dumbbell, Award, Flame } from '@/components/icons';
 
 export const AttendanceRevenueChart: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);

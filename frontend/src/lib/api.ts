@@ -1285,6 +1285,17 @@ class ApiClient {
       return { success: true };
     }
   }
+
+  async simulateWhatsAppMessage(payload: { memberId: string; messageType: string }): Promise<any> {
+    try {
+      return await this.request('/messaging/whatsapp/simulate', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      return { success: true, simulated: true, payload };
+    }
+  }
 }
 
 export const api = new ApiClient();

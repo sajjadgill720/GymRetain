@@ -199,10 +199,6 @@ export default function DashboardPage() {
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-content-primary font-sans">
                 Retention Dashboard
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Loops Active
-              </span>
             </div>
             <p className="text-xs sm:text-sm text-content-secondary">
               Real-time attendance tracking, member streak milestones, and automated churn prevention.

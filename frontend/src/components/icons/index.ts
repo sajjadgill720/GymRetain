@@ -74,6 +74,8 @@ import {
   // Business, Billing & Stores
   CurrencyDollar,
   CreditCard,
+  Receipt,
+  Bank,
   Storefront,
   Buildings,
   Tag,
@@ -163,6 +165,8 @@ export {
   ArrowUpRight,
   CurrencyDollar,
   CreditCard,
+  Receipt,
+  Bank,
   Storefront,
   Buildings,
   Tag,

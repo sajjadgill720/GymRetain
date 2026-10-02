@@ -18,6 +18,7 @@ import {
   Sparkles,
   Dumbbell,
   Utensils,
+  CreditCard,
   PanelLeftClose,
   PanelLeftOpen,
   Lightbulb,
@@ -86,6 +87,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       href: '/diet-plans',
       icon: Utensils,
       badge: 'Diet',
+      badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono',
+    },
+    {
+      name: 'Subscriptions',
+      href: '/subscriptions',
+      icon: CreditCard,
+      badge: 'Billing',
       badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono',
     },
     {

@@ -39,6 +39,9 @@ import {
   TrendUp,
   TrendDown,
   Lightbulb,
+  Planet,
+  Globe,
+  Table,
   
   // Members & Auth
   Users,
@@ -138,6 +141,9 @@ export {
   TrendUp,
   TrendDown,
   Lightbulb,
+  Planet,
+  Globe,
+  Table,
   Users,
   User,
   UserCheck,
@@ -242,6 +248,8 @@ export const Loader2 = CircleNotch;
 export const Edit2 = PencilSimple;
 export const Trash2 = Trash;
 export const Download = DownloadSimple;
+export const Info = Lightbulb;
+export const PhoneCall = Phone;
 export const Layers = Stack;
 export const Menu = List;
 export const PanelLeftClose = SidebarSimple;

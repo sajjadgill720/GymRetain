@@ -317,8 +317,8 @@ export default function InsightsPage() {
                 onClick={() => setActiveTab('COPILOT')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   activeTab === 'COPILOT'
-                    ? 'bg-purple-600 text-white shadow-sm'
-                    : 'text-content-secondary hover:text-content-primary'
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-black shadow-md btn-shadow-primary'
+                    : 'text-content-secondary hover:text-content-primary hover:bg-surface'
                 }`}
               >
                 <Bot className="w-3.5 h-3.5" />
@@ -329,8 +329,8 @@ export default function InsightsPage() {
                 onClick={() => setActiveTab('PREDICTIVE')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   activeTab === 'PREDICTIVE'
-                    ? 'bg-purple-600 text-white shadow-sm'
-                    : 'text-content-secondary hover:text-content-primary'
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-black shadow-md btn-shadow-primary'
+                    : 'text-content-secondary hover:text-content-primary hover:bg-surface'
                 }`}
               >
                 <BarChart3 className="w-3.5 h-3.5" />
@@ -341,8 +341,8 @@ export default function InsightsPage() {
                 onClick={() => setActiveTab('ATTENDANCE')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   activeTab === 'ATTENDANCE'
-                    ? 'bg-purple-600 text-white shadow-sm'
-                    : 'text-content-secondary hover:text-content-primary'
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-black shadow-md btn-shadow-primary'
+                    : 'text-content-secondary hover:text-content-primary hover:bg-surface'
                 }`}
               >
                 <Clock className="w-3.5 h-3.5" />

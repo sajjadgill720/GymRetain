@@ -20,4 +20,12 @@ export class UpdateGymDto {
   @IsOptional()
   @IsString()
   timezone?: string;
+
+  @IsOptional()
+  capacity?: number;
+
+  @IsOptional()
+  @IsString()
+  capacityPolicy?: 'WARNING_ONLY' | 'BLOCK_ADMISSION';
 }
+

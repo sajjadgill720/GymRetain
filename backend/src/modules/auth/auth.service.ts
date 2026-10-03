@@ -1,6 +1,7 @@
 import {
   Injectable,
   ConflictException,
+  NotFoundException,
   UnauthorizedException,
   BadRequestException,
   ForbiddenException,
@@ -53,6 +54,13 @@ export class AuthService {
           address: dto.gymAddress,
           currency: 'PKR',
           status: 'ACTIVE',
+          capacity: 100,
+          capacityPolicy: 'WARNING_ONLY',
+          saasPlan: 'TRIAL',
+          saasStatus: 'TRIALING',
+          trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+          maxMembers: 50,
+          maxStaff: 5,
         },
       });
 
@@ -69,6 +77,7 @@ export class AuthService {
 
       return { gym, staff };
     });
+
 
     const token = this.generateToken(result.staff);
 
@@ -158,8 +167,25 @@ export class AuthService {
 
   /**
    * Gym Owner invites a new staff member to their gym
+   * Enforces staff quota limits and creates a persistent invitation record
    */
-  async inviteStaff(gymId: string, dto: InviteStaffDto) {
+  async inviteStaff(gymId: string, dto: InviteStaffDto, invitedById?: string) {
+    const gym = await this.prisma.gym.findUnique({
+      where: { id: gymId },
+      select: { maxStaff: true },
+    });
+
+    if (gym && gym.maxStaff) {
+      const activeStaffCount = await this.prisma.gymStaff.count({
+        where: { gymId, isActive: true },
+      });
+      if (activeStaffCount >= gym.maxStaff) {
+        throw new ForbiddenException(
+          `Staff limit reached (${activeStaffCount}/${gym.maxStaff}). Upgrade your subscription tier to invite more team members.`,
+        );
+      }
+    }
+
     const existing = await this.prisma.gymStaff.findFirst({
       where: { email: dto.email.toLowerCase(), gymId },
     });
@@ -167,7 +193,28 @@ export class AuthService {
       throw new ConflictException('A staff member with this email already exists in this gym');
     }
 
-    // Default temporary password for invite
+    const { randomBytes } = await import('crypto');
+    const token = randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    // Store formal invitation
+    const ownerStaff = await this.prisma.gymStaff.findFirst({ where: { gymId, role: 'GYM_OWNER' } });
+    const inviterId = invitedById || ownerStaff?.id || gymId;
+
+    const invitation = await this.prisma.staffInvitation.create({
+      data: {
+        gymId,
+        email: dto.email.toLowerCase(),
+        role: dto.role,
+        name: dto.name,
+        token,
+        invitedById: inviterId,
+        expiresAt,
+        status: 'PENDING',
+      },
+    });
+
+    // Support instant credentials for backwards compatibility & automated tests
     const defaultPassword = 'GymRetain2026!';
     const passwordHash = await bcrypt.hash(defaultPassword, 10);
 
@@ -194,10 +241,90 @@ export class AuthService {
 
     return {
       staff,
+      invitationId: invitation.id,
+      invitationToken: token,
+      invitationExpiresAt: expiresAt,
       temporaryPassword: defaultPassword,
-      message: 'Staff member invited successfully',
+      message: 'Staff member invited successfully with secure invitation token and temporary credentials.',
     };
   }
+
+  async listStaff(gymId: string) {
+    return this.prisma.gymStaff.findMany({
+      where: { gymId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        lastLoginAt: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async listInvitations(gymId: string) {
+    return this.prisma.staffInvitation.findMany({
+      where: { gymId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async revokeInvitation(gymId: string, invitationId: string, actorStaffId?: string, actorRole: string = 'GYM_OWNER') {
+    const inv = await this.prisma.staffInvitation.findFirst({
+      where: { id: invitationId, gymId },
+    });
+    if (!inv) throw new NotFoundException('Invitation not found');
+
+    const updated = await this.prisma.staffInvitation.update({
+      where: { id: invitationId },
+      data: { status: 'REVOKED' },
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        gymId,
+        staffId: actorStaffId || null,
+        actorRole,
+        action: 'STAFF_INVITATION_REVOKED',
+        resource: 'STAFF_INVITATION',
+        metadata: { invitationId, email: inv.email },
+      },
+    });
+
+    return { success: true, message: 'Invitation revoked', invitation: updated };
+  }
+
+  async updateStaffRole(gymId: string, targetStaffId: string, newRole: any, actorStaffId?: string, actorRole: string = 'GYM_OWNER') {
+    const staff = await this.prisma.gymStaff.findFirst({
+      where: { id: targetStaffId, gymId },
+    });
+    if (!staff) throw new NotFoundException('Staff member not found');
+
+    const previousRole = staff.role;
+    const updated = await this.prisma.gymStaff.update({
+      where: { id: targetStaffId },
+      data: { role: newRole },
+      select: { id: true, email: true, name: true, role: true, isActive: true },
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        gymId,
+        staffId: actorStaffId || null,
+        actorRole,
+        action: 'STAFF_ROLE_CHANGED',
+        resource: 'GYM_STAFF',
+        metadata: { targetStaffId, previousRole, newRole },
+      },
+    });
+
+    return { success: true, staff: updated };
+  }
+
 
   /**
    * Returns the authenticated user's profile and their gym details.

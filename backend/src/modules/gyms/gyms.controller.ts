@@ -12,6 +12,8 @@ import { TenantAccessGuard } from '../../common/guards/tenant-access.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentGymId } from '../../common/decorators/current-gym.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { JwtPayload } from '../../common/interfaces/jwt-payload.interface';
 
 @Controller('gyms')
 @UseGuards(TenantAccessGuard, RolesGuard)
@@ -27,9 +29,15 @@ export class GymsController {
   @Roles('GYM_OWNER')
   async updateMyGym(
     @CurrentGymId() gymId: string,
+    @CurrentUser() user: JwtPayload,
     @Body() dto: UpdateGymDto,
   ) {
-    return this.gymsService.updateGymDetails(gymId, dto);
+    return this.gymsService.updateGymDetails(gymId, dto, user.sub, user.role);
+  }
+
+  @Get('capacity')
+  async getCapacityStatus(@CurrentGymId() gymId: string) {
+    return this.gymsService.getCapacityStatus(gymId);
   }
 
   @Get('qr-code')
@@ -39,7 +47,10 @@ export class GymsController {
 
   @Post('qr-code/rotate')
   @Roles('GYM_OWNER')
-  async rotateQrSecret(@CurrentGymId() gymId: string) {
-    return this.gymsService.rotateQrSecret(gymId);
+  async rotateQrSecret(
+    @CurrentGymId() gymId: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.gymsService.rotateQrSecret(gymId, user.sub, user.role);
   }
 }

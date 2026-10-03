@@ -11,6 +11,12 @@ export interface Gym {
   currency: string;
   timezone: string;
   status: 'ACTIVE' | 'SUSPENDED' | 'TRIAL';
+  capacity?: number;
+  capacityPolicy?: 'WARNING_ONLY' | 'BLOCK_ADMISSION';
+  saasPlan?: 'TRIAL' | 'STARTER' | 'PRO' | 'ENTERPRISE';
+  saasStatus?: 'TRIALING' | 'ACTIVE' | 'PAST_DUE' | 'CANCELLED';
+  maxMembers?: number;
+  maxStaff?: number;
 }
 
 export interface User {
@@ -180,6 +186,11 @@ export interface MemberRiskDetails {
   phone: string;
   riskScore: number; // 0 - 100
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+  isNewMember?: boolean;
+  dataQuality?: 'SUFFICIENT_BASELINE' | 'SPARSE_DATA' | 'PAUSED_MEMBERSHIP';
+  disengagementExplanation?: string;
+  baselineWeeklyVisits?: number;
+  recentWeeklyVisits?: number;
   factors: {
     daysSinceLastCheckIn: number;
     daysInactiveScore: number;
@@ -197,10 +208,31 @@ export interface MemberRiskDetails {
 export interface DashboardSummary {
   kpis: {
     activeMembers: number;
-    todayCheckIns: number;
+    membersCheckedInToday: number;
+    visitsToday: number;
+    currentlyCheckedIn: number;
+    capacity: number;
+    capacityPolicy: 'WARNING_ONLY' | 'BLOCK_AT_CAPACITY' | 'BLOCK_ADMISSION';
+    capacityUsagePercent: number;
+    isOverCapacity: boolean;
+    averageVisitDurationMinutes: number | null;
+    accuracyNotice: string;
     atRiskMembersTotal: number;
     highRiskCount: number;
     mediumRiskCount: number;
+    timezone: string;
+    busiestArrivalHours?: Array<{ hour: number; label: string; count: number }>;
+    todayCheckIns?: number; // legacy fallback
+  };
+  busiestArrivalHours?: {
+    hasEnoughData: boolean;
+    periods: Array<{
+      period: string;
+      arrivals: number;
+      label: string;
+    }>;
+    hourlyDistribution?: number[];
+    sampleSizeCheckIns?: number;
   };
   streakLeaders: Array<{
     memberId: string;

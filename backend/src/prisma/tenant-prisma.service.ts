@@ -210,6 +210,34 @@ export class TenantPrismaService {
             return query(args);
           },
         },
+        staffInvitation: {
+          async findMany({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+          async findFirst({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+          async create({ args, query }) {
+            args.data = { ...args.data, gymId: tenantGymId } as any;
+            return query(args);
+          },
+        },
+        saaSBillingRecord: {
+          async findMany({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+          async findFirst({ args, query }) {
+            args.where = { ...args.where, gymId: tenantGymId };
+            return query(args);
+          },
+          async create({ args, query }) {
+            args.data = { ...args.data, gymId: tenantGymId } as any;
+            return query(args);
+          },
+        },
       },
     });
   }

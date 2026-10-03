@@ -15,10 +15,21 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/a
 const MOCK_SUMMARY: DashboardSummary = {
   kpis: {
     activeMembers: 142,
-    todayCheckIns: 38,
+    membersCheckedInToday: 38,
+    visitsToday: 41,
+    currentlyCheckedIn: 24,
+    capacity: 100,
+    capacityPolicy: 'WARNING_ONLY',
+    capacityUsagePercent: 24,
+    isOverCapacity: false,
+    averageVisitDurationMinutes: 62,
+    accuracyNotice:
+      'Live count reflects open attendance sessions. Missed check-outs or delayed check-outs can affect real-time accuracy.',
     atRiskMembersTotal: 19,
     highRiskCount: 6,
     mediumRiskCount: 13,
+    timezone: 'Asia/Karachi',
+    todayCheckIns: 38,
   },
   streakLeaders: [
     {
@@ -555,13 +566,19 @@ class ApiClient {
       });
 
       if (!res.ok) {
-        throw new Error(`HTTP error ${res.status}`);
+        let errorMsg = `HTTP error ${res.status}`;
+        try {
+          const errJson = await res.json();
+          errorMsg = errJson.message || errJson.error || errorMsg;
+        } catch {
+          // Keep default errorMsg
+        }
+        throw new Error(errorMsg);
       }
 
       const json = await res.json();
       return json.data !== undefined ? json.data : json;
     } catch (err) {
-      // Fallback handled in specific methods
       throw err;
     }
   }
@@ -778,73 +795,121 @@ class ApiClient {
     }
   }
 
-  // Record Check-In
-  async recordCheckIn(memberIdentifier: string, method = 'QR_SCAN'): Promise<any> {
+  // Capacity Management
+  async getCapacityStatus(): Promise<{
+    capacity: number;
+    capacityPolicy: 'WARNING_ONLY' | 'BLOCK_AT_CAPACITY';
+    currentlyCheckedIn: number;
+    capacityUsagePercent: number;
+    isOverCapacity: boolean;
+    remainingCapacity: number;
+  }> {
     try {
-      return await this.request('/check-ins', {
-        method: 'POST',
-        body: JSON.stringify({ memberIdentifier, method }),
-      });
+      const res = await this.request<any>('/gyms/capacity');
+      return res.data || res;
     } catch {
-      // Find matching member in mock data
-      const member = MOCK_MEMBERS.find(
-        (m) =>
-          m.memberCode.toLowerCase() === memberIdentifier.toLowerCase() ||
-          m.phone.includes(memberIdentifier) ||
-          m.id === memberIdentifier,
-      );
-
-      if (!member) {
-        throw new Error(`Member not found with code or phone "${memberIdentifier}"`);
-      }
-
-      const prevStreak = member.streak?.currentStreak || 0;
-      const newStreak = prevStreak + 1;
-      const newLongest = Math.max(member.streak?.longestStreak || 0, newStreak);
-
-      if (member.streak) {
-        member.streak.currentStreak = newStreak;
-        member.streak.longestStreak = newLongest;
-        member.streak.lastCheckInDate = new Date().toISOString();
-      }
-
-      // Check if unlocked 10-day badge
-      const unlockedRewards = [];
-      if (newStreak === 10) {
-        unlockedRewards.push({
-          title: '10-Day Streak Warrior',
-          badgeIcon: 'flame-gold',
-          description: 'Awarded for checking in 10 consecutive days!',
-        });
-      }
-
       return {
-        checkIn: {
-          id: `ci-${Date.now()}`,
-          checkInTime: new Date().toISOString(),
-          method,
-        },
-        member: {
-          id: member.id,
-          code: member.memberCode,
-          name: `${member.firstName} ${member.lastName}`,
-          phone: member.phone,
-        },
-        streak: {
-          current: newStreak,
-          longest: newLongest,
-          incremented: true,
-          streakBroken: false,
-        },
-        unlockedRewards,
+        capacity: 100,
+        capacityPolicy: 'WARNING_ONLY',
+        currentlyCheckedIn: 38,
+        capacityUsagePercent: 38,
+        isOverCapacity: false,
+        remainingCapacity: 62,
       };
     }
   }
 
-  // QR Code generator
+  async updateCapacity(dto: {
+    capacity: number;
+    capacityPolicy?: 'WARNING_ONLY' | 'BLOCK_AT_CAPACITY';
+  }): Promise<any> {
+    const res = await this.request<any>('/gyms/capacity', {
+      method: 'PATCH',
+      body: JSON.stringify(dto),
+    });
+    return res.data || res;
+  }
+
+  // Attendance Sessions: Lookup Member Before Check-In/Check-Out
+  async lookupMemberForCheckIn(identifier: string): Promise<any> {
+    try {
+      const res = await this.request<any>(
+        `/members/lookup-for-checkin?identifier=${encodeURIComponent(identifier)}`,
+      );
+      return res.data || res;
+    } catch (err: any) {
+      // Mock lookup fallback if server offline
+      const member = MOCK_MEMBERS.find(
+        (m) =>
+          m.memberCode.toLowerCase() === identifier.toLowerCase() ||
+          m.phone.includes(identifier) ||
+          m.id === identifier,
+      );
+      if (!member) {
+        throw new Error(err.message || `Member not found with "${identifier}"`);
+      }
+      return {
+        id: member.id,
+        memberCode: member.memberCode,
+        fullName: `${member.firstName} ${member.lastName}`,
+        phone: member.phone,
+        status: member.status,
+        hasActivePass: true,
+        currentSession: null,
+      };
+    }
+  }
+
+  // Attendance Sessions: Record Check-In
+  async recordCheckIn(
+    memberIdentifier: string,
+    method = 'QR_SCAN',
+    idempotencyKey?: string,
+  ): Promise<any> {
+    const res = await this.request<any>('/check-ins', {
+      method: 'POST',
+      body: JSON.stringify({ memberIdentifier, method, idempotencyKey }),
+    });
+    return res.data || res;
+  }
+
+  // Attendance Sessions: Explicit Check-Out
+  async recordCheckOut(memberIdentifier: string, method = 'QR_SCAN'): Promise<any> {
+    const res = await this.request<any>('/check-ins/check-out', {
+      method: 'POST',
+      body: JSON.stringify({ memberIdentifier, method }),
+    });
+    return res.data || res;
+  }
+
+  // Attendance Sessions: Open Sessions on Floor
+  async getOpenAttendanceSessions(): Promise<any[]> {
+    try {
+      const res = await this.request<any>('/check-ins/open-sessions');
+      return res.data || res;
+    } catch {
+      return [];
+    }
+  }
+
+  // Attendance Sessions: Correct Missed Check-Out
+  async correctMissedCheckOut(
+    checkInId: string,
+    checkOutTime: string,
+    note?: string,
+  ): Promise<any> {
+    const res = await this.request<any>(`/check-ins/${checkInId}/correct`, {
+      method: 'PATCH',
+      body: JSON.stringify({ checkOutTime, note }),
+    });
+    return res.data || res;
+  }
+
+  // QR Code generator for Front Desk
   async getFrontDeskQrCode(): Promise<{ qrPayload: string; qrDataUrl: string }> {
     try {
-      return await this.request('/gyms/qr-code');
+      const res = await this.request<any>('/gyms/qr-code');
+      return res.data || res;
     } catch {
       return {
         qrPayload: JSON.stringify({
@@ -856,6 +921,162 @@ class ApiClient {
         qrDataUrl: '',
       };
     }
+  }
+
+  async rotateFrontDeskQrCode(): Promise<any> {
+    const res = await this.request<any>('/gyms/qr-code/rotate', {
+      method: 'POST',
+    });
+    return res.data || res;
+  }
+
+  // Member Individual QR Credentials
+  async getMemberQrCode(memberId: string): Promise<any> {
+    const res = await this.request<any>(`/members/${memberId}/qr-code`);
+    return res.data || res;
+  }
+
+  async rotateMemberQrCredential(memberId: string): Promise<any> {
+    const res = await this.request<any>(`/members/${memberId}/qr-code/rotate`, {
+      method: 'POST',
+    });
+    return res.data || res;
+  }
+
+  async revokeMemberQrCredential(memberId: string): Promise<any> {
+    const res = await this.request<any>(`/members/${memberId}/qr-code/revoke`, {
+      method: 'POST',
+    });
+    return res.data || res;
+  }
+
+  // Retention Interventions & Notes
+  async recordRetentionIntervention(payload: {
+    memberId: string;
+    outreachMethod: string;
+    notes?: string;
+    outcome?: string;
+    followUpDate?: string;
+  }): Promise<any> {
+    const res = await this.request<any>('/retention/intervention', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return res.data || res;
+  }
+
+  async getMemberInterventions(memberId: string): Promise<any[]> {
+    try {
+      const res = await this.request<any>(`/retention/members/${memberId}/interventions`);
+      return res.data || res;
+    } catch {
+      return [];
+    }
+  }
+
+  // SaaS Multi-Tenant Billing & Entitlements
+  async getSaasBillingStatus(): Promise<any> {
+    try {
+      const res = await this.request<any>('/saas-billing/status');
+      return res.data || res;
+    } catch {
+      return {
+        gymId: this.currentGym.id,
+        plan: 'STARTER',
+        status: 'TRIAL',
+        currentPeriodEnd: new Date(Date.now() + 14 * 86400000).toISOString(),
+        isTrialActive: true,
+        entitlements: {
+          maxMembers: 150,
+          maxStaff: 3,
+          currentMemberCount: 142,
+          currentStaffCount: 2,
+          hasAiAssistant: false,
+          hasMultiLocation: false,
+        },
+      };
+    }
+  }
+
+  async createSaasCheckout(dto: {
+    plan: 'STARTER' | 'PRO' | 'ENTERPRISE';
+    billingInterval?: 'MONTHLY' | 'ANNUAL';
+    returnUrl?: string;
+  }): Promise<any> {
+    const res = await this.request<any>('/saas-billing/checkout', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    });
+    return res.data || res;
+  }
+
+  async simulateSaasPayment(dto: {
+    eventType: 'payment_succeeded' | 'payment_failed';
+    plan?: 'STARTER' | 'PRO' | 'ENTERPRISE';
+  }): Promise<any> {
+    const res = await this.request<any>('/saas-billing/simulate-webhook', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    });
+    return res.data || res;
+  }
+
+  async cancelSaasSubscription(): Promise<any> {
+    const res = await this.request<any>('/saas-billing/cancel', {
+      method: 'POST',
+    });
+    return res.data || res;
+  }
+
+  async getSaasInvoices(): Promise<any[]> {
+    try {
+      const res = await this.request<any>('/saas-billing/invoices');
+      return res.data || res;
+    } catch {
+      return [];
+    }
+  }
+
+  // Staff Team & Role Management
+  async getStaffTeam(): Promise<any[]> {
+    try {
+      const res = await this.request<any>('/auth/team/staff');
+      return res.data || res;
+    } catch {
+      return [];
+    }
+  }
+
+  async getStaffInvitations(): Promise<any[]> {
+    try {
+      const res = await this.request<any>('/auth/team/invitations');
+      return res.data || res;
+    } catch {
+      return [];
+    }
+  }
+
+  async inviteStaffMember(dto: { email: string; role: 'STAFF' | 'TRAINER' }): Promise<any> {
+    const res = await this.request<any>('/auth/team/invite', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    });
+    return res.data || res;
+  }
+
+  async revokeStaffInvitation(id: string): Promise<any> {
+    const res = await this.request<any>(`/auth/team/invitations/${id}`, {
+      method: 'DELETE',
+    });
+    return res.data || res;
+  }
+
+  async updateStaffRole(id: string, role: 'STAFF' | 'TRAINER'): Promise<any> {
+    const res = await this.request<any>(`/auth/team/staff/${id}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    });
+    return res.data || res;
   }
 
   // --- TRAINER ASSIGNMENT API METHODS ---

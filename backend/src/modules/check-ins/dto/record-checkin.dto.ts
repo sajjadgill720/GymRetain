@@ -14,6 +14,14 @@ export class RecordCheckInDto {
   qrPayload?: string; // Raw scanned QR code payload JSON
 
   @IsOptional()
+  @IsString()
+  qrCredential?: string; // Opaque individual member QR credential
+
+  @IsOptional()
+  @IsString()
+  idempotencyKey?: string; // Client idempotency token to prevent concurrent duplicate scans
+
+  @IsOptional()
   @IsIn(['QR_SCAN', 'MANUAL_STAFF', 'KIOSK'])
   method?: 'QR_SCAN' | 'MANUAL_STAFF' | 'KIOSK';
 
@@ -21,3 +29,4 @@ export class RecordCheckInDto {
   @IsString()
   notes?: string;
 }
+

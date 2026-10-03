@@ -22,6 +22,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
+  ShieldCheck,
 } from '@/components/icons';
 import { useAuth, GymInfo } from '../lib/AuthProvider';
 import { ThemeToggle } from './ThemeToggle';
@@ -130,6 +131,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       name: 'Rewards & Perks',
       href: '/rewards',
       icon: Award,
+    },
+    {
+      name: 'Gym SaaS & Settings',
+      href: '/settings',
+      icon: ShieldCheck,
+      badge: 'SaaS',
+      badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-cyan-400 font-mono',
     },
   ];
 

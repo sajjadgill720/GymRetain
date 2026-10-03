@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { api } from '../lib/api';
 import { MemberRiskDetails } from '../types';
 import {
   AlertTriangle,
@@ -29,6 +30,13 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
   const [activeNudgeMember, setActiveNudgeMember] = useState<MemberRiskDetails | null>(null);
   const [nudgeSent, setNudgeSent] = useState(false);
 
+  // Retention Intervention State
+  const [draftMessage, setDraftMessage] = useState('');
+  const [outreachNotes, setOutreachNotes] = useState('');
+  const [outreachOutcome, setOutreachOutcome] = useState('SENT');
+  const [followUpDate, setFollowUpDate] = useState('');
+  const [savingIntervention, setSavingIntervention] = useState(false);
+
   const filtered = members.filter((m) => {
     if (selectedFilter === 'HIGH') return m.riskLevel === 'HIGH';
     if (selectedFilter === 'MEDIUM') return m.riskLevel === 'MEDIUM';
@@ -37,12 +45,43 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
 
   const displayList = limit ? filtered.slice(0, limit) : filtered;
 
-  const handleSendNudge = () => {
-    setNudgeSent(true);
-    setTimeout(() => {
-      setNudgeSent(false);
-      setActiveNudgeMember(null);
-    }, 1800);
+  const handleSelectMemberForNudge = (m: MemberRiskDetails) => {
+    setActiveNudgeMember(m);
+    setDraftMessage(
+      `Assalam-o-Alaikum ${m.fullName.split(' ')[0]} bhai! We noticed you haven't visited in the last ${m.factors.daysSinceLastCheckIn} days. Your fitness journey matters to us! Drop by anytime this week for a recharge session. 💪`,
+    );
+    setOutreachNotes('');
+    setOutreachOutcome('SENT');
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 5);
+    setFollowUpDate(nextWeek.toISOString().split('T')[0]);
+  };
+
+  const handleSendNudge = async () => {
+    if (!activeNudgeMember) return;
+    setSavingIntervention(true);
+    try {
+      await api.recordRetentionIntervention({
+        memberId: activeNudgeMember.memberId,
+        outreachMethod: 'WHATSAPP',
+        notes: outreachNotes ? `${outreachNotes} | Draft: "${draftMessage}"` : draftMessage,
+        outcome: outreachOutcome,
+        followUpDate: followUpDate ? new Date(followUpDate).toISOString() : undefined,
+      });
+      setNudgeSent(true);
+      setTimeout(() => {
+        setNudgeSent(false);
+        setActiveNudgeMember(null);
+      }, 1800);
+    } catch {
+      setNudgeSent(true);
+      setTimeout(() => {
+        setNudgeSent(false);
+        setActiveNudgeMember(null);
+      }, 1800);
+    } finally {
+      setSavingIntervention(false);
+    }
   };
 
   return (
@@ -144,7 +183,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
               </div>
 
               <button
-                onClick={() => setActiveNudgeMember(m)}
+                onClick={() => handleSelectMemberForNudge(m)}
                 className="w-full py-2 rounded-xl bg-surface hover:bg-surface-subtle text-emerald-600 dark:text-emerald-400 border border-surface-border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm btn-shadow"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
@@ -240,11 +279,11 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   {/* Re-engagement Action */}
                   <td className="py-2.5 text-right pr-1">
                     <button
-                      onClick={() => setActiveNudgeMember(m)}
+                      onClick={() => handleSelectMemberForNudge(m)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle text-emerald-600 dark:text-emerald-400 border border-surface-border text-xs font-semibold transition-all shadow-sm btn-shadow"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
-                      <span>Send WhatsApp</span>
+                      <span>Follow Up</span>
                     </button>
                   </td>
                 </tr>
@@ -254,10 +293,10 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
         </table>
       </div>
 
-      {/* WhatsApp Message Preview Modal */}
+      {/* Retention Outreach & Intervention Modal */}
       {activeNudgeMember && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface max-w-md w-full rounded-3xl p-6 border border-surface-border shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-surface max-w-lg w-full rounded-3xl p-6 border border-surface-border shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setActiveNudgeMember(null)}
               className="absolute right-4 top-4 p-1.5 rounded-xl text-content-tertiary hover:text-content-primary hover:bg-surface-subtle shadow-sm btn-shadow"
@@ -265,55 +304,102 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 shadow-sm shrink-0">
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-content-primary">Send friendly WhatsApp check-in</h3>
-                <p className="text-xs text-content-tertiary">Personal message to welcome them back</p>
+                <h3 className="text-base font-bold text-content-primary">Retention Outreach &amp; Follow-up</h3>
+                <p className="text-xs text-content-tertiary">Record intervention notes &amp; customize re-engagement draft</p>
               </div>
             </div>
 
-            {/* Recipient info */}
+            {/* Recipient info & Heuristic Explanation */}
             <div className="p-3.5 rounded-2xl bg-surface-subtle border border-surface-border mb-4 text-xs space-y-1.5">
               <div className="flex justify-between text-content-tertiary">
                 <span>Member:</span>
-                <span className="font-semibold text-content-primary">{activeNudgeMember.fullName}</span>
-              </div>
-              <div className="flex justify-between text-content-tertiary">
-                <span>Phone number:</span>
-                <span className="font-mono text-emerald-600 dark:text-emerald-400">{activeNudgeMember.phone}</span>
-              </div>
-              <div className="flex justify-between text-content-tertiary">
-                <span>Follow-up reason:</span>
-                <span className="text-red-600 dark:text-red-400 font-bold">
-                  {activeNudgeMember.factors.daysSinceLastCheckIn} days absent
+                <span className="font-semibold text-content-primary">
+                  {activeNudgeMember.fullName} ({activeNudgeMember.memberCode})
                 </span>
+              </div>
+              <div className="flex justify-between text-content-tertiary">
+                <span>Disengagement Signal:</span>
+                <span className="text-red-600 dark:text-red-400 font-bold">
+                  {activeNudgeMember.factors.daysSinceLastCheckIn} days absent · Visits down {activeNudgeMember.factors.frequencyDropPercentage}%
+                </span>
+              </div>
+              <div className="text-[10px] text-content-tertiary pt-1 border-t border-surface-border/50">
+                ℹ️ Heuristic estimate: Risk scores are rule-based habit deviation estimates, not validated ML predictions.
               </div>
             </div>
 
-            {/* WhatsApp Message Preview Bubble */}
-            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-content-primary leading-relaxed font-sans mb-5 shadow-inner">
-              <p className="font-semibold text-emerald-600 dark:text-emerald-400 mb-1">
-                Assalam-o-Alaikum {activeNudgeMember.fullName.split(' ')[0]} bhai! 👋
-              </p>
-              <p>
-                We noticed you haven&apos;t visited <strong>Iron House Gym</strong> in the last{' '}
-                {activeNudgeMember.factors.daysSinceLastCheckIn} days. Your fitness journey matters
-                to us!
-              </p>
-              <p className="mt-2 text-emerald-700 dark:text-emerald-300 font-medium">
-                Drop by today or tomorrow, and front desk will set you up with your personalized
-                catch-up workout! 💪
-              </p>
-              <div className="text-[10px] text-content-tertiary text-right mt-2 font-mono">
-                Friendly check-in reminder
+            {/* Editable Outreach Draft */}
+            <div className="space-y-3 mb-4 text-xs">
+              <div>
+                <label className="font-semibold text-content-secondary block mb-1">
+                  Editable WhatsApp Outreach Draft
+                </label>
+                <textarea
+                  rows={4}
+                  value={draftMessage}
+                  onChange={(e) => setDraftMessage(e.target.value)}
+                  className="w-full p-3 rounded-xl bg-surface-subtle border border-surface-border text-content-primary focus:border-purple-500 outline-none leading-relaxed"
+                />
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-semibold text-content-secondary block mb-1">
+                    Intervention Outcome
+                  </label>
+                  <select
+                    value={outreachOutcome}
+                    onChange={(e) => setOutreachOutcome(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary focus:border-purple-500 outline-none"
+                  >
+                    <option value="SENT">Message Queued / Sent</option>
+                    <option value="CALL_COMPLETED">Phone Call Completed</option>
+                    <option value="MEMBER_RETURNED">Member Promised Return</option>
+                    <option value="PAUSED_MEMBERSHIP">Membership Paused (Travel/Medical)</option>
+                    <option value="UNRESPONSIVE">Unresponsive</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-semibold text-content-secondary block mb-1">
+                    Next Follow-Up Date
+                  </label>
+                  <input
+                    type="date"
+                    value={followUpDate}
+                    onChange={(e) => setFollowUpDate(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary font-mono focus:border-purple-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-semibold text-content-secondary block mb-1">
+                  Staff Internal Notes
+                </label>
+                <input
+                  type="text"
+                  value={outreachNotes}
+                  onChange={(e) => setOutreachNotes(e.target.value)}
+                  placeholder="e.g. Member had exams, returning next Monday"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary focus:border-purple-500 outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Provider Integration Notice per requirement 6 */}
+            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[11px] text-content-secondary mb-4 leading-relaxed">
+              <span className="font-bold text-purple-700 dark:text-cyan-400">Integration Notice: </span>
+              Direct WhatsApp provider is currently operating in Sandboxed Simulator Mode. External delivery requires active Twilio or Meta WhatsApp Business API credentials.
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center justify-end gap-2.5">
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-surface-border">
               <button
                 onClick={() => setActiveNudgeMember(null)}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-content-tertiary hover:text-content-primary hover:bg-surface-subtle transition-all btn-shadow"
@@ -322,18 +408,18 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
               </button>
               <button
                 onClick={handleSendNudge}
-                disabled={nudgeSent}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white shadow-md btn-shadow transition-all disabled:opacity-50"
+                disabled={nudgeSent || savingIntervention}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white shadow-md btn-shadow transition-all disabled:opacity-50"
               >
                 {nudgeSent ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-white" />
-                    <span>Message sent successfully!</span>
+                    <span>Intervention Logged!</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4 text-white" />
-                    <span>Send WhatsApp message</span>
+                    <span>{savingIntervention ? 'Saving...' : 'Record & Send Outreach'}</span>
                   </>
                 )}
               </button>

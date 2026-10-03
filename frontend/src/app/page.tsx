@@ -70,14 +70,57 @@ export default function DashboardPage() {
       .catch(() => {});
   }, [timeframe]);
 
-  // KPIs
-  const activeMembers = summary?.kpis?.activeMembers || 142;
-  const todayCheckIns = summary?.kpis?.todayCheckIns || 38;
-  const highRiskCount = summary?.kpis?.highRiskCount || 6;
+  // Real Backend KPIs
+  const kpis = summary?.kpis;
+  const activeMembers = kpis?.activeMembers ?? 142;
+  const membersCheckedInToday = kpis?.membersCheckedInToday ?? kpis?.todayCheckIns ?? 0;
+  const visitsToday = kpis?.visitsToday ?? membersCheckedInToday;
+  const currentlyCheckedIn = kpis?.currentlyCheckedIn ?? 0;
+  const gymCapacity = kpis?.capacity ?? 100;
+  const capacityUsagePercent = kpis?.capacityUsagePercent ?? Math.round((currentlyCheckedIn / (gymCapacity || 1)) * 100);
+  const rawPolicy = kpis?.capacityPolicy;
+  const capacityPolicy: 'WARNING_ONLY' | 'BLOCK_AT_CAPACITY' =
+    rawPolicy === 'BLOCK_AT_CAPACITY' || rawPolicy === 'BLOCK_ADMISSION'
+      ? 'BLOCK_AT_CAPACITY'
+      : 'WARNING_ONLY';
+  const averageVisitDurationMinutes = kpis?.averageVisitDurationMinutes;
+  const busiestArrivalHours = kpis?.busiestArrivalHours ?? [];
+  const accuracyNotice = kpis?.accuracyNotice ?? 'Live count reflects open attendance sessions. Missed check-outs or delayed check-outs can affect real-time accuracy.';
+  const highRiskCount = kpis?.highRiskCount ?? 6;
   const topStreakLeader = summary?.streakLeaders?.[0] || {
     memberName: 'Hamza Sheikh',
     currentStreak: 12,
     memberCode: 'GR-1001',
+  };
+
+  // Capacity Modal State
+  const [isCapacityModalOpen, setIsCapacityModalOpen] = useState(false);
+  const [capacityInput, setCapacityInput] = useState<number>(gymCapacity);
+  const [policyInput, setPolicyInput] = useState<'WARNING_ONLY' | 'BLOCK_AT_CAPACITY'>(capacityPolicy);
+  const [savingCapacity, setSavingCapacity] = useState(false);
+
+  useEffect(() => {
+    if (kpis?.capacity) setCapacityInput(kpis.capacity);
+    if (kpis?.capacityPolicy) {
+      setPolicyInput(kpis.capacityPolicy === 'BLOCK_ADMISSION' ? 'BLOCK_AT_CAPACITY' : kpis.capacityPolicy);
+    }
+  }, [kpis?.capacity, kpis?.capacityPolicy]);
+
+  const handleSaveCapacity = async () => {
+    setSavingCapacity(true);
+    try {
+      await api.updateCapacity({
+        capacity: Number(capacityInput),
+        capacityPolicy: policyInput,
+      });
+      showToast('Gym capacity settings updated successfully.');
+      setIsCapacityModalOpen(false);
+      loadData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to update capacity');
+    } finally {
+      setSavingCapacity(false);
+    }
   };
 
   // Recent at-risk preview fallback
@@ -173,7 +216,7 @@ export default function DashboardPage() {
     { date: '2026-09-18', checkIns: 31 },
     { date: '2026-09-23', checkIns: 45 },
     { date: '2026-09-28', checkIns: 39 },
-    { date: '2026-10-02', checkIns: todayCheckIns },
+    { date: '2026-10-02', checkIns: membersCheckedInToday },
   ];
 
   const maxVal = Math.max(...chartPoints.map((p) => p.checkIns), 45);
@@ -295,11 +338,11 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Card 2: Today's Check-Ins */}
+          {/* Card 2: Today's Attendance */}
           <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Today&apos;s Check-Ins
+                Today&apos;s Attendance
               </span>
               <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <UserCheck className="w-4 h-4" weight="duotone" />
@@ -307,14 +350,17 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-2xl sm:text-3xl font-extrabold text-content-primary tracking-tight font-sans">
-                {todayCheckIns}
+                {membersCheckedInToday}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-cyan-400">
-                Peak: 6-8 PM
+              <span className="text-xs text-content-tertiary">
+                distinct ({visitsToday} visit{visitsToday !== 1 ? 's' : ''})
               </span>
             </div>
             <p className="text-[11px] text-content-tertiary">
-              Floor capacity: 54% · Average workout: 62 mins
+              Avg duration:{' '}
+              {averageVisitDurationMinutes !== null && averageVisitDurationMinutes !== undefined
+                ? `${averageVisitDurationMinutes} mins`
+                : 'Not enough data'}
             </p>
           </div>
 
@@ -568,49 +614,88 @@ export default function DashboardPage() {
                     Gym floor occupancy
                   </span>
                   <span className="text-xs font-mono font-bold text-content-primary">
-                    {todayCheckIns} of 70 spots filled
+                    {currentlyCheckedIn} of {gymCapacity} on floor ({capacityUsagePercent}%)
                   </span>
                 </div>
                 <div className="w-full bg-surface rounded-full h-2 overflow-hidden border border-surface-border">
                   <div
-                    className="bg-purple-600 h-full rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(100, Math.round((todayCheckIns / 70) * 100))}%` }}
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      capacityUsagePercent >= 100
+                        ? 'bg-red-500'
+                        : capacityUsagePercent >= 80
+                        ? 'bg-amber-500'
+                        : 'bg-purple-600 dark:bg-cyan-500'
+                    }`}
+                    style={{ width: `${Math.min(100, capacityUsagePercent)}%` }}
                   />
                 </div>
                 <div className="flex justify-between text-[10px] text-content-tertiary mt-2">
-                  <span>Quiet</span>
-                  <span className="font-bold text-purple-600 dark:text-cyan-400">Moderate pace</span>
-                  <span>Full</span>
+                  <span>Policy: {capacityPolicy === 'BLOCK_AT_CAPACITY' ? 'Strict admission limit' : 'Warning only'}</span>
+                  <span className="font-bold text-purple-600 dark:text-cyan-400">
+                    {capacityUsagePercent > 100
+                      ? '⚠️ Over-Capacity'
+                      : capacityUsagePercent >= 85
+                      ? 'Near Peak'
+                      : 'Comfortable Pace'}
+                  </span>
+                  <span>Limit: {gymCapacity}</span>
+                </div>
+
+                {/* Over-capacity alert if current occupancy exceeds owner limit */}
+                {currentlyCheckedIn > gymCapacity && (
+                  <div className="mt-2.5 p-2 rounded-lg bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 text-[11px] font-semibold flex items-center gap-1.5">
+                    <Warning className="w-3.5 h-3.5 shrink-0" weight="fill" />
+                    <span>Floor capacity exceeded ({currentlyCheckedIn}/{gymCapacity}). Existing sessions preserved.</span>
+                  </div>
+                )}
+
+                {/* Accuracy notice per requirement 1 */}
+                <div className="mt-2.5 pt-2 border-t border-surface-border/50 text-[10px] text-content-tertiary flex items-start gap-1.5 leading-tight">
+                  <Clock className="w-3 h-3 text-content-secondary shrink-0 mt-0.5" />
+                  <span>{accuracyNotice}</span>
                 </div>
               </div>
 
               {/* Peak Hours Forecast */}
               <div className="space-y-2.5">
                 <div className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                  Busiest hours today
+                  Busiest arrival hours (historical)
                 </div>
-                <div className="flex items-center justify-between text-xs py-1.5 border-b border-surface-border/50">
-                  <span className="text-content-secondary">5:00 PM – 6:30 PM</span>
-                  <span className="font-mono text-content-primary font-bold">~42 members (Busy)</span>
-                </div>
-                <div className="flex items-center justify-between text-xs py-1.5 border-b border-surface-border/50">
-                  <span className="text-content-secondary">6:30 PM – 8:00 PM</span>
-                  <span className="font-mono text-amber-600 dark:text-amber-400 font-bold">~58 members (Peak)</span>
-                </div>
-                <div className="flex items-center justify-between text-xs py-1.5">
-                  <span className="text-content-secondary">8:00 PM – 9:30 PM</span>
-                  <span className="font-mono text-content-primary font-bold">~25 members (Quiet)</span>
-                </div>
+                {busiestArrivalHours.length > 0 ? (
+                  busiestArrivalHours.slice(0, 3).map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between text-xs py-1.5 border-b border-surface-border/50 last:border-b-0"
+                    >
+                      <span className="text-content-secondary">{item.label}</span>
+                      <span className="font-mono text-content-primary font-bold">
+                        {item.count} arrivals
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-2.5 text-xs text-content-tertiary italic">
+                    Not enough historical arrival data yet.
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="pt-4 border-t border-surface-border mt-4">
+            <div className="pt-4 border-t border-surface-border mt-4 space-y-2">
+              <button
+                type="button"
+                onClick={() => setIsCapacityModalOpen(true)}
+                className="w-full py-2 px-3 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary flex items-center justify-center gap-2 transition-all shadow-sm btn-shadow"
+              >
+                <span>⚙️ Manage Gym Floor Capacity</span>
+              </button>
+
               <Link
                 href="/check-in"
-                className="w-full py-2 px-3 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary flex items-center justify-center gap-2 transition-all btn-shadow"
+                className="w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black flex items-center justify-center gap-2 transition-all shadow-sm btn-shadow"
               >
-                <QrCode className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
-                <span>Open front-desk scanner</span>
+                <QrCode className="w-4 h-4" />
+                <span>Open Front-Desk Scanner</span>
               </Link>
             </div>
           </div>
@@ -821,6 +906,112 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      {/* Owner Gym Floor Capacity Management Modal */}
+      {isCapacityModalOpen && (
+        <div className="fixed inset-0 bg-black/60 dark:bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-surface max-w-md w-full rounded-2xl p-6 border border-surface-border shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-surface-border mb-4">
+              <div>
+                <h3 className="text-base font-bold text-content-primary">
+                  Gym Floor Capacity Settings
+                </h3>
+                <p className="text-xs text-content-tertiary">
+                  Owner operational floor threshold (separate from membership counts)
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCapacityModalOpen(false)}
+                className="p-1.5 rounded-xl text-content-tertiary hover:text-content-primary hover:bg-surface-subtle btn-shadow"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-content-secondary block mb-1.5">
+                  Target Gym Floor Capacity
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10000"
+                  value={capacityInput}
+                  onChange={(e) => setCapacityInput(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-sm font-bold text-content-primary font-mono focus:border-purple-500 outline-none"
+                />
+                <p className="text-[11px] text-content-tertiary mt-1">
+                  Note: This is an owner operational guide, not a certified fire safety or municipal occupancy code.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-content-secondary block mb-1.5">
+                  Admission Policy at Capacity
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-start gap-2.5 p-3 rounded-xl border border-surface-border bg-surface-subtle cursor-pointer hover:bg-surface-subtle/80">
+                    <input
+                      type="radio"
+                      name="policy"
+                      checked={policyInput === 'WARNING_ONLY'}
+                      onChange={() => setPolicyInput('WARNING_ONLY')}
+                      className="mt-0.5 text-purple-600 focus:ring-0"
+                    />
+                    <div>
+                      <div className="text-xs font-bold text-content-primary">Warning-Only Policy</div>
+                      <div className="text-[11px] text-content-tertiary">
+                        Alert staff on floor when capacity is reached, but permit check-ins.
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-2.5 p-3 rounded-xl border border-surface-border bg-surface-subtle cursor-pointer hover:bg-surface-subtle/80">
+                    <input
+                      type="radio"
+                      name="policy"
+                      checked={policyInput === 'BLOCK_AT_CAPACITY'}
+                      onChange={() => setPolicyInput('BLOCK_AT_CAPACITY')}
+                      className="mt-0.5 text-purple-600 focus:ring-0"
+                    />
+                    <div>
+                      <div className="text-xs font-bold text-content-primary">Admission-Blocking Policy</div>
+                      <div className="text-[11px] text-content-tertiary">
+                        Atomically reject new check-ins until members check out.
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {currentlyCheckedIn > capacityInput && (
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-400 text-xs">
+                  ⚠️ Note: Current occupancy ({currentlyCheckedIn}) is higher than your new setting ({capacityInput}). Active member sessions will NOT be removed, but an over-capacity alert will remain active.
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-surface-border mt-5">
+              <button
+                type="button"
+                onClick={() => setIsCapacityModalOpen(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-content-tertiary hover:text-content-primary hover:bg-surface-subtle btn-shadow"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveCapacity}
+                disabled={savingCapacity}
+                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black shadow-md btn-shadow transition-all disabled:opacity-50"
+              >
+                {savingCapacity ? 'Saving...' : 'Save Settings'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

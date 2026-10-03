@@ -23,6 +23,8 @@ import {
   Sparkles,
   AlertCircle,
   Copy,
+  QrCode,
+  ShieldAlert,
 } from '@/components/icons';
 
 export default function MembersPage() {
@@ -43,6 +45,50 @@ export default function MembersPage() {
   const [isReassignOpen, setIsReassignOpen] = useState(false);
   const [targetTrainerId, setTargetTrainerId] = useState('');
   const [reassigning, setReassigning] = useState(false);
+
+  // Member QR Credential State
+  const [memberQrData, setMemberQrData] = useState<any | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+
+  const loadMemberQr = async (memberId: string) => {
+    setQrLoading(true);
+    try {
+      const data = await api.getMemberQrCode(memberId);
+      setMemberQrData(data);
+    } catch {
+      setMemberQrData(null);
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
+  const handleRotateMemberQr = async () => {
+    if (!selectedMember) return;
+    setQrLoading(true);
+    try {
+      const res = await api.rotateMemberQrCredential(selectedMember.id);
+      setMemberQrData(res);
+      setToastMessage(`New QR credential generated for ${selectedMember.firstName}. Previous code invalidated.`);
+    } catch (err: any) {
+      setToastMessage(err?.message || 'Failed to rotate QR credential');
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
+  const handleRevokeMemberQr = async () => {
+    if (!selectedMember) return;
+    setQrLoading(true);
+    try {
+      const res = await api.revokeMemberQrCredential(selectedMember.id);
+      setMemberQrData(res);
+      setToastMessage(`QR credential revoked for ${selectedMember.firstName}. Member cannot scan until re-issued.`);
+    } catch (err: any) {
+      setToastMessage(err?.message || 'Failed to revoke QR credential');
+    } finally {
+      setQrLoading(false);
+    }
+  };
 
   // New Member form state
   const [formFirstName, setFormFirstName] = useState('');
@@ -79,6 +125,7 @@ export default function MembersPage() {
 
   const handleOpenMemberStory = async (member: Member) => {
     setSelectedMember(member);
+    loadMemberQr(member.id);
     try {
       const plans = await api.getMemberDietPlans(member.id);
       setMemberDietPlans(plans);
@@ -443,6 +490,75 @@ export default function MembersPage() {
                     {selectedMember.trainerAssignments?.find((a) => a.isActive)?.trainer?.name || 'Coach Tariq Mehmood'}
                   </div>
                   <div className="text-[11px] text-content-tertiary">Personal trainer assigned for regular guidance and workout accountability</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Member QR Attendance Credential Card */}
+            <div className="p-4 rounded-2xl bg-surface-subtle border border-surface-border space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
+                  <QrCode className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                  <span>Member QR Attendance Credential</span>
+                </div>
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    memberQrData?.status === 'ACTIVE'
+                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                      : 'bg-red-500/15 text-red-600 dark:text-red-400'
+                  }`}
+                >
+                  {memberQrData?.status === 'ACTIVE' ? 'Active Credential' : 'Revoked'}
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-4 bg-surface p-3.5 rounded-xl border border-surface-border">
+                {memberQrData?.qrDataUrl ? (
+                  <img
+                    src={memberQrData.qrDataUrl}
+                    alt="Member QR Attendance Credential"
+                    className="w-32 h-32 rounded-lg border border-slate-200 p-1 shadow-sm object-contain shrink-0"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-lg border border-surface-border flex flex-col items-center justify-center bg-surface-subtle shrink-0">
+                    <QrCode className="w-10 h-10 text-content-tertiary mb-1" />
+                    <span className="text-[10px] text-content-tertiary font-mono">
+                      {qrLoading ? 'Loading QR...' : 'No Credential'}
+                    </span>
+                  </div>
+                )}
+
+                <div className="space-y-1.5 text-xs text-content-secondary flex-1">
+                  <p className="leading-relaxed">
+                    Opaque cryptographically random token used strictly for front-desk check-in lookup. Contains no personal information.
+                  </p>
+                  <div className="text-[10px] text-content-tertiary font-mono">
+                    Issued:{' '}
+                    {memberQrData?.issuedAt
+                      ? new Date(memberQrData.issuedAt).toLocaleDateString()
+                      : 'Not issued'}
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleRotateMemberQr}
+                      disabled={qrLoading}
+                      className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-[11px] transition-all btn-shadow disabled:opacity-50"
+                    >
+                      {qrLoading ? 'Processing...' : 'Rotate Credential'}
+                    </button>
+                    {memberQrData?.status === 'ACTIVE' && (
+                      <button
+                        type="button"
+                        onClick={handleRevokeMemberQr}
+                        disabled={qrLoading}
+                        className="px-3 py-1.5 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-500/10 border border-red-500/20 font-semibold text-[11px] transition-all btn-shadow disabled:opacity-50"
+                      >
+                        Revoke Credential
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

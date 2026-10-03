@@ -127,6 +127,53 @@ enum MessagingProviderType {
   META_DIRECT
 }
 
+enum CapacityPolicy {
+  WARNING_ONLY
+  BLOCK_ADMISSION
+}
+
+enum SaaSSubscriptionPlan {
+  TRIAL
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum SaaSSubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  UNPAID
+}
+
+enum AttendanceSessionStatus {
+  OPEN
+  COMPLETED
+  AUTO_CLOSED
+  CORRECTED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum SaaSBillingStatus {
+  PAID
+  PENDING
+  FAILED
+  REFUNDED
+}
+
+enum SaaSPaymentProvider {
+  SANDBOX_SIMULATOR
+  STRIPE
+  JAZZCASH
+}
+
 // ==========================================
 // MODELS
 // ==========================================
@@ -143,6 +190,15 @@ model Gym {
   timezone        String      @default("Asia/Karachi") @db.VarChar(50)
   status          GymStatus   @default(ACTIVE)
   settings        Json?       @db.JsonB
+  capacity            Int                     @default(100)
+  capacityPolicy      CapacityPolicy          @default(WARNING_ONLY) @map("capacity_policy")
+  saasPlan            SaaSSubscriptionPlan    @default(TRIAL) @map("saas_plan")
+  saasStatus          SaaSSubscriptionStatus  @default(TRIALING) @map("saas_status")
+  trialEndsAt         DateTime?               @map("trial_ends_at") @db.Timestamptz(6)
+  currentPeriodEnd    DateTime?               @map("current_period_end") @db.Timestamptz(6)
+  cancelAtPeriodEnd   Boolean                 @default(false) @map("cancel_at_period_end")
+  maxMembers          Int                     @default(100) @map("max_members")
+  maxStaff            Int                     @default(5) @map("max_staff")
   createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -162,6 +218,8 @@ model Gym {
   dietPlans           DietPlan[]
   dietPlanTemplates   DietPlanTemplate[]
   chatConversations   ChatConversation[]
+  saasBillingRecords  SaaSBillingRecord[]
+  staffInvitations    StaffInvitation[]
 
   @@map("gyms")
 }
@@ -182,6 +240,8 @@ model GymStaff {
   // Relations
   gym                 Gym?                @relation(fields: [gymId], references: [id], onDelete: Cascade)
   manualCheckIns      CheckIn[]           @relation("StaffManualCheckIns")
+  checkOuts           CheckIn[]           @relation("StaffCheckOuts")
+  sentInvitations     StaffInvitation[]   @relation("StaffSentInvitations")
   trainerAssignments  TrainerAssignment[] @relation("StaffTrainerAssignments")
   createdDietPlans    DietPlan[]          @relation("DietPlanCreatedBy")
 
@@ -191,23 +251,26 @@ model GymStaff {
 }
 
 model Member {
-  id                String        @id @default(uuid()) @db.Uuid
-  gymId             String        @map("gym_id") @db.Uuid
-  memberCode        String        @map("member_code") @db.VarChar(50)
-  firstName         String        @map("first_name") @db.VarChar(100)
-  lastName          String        @map("last_name") @db.VarChar(100)
-  phone             String        @db.VarChar(30)
-  email             String?       @db.VarChar(255)
-  gender            Gender?
-  dateOfBirth       DateTime?     @map("date_of_birth") @db.Date
-  joinDate          DateTime      @default(now()) @map("join_date") @db.Date
-  status            MemberStatus  @default(ACTIVE)
-  isOptedOut        Boolean       @default(false) @map("is_opted_out")
-  optedOutAt        DateTime?     @map("opted_out_at") @db.Timestamptz(6)
-  emergencyContact  String?       @map("emergency_contact") @db.VarChar(255)
-  notes             String?       @db.Text
-  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                    String        @id @default(uuid()) @db.Uuid
+  gymId                 String        @map("gym_id") @db.Uuid
+  memberCode            String        @map("member_code") @db.VarChar(50)
+  firstName             String        @map("first_name") @db.VarChar(100)
+  lastName              String        @map("last_name") @db.VarChar(100)
+  phone                 String        @db.VarChar(30)
+  email                 String?       @db.VarChar(255)
+  gender                Gender?
+  dateOfBirth           DateTime?     @map("date_of_birth") @db.Date
+  joinDate              DateTime      @default(now()) @map("join_date") @db.Date
+  status                MemberStatus  @default(ACTIVE)
+  qrCredential          String?       @unique @map("qr_credential") @db.VarChar(100)
+  qrCredentialIssuedAt  DateTime?     @map("qr_credential_issued_at") @db.Timestamptz(6)
+  qrCredentialRevokedAt DateTime?     @map("qr_credential_revoked_at") @db.Timestamptz(6)
+  isOptedOut            Boolean       @default(false) @map("is_opted_out")
+  optedOutAt            DateTime?     @map("opted_out_at") @db.Timestamptz(6)
+  emergencyContact      String?       @map("emergency_contact") @db.VarChar(255)
+  notes                 String?       @db.Text
+  createdAt             DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relations
   gym               Gym           @relation(fields: [gymId], references: [id], onDelete: Cascade)
@@ -255,24 +318,33 @@ model Membership {
 }
 
 model CheckIn {
-  id              String          @id @default(uuid()) @db.Uuid
-  gymId           String          @map("gym_id") @db.Uuid
-  memberId        String          @map("member_id") @db.Uuid
-  checkInTime     DateTime        @default(now()) @map("check_in_time") @db.Timestamptz(6)
-  checkInDate     DateTime        @map("check_in_date") @db.Date // Normalized to calendar date in gym's timezone
-  method          CheckInMethod   @default(QR_SCAN)
-  staffId         String?         @map("staff_id") @db.Uuid
-  notes           String?         @db.Text
-  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  id                    String                  @id @default(uuid()) @db.Uuid
+  gymId                 String                  @map("gym_id") @db.Uuid
+  memberId              String                  @map("member_id") @db.Uuid
+  checkInTime           DateTime                @default(now()) @map("check_in_time") @db.Timestamptz(6)
+  checkInDate           DateTime                @map("check_in_date") @db.Date // Normalized to calendar date in gym's timezone
+  checkOutTime          DateTime?               @map("check_out_time") @db.Timestamptz(6)
+  checkOutStaffId       String?                 @map("check_out_staff_id") @db.Uuid
+  isEstimatedDeparture  Boolean                 @default(false) @map("is_estimated_departure")
+  idempotencyKey        String?                 @unique @map("idempotency_key") @db.VarChar(100)
+  sessionStatus         AttendanceSessionStatus @default(OPEN) @map("session_status")
+  legacyEstimated       Boolean                 @default(false) @map("legacy_estimated")
+  method                CheckInMethod           @default(QR_SCAN)
+  staffId               String?                 @map("staff_id") @db.Uuid
+  notes                 String?                 @db.Text
+  createdAt             DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
 
   // Relations
   gym             Gym             @relation(fields: [gymId], references: [id], onDelete: Cascade)
   member          Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
   staff           GymStaff?       @relation("StaffManualCheckIns", fields: [staffId], references: [id], onDelete: SetNull)
+  checkOutStaff   GymStaff?       @relation("StaffCheckOuts", fields: [checkOutStaffId], references: [id], onDelete: SetNull)
 
   @@index([gymId, memberId, checkInDate])
   @@index([gymId, checkInDate])
   @@index([gymId, checkInTime])
+  @@index([gymId, sessionStatus])
+  @@index([gymId, memberId, sessionStatus])
   @@map("check_ins")
 }
 
@@ -548,5 +620,50 @@ model ChatMessage {
   @@index([gymId])
   @@map("chat_messages")
 }
+
+model StaffInvitation {
+  id          String            @id @default(uuid()) @db.Uuid
+  gymId       String            @map("gym_id") @db.Uuid
+  email       String            @db.VarChar(255)
+  role        StaffRole         @default(GYM_STAFF)
+  name        String?           @db.VarChar(255)
+  token       String            @unique @db.VarChar(100)
+  invitedById String            @map("invited_by_id") @db.Uuid
+  status      InvitationStatus  @default(PENDING)
+  expiresAt   DateTime          @map("expires_at") @db.Timestamptz(6)
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym         Gym               @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  invitedBy   GymStaff          @relation("StaffSentInvitations", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([gymId, status])
+  @@map("staff_invitations")
+}
+
+model SaaSBillingRecord {
+  id                    String                @id @default(uuid()) @db.Uuid
+  gymId                 String                @map("gym_id") @db.Uuid
+  amount                Int                   // Minor units (paisa or cents)
+  currency              String                @default("USD") @db.VarChar(3)
+  plan                  SaaSSubscriptionPlan  @default(PRO)
+  status                SaaSBillingStatus     @default(PAID)
+  provider              SaaSPaymentProvider   @default(SANDBOX_SIMULATOR)
+  providerTransactionId String?               @map("provider_transaction_id") @db.VarChar(255)
+  invoiceNumber         String                @unique @map("invoice_number") @db.VarChar(100)
+  periodStart           DateTime              @map("period_start") @db.Timestamptz(6)
+  periodEnd             DateTime              @map("period_end") @db.Timestamptz(6)
+  paidAt                DateTime?             @map("paid_at") @db.Timestamptz(6)
+  description           String?               @db.Text
+  createdAt             DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  gym                   Gym                   @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@index([gymId, status])
+  @@map("saas_billing_records")
+}
+
 
 

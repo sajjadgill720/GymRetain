@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Param,
   Body,
   Req,
   UseGuards,
@@ -54,8 +56,46 @@ export class AuthController {
   @Roles('GYM_OWNER')
   async inviteStaff(
     @CurrentGymId() gymId: string,
+    @Req() req: any,
     @Body() dto: InviteStaffDto,
   ) {
-    return this.authService.inviteStaff(gymId, dto);
+    return this.authService.inviteStaff(gymId, dto, req.user?.sub);
+  }
+
+  @Get('staff')
+  @UseGuards(TenantAccessGuard)
+  async listStaff(@CurrentGymId() gymId: string) {
+    return this.authService.listStaff(gymId);
+  }
+
+  @Get('invitations')
+  @UseGuards(TenantAccessGuard, RolesGuard)
+  @Roles('GYM_OWNER', 'GYM_MANAGER')
+  async listInvitations(@CurrentGymId() gymId: string) {
+    return this.authService.listInvitations(gymId);
+  }
+
+  @Post('invitations/:id/revoke')
+  @UseGuards(TenantAccessGuard, RolesGuard)
+  @Roles('GYM_OWNER')
+  async revokeInvitation(
+    @CurrentGymId() gymId: string,
+    @Req() req: any,
+    @Param('id') id: string,
+  ) {
+    return this.authService.revokeInvitation(gymId, id, req.user?.sub, req.user?.role);
+  }
+
+  @Patch('staff/:id/role')
+  @UseGuards(TenantAccessGuard, RolesGuard)
+  @Roles('GYM_OWNER')
+  async updateStaffRole(
+    @CurrentGymId() gymId: string,
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body('role') role: any,
+  ) {
+    return this.authService.updateStaffRole(gymId, id, role, req.user?.sub, req.user?.role);
   }
 }
+

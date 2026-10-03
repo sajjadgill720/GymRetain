@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RetentionService } from '../retention/retention.service';
-import { subDays, startOfDay, endOfDay, format } from 'date-fns';
+import { subDays, differenceInMinutes, format } from 'date-fns';
+import { getLocalDayBoundsUtc, getLocalHourOfDay, formatLocalDate } from '../../common/utils/timezone.util';
 
 @Injectable()
 export class AnalyticsService {
@@ -11,27 +12,61 @@ export class AnalyticsService {
   ) {}
 
   /**
-   * Gym Owner Dashboard Overview KPIs
+   * Gym Owner Dashboard Overview KPIs (Real calculations with timezone awareness)
    */
   async getDashboardSummary(gymId: string) {
-    const today = new Date();
-    const todayStart = startOfDay(today);
-    const todayEnd = endOfDay(today);
+    const gym = await this.prisma.gym.findUnique({
+      where: { id: gymId },
+      select: { capacity: true, capacityPolicy: true, timezone: true, name: true },
+    });
+    const timezone = gym?.timezone || 'Asia/Karachi';
+    const capacity = gym?.capacity || 100;
+    const capacityPolicy = gym?.capacityPolicy || 'WARNING_ONLY';
+
+    const dayBounds = getLocalDayBoundsUtc(timezone, new Date());
 
     const [
       activeMembersCount,
-      todayCheckInsCount,
+      distinctMembersToday,
+      visitsToday,
+      currentlyCheckedIn,
+      completedSessionsToday,
       streakLeaders,
       atRiskMembers,
+      historicalCheckIns,
     ] = await Promise.all([
       this.prisma.member.count({
         where: { gymId, status: 'ACTIVE' },
       }),
+      this.prisma.checkIn.findMany({
+        where: {
+          gymId,
+          checkInTime: { gte: dayBounds.start, lt: dayBounds.end },
+        },
+        distinct: ['memberId'],
+        select: { memberId: true },
+      }),
       this.prisma.checkIn.count({
         where: {
           gymId,
-          checkInTime: { gte: todayStart, lte: todayEnd },
+          checkInTime: { gte: dayBounds.start, lt: dayBounds.end },
         },
+      }),
+      this.prisma.checkIn.count({
+        where: {
+          gymId,
+          sessionStatus: 'OPEN',
+        },
+      }),
+      this.prisma.checkIn.findMany({
+        where: {
+          gymId,
+          checkInTime: { gte: dayBounds.start, lt: dayBounds.end },
+          sessionStatus: { in: ['COMPLETED', 'CORRECTED'] },
+          checkOutTime: { not: null },
+          isEstimatedDeparture: false,
+        },
+        select: { checkInTime: true, checkOutTime: true },
       }),
       this.prisma.streak.findMany({
         where: { gymId, currentStreak: { gt: 0 } },
@@ -44,7 +79,69 @@ export class AnalyticsService {
         take: 5,
       }),
       this.retentionService.getAtRiskMembers(gymId),
+      this.prisma.checkIn.findMany({
+        where: {
+          gymId,
+          checkInTime: { gte: subDays(dayBounds.start, 30) },
+        },
+        select: { checkInTime: true },
+      }),
     ]);
+
+    const membersCheckedInToday = distinctMembersToday.length;
+
+    // Capacity usage calculation
+    const capacityUsagePercent = Math.min(100, Math.round((currentlyCheckedIn / capacity) * 100));
+    const isOverCapacity = currentlyCheckedIn > capacity;
+
+    // Measured average visit duration (only from explicitly closed, non-estimated departures)
+    let averageVisitDurationMinutes: number | null = null;
+    if (completedSessionsToday.length > 0) {
+      const totalMinutes = completedSessionsToday.reduce((sum, s) => {
+        return sum + Math.max(1, differenceInMinutes(s.checkOutTime!, s.checkInTime));
+      }, 0);
+      averageVisitDurationMinutes = Math.round(totalMinutes / completedSessionsToday.length);
+    }
+
+    // Historical busiest arrival hours in gym's timezone
+    const hourlyCounts = new Array(24).fill(0);
+    for (const record of historicalCheckIns) {
+      const hour = getLocalHourOfDay(record.checkInTime, timezone);
+      hourlyCounts[hour]++;
+    }
+
+    const morningCount = hourlyCounts.slice(6, 11).reduce((a, b) => a + b, 0);
+    const middayCount = hourlyCounts.slice(11, 16).reduce((a, b) => a + b, 0);
+    const eveningCount = hourlyCounts.slice(16, 21).reduce((a, b) => a + b, 0);
+    const nightCount =
+      hourlyCounts.slice(21, 24).reduce((a, b) => a + b, 0) +
+      hourlyCounts.slice(0, 6).reduce((a, b) => a + b, 0);
+
+    const hasEnoughDataForPeaks = historicalCheckIns.length >= 5;
+    const busiestPeriods = hasEnoughDataForPeaks
+      ? [
+          {
+            period: 'Morning (6:00 AM - 11:00 AM)',
+            arrivals: morningCount,
+            label: morningCount >= eveningCount ? 'Peak' : 'Busy',
+          },
+          {
+            period: 'Midday (11:00 AM - 4:00 PM)',
+            arrivals: middayCount,
+            label: 'Moderate',
+          },
+          {
+            period: 'Evening (4:00 PM - 9:00 PM)',
+            arrivals: eveningCount,
+            label: eveningCount >= morningCount ? 'Peak' : 'Busy',
+          },
+          {
+            period: 'Late (9:00 PM - 6:00 AM)',
+            arrivals: nightCount,
+            label: 'Quiet',
+          },
+        ]
+      : [];
 
     const highRiskCount = atRiskMembers.filter((m) => m.riskLevel === 'HIGH').length;
     const mediumRiskCount = atRiskMembers.filter((m) => m.riskLevel === 'MEDIUM').length;
@@ -52,10 +149,26 @@ export class AnalyticsService {
     return {
       kpis: {
         activeMembers: activeMembersCount,
-        todayCheckIns: todayCheckInsCount,
+        membersCheckedInToday,
+        visitsToday,
+        currentlyCheckedIn,
+        capacity,
+        capacityPolicy,
+        capacityUsagePercent,
+        isOverCapacity,
+        averageVisitDurationMinutes,
+        accuracyNotice:
+          'Open sessions represent members who have not checked out yet. Missed check-outs or manual entries can affect real-time accuracy.',
         atRiskMembersTotal: highRiskCount + mediumRiskCount,
         highRiskCount,
         mediumRiskCount,
+        timezone,
+      },
+      busiestArrivalHours: {
+        hasEnoughData: hasEnoughDataForPeaks,
+        periods: busiestPeriods,
+        hourlyDistribution: hourlyCounts,
+        sampleSizeCheckIns: historicalCheckIns.length,
       },
       streakLeaders: streakLeaders.map((s) => ({
         memberId: s.memberId,
@@ -70,31 +183,38 @@ export class AnalyticsService {
 
   /**
    * Attendance Trend: Group check-ins day-by-day for the last N days (default 30 days)
+   * Using gym's local calendar dates
    */
   async getAttendanceTrends(gymId: string, days = 30) {
-    const today = new Date();
-    const startDate = startOfDay(subDays(today, days - 1));
+    const gym = await this.prisma.gym.findUnique({
+      where: { id: gymId },
+      select: { timezone: true },
+    });
+    const timezone = gym?.timezone || 'Asia/Karachi';
+
+    const dayBounds = getLocalDayBoundsUtc(timezone, new Date());
+    const startDate = subDays(dayBounds.start, days - 1);
 
     const checkIns = await this.prisma.checkIn.findMany({
       where: {
         gymId,
-        checkInDate: { gte: startDate },
+        checkInTime: { gte: startDate },
       },
       select: {
-        checkInDate: true,
+        checkInTime: true,
       },
     });
 
-    // Bucket counts by day
     const trendMap = new Map<string, number>();
 
     for (let i = 0; i < days; i++) {
-      const dateStr = format(subDays(today, days - 1 - i), 'yyyy-MM-dd');
+      const dayDate = subDays(new Date(), days - 1 - i);
+      const dateStr = formatLocalDate(dayDate, timezone);
       trendMap.set(dateStr, 0);
     }
 
     for (const ci of checkIns) {
-      const dateStr = format(ci.checkInDate, 'yyyy-MM-dd');
+      const dateStr = formatLocalDate(ci.checkInTime, timezone);
       if (trendMap.has(dateStr)) {
         trendMap.set(dateStr, (trendMap.get(dateStr) || 0) + 1);
       }

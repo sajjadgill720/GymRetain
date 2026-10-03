@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   RiskScoreConfig,
@@ -18,8 +18,14 @@ export interface MemberRiskDetails {
   memberCode: string;
   fullName: string;
   phone: string;
-  riskScore: number; // 0 - 100
+  riskScore: number; // 0 - 100 (Heuristic estimate)
   riskLevel: RiskLevel;
+  isNewMember: boolean;
+  dataQuality: 'SUFFICIENT_BASELINE' | 'SPARSE_DATA' | 'PAUSED_MEMBERSHIP';
+  disengagementExplanation: string;
+  baselineWeeklyVisits: number;
+  recentWeeklyVisits: number;
+  scoreType: 'RULE_BASED_HEURISTIC_ESTIMATE';
   factors: {
     daysSinceLastCheckIn: number;
     daysInactiveScore: number;
@@ -32,6 +38,7 @@ export interface MemberRiskDetails {
     isRecentlyBrokenStreak: boolean;
     brokenStreakScore: number;
   };
+  interventions?: any[];
 }
 
 @Injectable()
@@ -162,18 +169,21 @@ export class RetentionService {
     const atRiskMembers: MemberRiskDetails[] = [];
 
     for (const member of members) {
+      const daysSinceJoined = differenceInCalendarDays(today, member.joinDate);
+      const isNewMember = daysSinceJoined < 14;
+
       // 1. Days since last check-in
       const lastCheckIn = member.checkIns[0];
       const daysSinceLastCheckIn = lastCheckIn
         ? differenceInCalendarDays(today, lastCheckIn.checkInDate)
-        : differenceInCalendarDays(today, member.joinDate);
+        : daysSinceJoined;
 
       // 2. Visits in the current 7-day window
       const visitsPast7Days = member.checkIns.filter((ci) =>
         ci.checkInDate >= startOfDay(sevenDaysAgo),
       ).length;
 
-      // 3. 4-week rolling average weekly visits
+      // 3. 4-week rolling average weekly visits (established baseline)
       const totalVisits4Weeks = member.checkIns.length;
       const fourWeekRollingAvg = Number((totalVisits4Weeks / 4).toFixed(1));
 
@@ -200,6 +210,38 @@ export class RetentionService {
         defaultRiskScoreConfig,
       );
 
+      // Explainable Disengagement Indicator
+      const explanations: string[] = [];
+      if (daysSinceLastCheckIn >= 14) {
+        explanations.push(`Absent for ${daysSinceLastCheckIn} days (critical disengagement threshold).`);
+      } else if (daysSinceLastCheckIn >= 7) {
+        explanations.push(`No visits for ${daysSinceLastCheckIn} days.`);
+      }
+
+      if (fourWeekRollingAvg > 1 && riskCalc.frequencyDropPercentage >= 50) {
+        explanations.push(
+          `Weekly visit rate dropped by ${riskCalc.frequencyDropPercentage}% from their ${fourWeekRollingAvg} visits/week baseline.`,
+        );
+      }
+
+      if (isPaymentOverdue) {
+        explanations.push('Membership payment or renewal is overdue.');
+      }
+
+      if (isRecentlyBrokenStreak) {
+        explanations.push('Workout streak was broken within the last 7 days.');
+      }
+
+      const disengagementExplanation =
+        explanations.length > 0
+          ? explanations.join(' ')
+          : 'Attendance is aligned with personal baseline habits.';
+
+      let dataQuality: 'SUFFICIENT_BASELINE' | 'SPARSE_DATA' | 'PAUSED_MEMBERSHIP' = 'SUFFICIENT_BASELINE';
+      if (isNewMember) {
+        dataQuality = 'SPARSE_DATA';
+      }
+
       if (!filterLevel || riskCalc.level === filterLevel) {
         atRiskMembers.push({
           memberId: member.id,
@@ -208,6 +250,12 @@ export class RetentionService {
           phone: member.phone,
           riskScore: riskCalc.score,
           riskLevel: riskCalc.level,
+          isNewMember,
+          dataQuality,
+          disengagementExplanation,
+          baselineWeeklyVisits: fourWeekRollingAvg,
+          recentWeeklyVisits: visitsPast7Days,
+          scoreType: 'RULE_BASED_HEURISTIC_ESTIMATE',
           factors: {
             daysSinceLastCheckIn,
             daysInactiveScore: riskCalc.daysInactiveScore,
@@ -227,4 +275,87 @@ export class RetentionService {
     // Sort descending by highest risk score
     return atRiskMembers.sort((a, b) => b.riskScore - a.riskScore);
   }
+
+  /**
+   * Records a staff retention intervention (notes, outreach draft, outcome)
+   */
+  async recordIntervention(
+    gymId: string,
+    dto: {
+      memberId: string;
+      status: string;
+      assignedStaffId?: string;
+      assignedStaffName?: string;
+      notes?: string;
+      outreachDraft?: string;
+      followUpDate?: string;
+    },
+    staffId: string,
+    actorRole: string,
+  ) {
+    const member = await this.prisma.member.findFirst({
+      where: { id: dto.memberId, gymId },
+    });
+    if (!member) {
+      throw new NotFoundException('Member not found');
+    }
+
+    const audit = await this.prisma.auditLog.create({
+      data: {
+        gymId,
+        staffId,
+        actorRole,
+        action: 'RETENTION_INTERVENTION_RECORDED',
+        resource: 'MEMBER_RETENTION',
+        metadata: {
+          memberId: dto.memberId,
+          memberCode: member.memberCode,
+          status: dto.status,
+          assignedStaffId: dto.assignedStaffId || staffId,
+          assignedStaffName: dto.assignedStaffName,
+          notes: dto.notes,
+          outreachDraft: dto.outreachDraft,
+          followUpDate: dto.followUpDate,
+          timestamp: new Date().toISOString(),
+        },
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Retention follow-up and intervention outcome recorded successfully.',
+      intervention: {
+        id: audit.id,
+        memberId: dto.memberId,
+        status: dto.status,
+        notes: dto.notes,
+        followUpDate: dto.followUpDate,
+        createdAt: audit.createdAt,
+      },
+    };
+  }
+
+  /**
+   * Retrieves intervention history for a member
+   */
+  async getMemberInterventions(gymId: string, memberId: string) {
+    const logs = await this.prisma.auditLog.findMany({
+      where: {
+        gymId,
+        action: 'RETENTION_INTERVENTION_RECORDED',
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+
+    return logs
+      .filter((l) => (l.metadata as any)?.memberId === memberId)
+      .map((l) => ({
+        id: l.id,
+        createdAt: l.createdAt,
+        staffId: l.staffId,
+        metadata: l.metadata,
+      }));
+  }
 }
+

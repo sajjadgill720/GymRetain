@@ -40,6 +40,14 @@ export class MembersController {
     });
   }
 
+  @Get('lookup/:identifier')
+  async lookupMemberForCheckIn(
+    @CurrentGymId() gymId: string,
+    @Param('identifier') identifier: string,
+  ) {
+    return this.membersService.lookupMemberForCheckIn(gymId, identifier);
+  }
+
   @Get(':id')
   async getMemberById(
     @CurrentGymId() gymId: string,
@@ -48,6 +56,32 @@ export class MembersController {
   ) {
     const trainerId = user?.role === 'TRAINER' ? user.sub : undefined;
     return this.membersService.getMemberById(gymId, memberId, trainerId);
+  }
+
+  @Get(':id/qr-code')
+  async getMemberQrCode(
+    @CurrentGymId() gymId: string,
+    @Param('id') memberId: string,
+  ) {
+    return this.membersService.getMemberQrCode(gymId, memberId);
+  }
+
+  @Post(':id/qr-code/rotate')
+  async rotateMemberQrCode(
+    @CurrentGymId() gymId: string,
+    @Param('id') memberId: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.membersService.issueOrRotateQrCredential(gymId, memberId, user.sub, user.role);
+  }
+
+  @Post(':id/qr-code/revoke')
+  async revokeMemberQrCode(
+    @CurrentGymId() gymId: string,
+    @Param('id') memberId: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.membersService.revokeQrCredential(gymId, memberId, user.sub, user.role);
   }
 
   @Post()

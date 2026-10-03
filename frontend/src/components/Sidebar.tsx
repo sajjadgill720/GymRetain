@@ -21,7 +21,6 @@ import {
   CreditCard,
   PanelLeftClose,
   PanelLeftOpen,
-  Lightbulb,
   LogOut,
 } from '@/components/icons';
 import { useAuth, GymInfo } from '../lib/AuthProvider';
@@ -290,25 +289,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <QrCode className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
               <span>Front-Desk QR</span>
             </button>
-          </div>
-        )}
-
-        {/* Pastel "Thoughts Time" Card from Foxstocks (Image 1) */}
-        {!collapsed && (
-          <div className="pt-4">
-            <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-50 to-lime-100 dark:from-[#131722] dark:to-[#171D2B] border border-emerald-200/60 dark:border-surface-border text-content-primary transition-all">
-              <div className="flex items-center gap-2 mb-1.5">
-                <div className="w-6 h-6 rounded-full bg-white dark:bg-emerald-500/20 flex items-center justify-center shadow-sm">
-                  <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-                </div>
-                <span className="text-xs font-bold text-emerald-900 dark:text-emerald-400">
-                  Retention Tip
-                </span>
-              </div>
-              <p className="text-[11px] text-emerald-800/90 dark:text-zinc-300 leading-snug">
-                80% of silent member churn happens when a member goes 14+ days without checking in.
-              </p>
-            </div>
           </div>
         )}
       </div>

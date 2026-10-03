@@ -23,13 +23,7 @@ import {
   Sparkles,
   AlertCircle,
   Copy,
-  Activity,
-  AlertTriangle,
-  Clock,
-  ShieldAlert,
-  Send,
 } from '@/components/icons';
-import { InterventionModal, InterventionMember } from '../../components/dashboard/InterventionModal';
 
 export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
@@ -45,49 +39,10 @@ export default function MembersPage() {
   const [templates, setTemplates] = useState<any[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Intervention modal state
-  const [interventionMember, setInterventionMember] = useState<InterventionMember | null>(null);
-  const [isInterventionOpen, setIsInterventionOpen] = useState(false);
-
   // Quick Reassign from Member Detail
   const [isReassignOpen, setIsReassignOpen] = useState(false);
   const [targetTrainerId, setTargetTrainerId] = useState('');
   const [reassigning, setReassigning] = useState(false);
-
-  const handleOpenIntervention = (member: Member) => {
-    const isAtRisk = (member.streak?.currentStreak || 0) === 0 || member.status === 'INACTIVE';
-    const activePlan = member.memberships?.[0];
-    const item: InterventionMember = {
-      memberId: member.id,
-      memberCode: member.memberCode,
-      fullName: `${member.firstName} ${member.lastName}`,
-      phone: member.phone,
-      planName: activePlan?.planName || 'Monthly Standard',
-      planPrice: activePlan ? activePlan.price / 100 : 5000,
-      riskScore: isAtRisk ? 82 : 24,
-      riskLevel: isAtRisk ? 'HIGH' : 'LOW',
-      daysInactive: isAtRisk ? 14 : 1,
-      usualCadence: '4 days / week (Mon, Wed, Fri, Sat)',
-      recentCadence: isAtRisk ? '0 days in last 14 days (-100%)' : '4 days in last 7 days',
-      disengagementReason: isAtRisk
-        ? 'Silent drop-off: Routine abruptly broken after consistent 3-month attendance.'
-        : 'Regular attendance pattern maintained.',
-      assignedStaff: member.trainerAssignments?.find((a) => a.isActive)?.trainer?.name || 'Coach Bilal',
-      status: 'NEEDS_OUTREACH',
-    };
-    setInterventionMember(item);
-    setIsInterventionOpen(true);
-  };
-
-  const handleInterventionComplete = (
-    memberId: string,
-    newStatus: InterventionMember['status'],
-    summary: string
-  ) => {
-    setToastMessage(`Outreach recorded for member: ${summary}`);
-    setIsInterventionOpen(false);
-  };
-
 
   // New Member form state
   const [formFirstName, setFormFirstName] = useState('');
@@ -451,104 +406,6 @@ export default function MembersPage() {
               </div>
             </div>
 
-            {/* Attendance Habit Timeline & Disengagement Risk Diagnostics */}
-            {(() => {
-              const currentStreak = selectedMember.streak?.currentStreak || 0;
-              const isDisengaging = currentStreak === 0 || selectedMember.status === 'INACTIVE';
-              return (
-                <div className={`p-4 rounded-2xl border transition-all ${
-                  isDisengaging
-                    ? 'bg-red-500/5 border-red-500/30'
-                    : 'bg-cyan-500/5 border-cyan-500/20'
-                }`}>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-surface-border">
-                    <div className="flex items-center gap-2">
-                      <Activity className={`w-4 h-4 ${isDisengaging ? 'text-red-400' : 'text-cyan-400'}`} />
-                      <span className="text-xs font-bold text-content-primary">
-                        Attendance Habit Timeline &amp; Retention Diagnosis
-                      </span>
-                    </div>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider inline-flex items-center gap-1 ${
-                      isDisengaging
-                        ? 'bg-red-500/10 text-red-400 border border-red-500/30'
-                        : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${isDisengaging ? 'bg-red-500 animate-ping' : 'bg-cyan-400'}`} />
-                      {isDisengaging ? 'Silent Disengagement Hazard' : 'Habit Consistent'}
-                    </span>
-                  </div>
-
-                  {/* Routine velocity & signal explanations */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-3 text-xs">
-                    <div>
-                      <div className="text-[10px] text-content-tertiary uppercase tracking-wider font-semibold">
-                        Routine Velocity Change
-                      </div>
-                      <div className="font-mono text-content-primary mt-1 text-xs">
-                        Customary: <span className="text-cyan-400">4 days/wk</span> → Last 14d:{' '}
-                        <span className={isDisengaging ? 'text-red-400 font-bold' : 'text-cyan-400'}>
-                          {isDisengaging ? '0 visits (-100%)' : '4 visits (Normal)'}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-content-tertiary mt-1 leading-relaxed">
-                        {isDisengaging
-                          ? 'Abrupt stop following consistent evening schedule. Primary dropout indicator.'
-                          : 'Adhering to regular training block schedule.'}
-                      </p>
-                    </div>
-
-                    <div className="bg-surface/60 rounded-xl p-2.5 border border-surface-border">
-                      <div className="text-[10px] text-content-tertiary uppercase tracking-wider font-semibold">
-                        Recommended Action
-                      </div>
-                      <div className="text-xs text-content-secondary mt-1">
-                        {isDisengaging
-                          ? 'Immediate personalized coach outreach via WhatsApp with workout check-in.'
-                          : 'Routine is healthy. Milestone reward due in 5 sessions.'}
-                      </div>
-                      {isDisengaging && (
-                        <button
-                          onClick={() => handleOpenIntervention(selectedMember)}
-                          className="mt-2.5 w-full py-1.5 px-3 rounded-xl bg-gradient-to-r from-red-500 to-amber-600 hover:from-red-400 hover:to-amber-500 text-white font-semibold text-xs shadow-md btn-shadow-primary flex items-center justify-center gap-1.5 transition-all"
-                        >
-                          <Send className="w-3.5 h-3.5" />
-                          <span>Initiate Proactive Intervention</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* 30-Day Punch Card Grid */}
-                  <div className="pt-2">
-                    <div className="flex items-center justify-between text-[10px] text-content-tertiary mb-1.5">
-                      <span>30-Day Attendance Punch Card Matrix</span>
-                      <span className="font-mono">{isDisengaging ? 'Last visited 16 days ago' : 'Last visited Yesterday'}</span>
-                    </div>
-                    <div className="grid grid-cols-10 sm:grid-cols-15 gap-1">
-                      {Array.from({ length: 30 }).map((_, i) => {
-                        const dayNum = 30 - i;
-                        // simulate realistic pattern based on streak
-                        const isAttended = isDisengaging ? dayNum > 15 && dayNum % 2 === 0 : (dayNum % 2 === 0 || dayNum % 5 === 0);
-                        return (
-                          <div
-                            key={i}
-                            title={`Day -${dayNum}: ${isAttended ? 'Attended (Check-in Verified)' : 'Missed Session'}`}
-                            className={`h-5 rounded-md border text-[9px] flex items-center justify-center font-mono transition-all ${
-                              isAttended
-                                ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300 shadow-[0_0_8px_rgba(0,242,254,0.25)]'
-                                : 'bg-surface/50 border-surface-border text-content-tertiary/40'
-                            }`}
-                          >
-                            {dayNum}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
             {/* Assigned Trainer Section */}
             <div className="p-4 rounded-2xl bg-surface-subtle border border-surface-border space-y-2">
               <div className="flex items-center justify-between">
@@ -818,13 +675,6 @@ export default function MembersPage() {
           </div>
         </div>
       )}
-      {/* Proactive Retention Intervention Modal */}
-      <InterventionModal
-        member={interventionMember}
-        isOpen={isInterventionOpen}
-        onClose={() => setIsInterventionOpen(false)}
-        onInterventionComplete={handleInterventionComplete}
-      />
     </AppLayout>
   );
 }

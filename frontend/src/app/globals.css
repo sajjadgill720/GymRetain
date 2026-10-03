@@ -138,127 +138,75 @@ button:active:not(:disabled),
 
 /* High-Contrast Primary Button Shadow */
 .btn-shadow-primary {
-  background: linear-gradient(135deg, #00F2FE 0%, #0284C7 100%) !important;
+  background-color: var(--accent-brand) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--shadow-btn-primary) !important;
+}
+
+.dark .btn-shadow-primary {
   color: #0A0C10 !important;
   font-weight: 700 !important;
-  box-shadow: 0 2px 12px 0 rgba(0, 242, 254, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-shadow-primary:hover:not(:disabled) {
-  box-shadow: 0 4px 20px 0 rgba(0, 242, 254, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.6) !important;
+  box-shadow: var(--shadow-btn-primary-hover) !important;
   filter: brightness(1.08);
-  transform: translateY(-1px);
 }
 
-/* ============================================================
-   FUTURISTIC GLASS & 3D SYSTEM
-   ============================================================ */
-.glass-panel {
-  background: rgba(16, 20, 29, 0.78);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+/* Pastel Cards for Light Theme (Foxstocks) */
+.pastel-card-mint {
+  background: linear-gradient(135deg, #E6FBF5 0%, #D4F7EE 100%);
+  border: 1px solid #B8EFE2;
 }
 
-:root:not(.dark) .glass-panel {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(230, 232, 242, 0.9);
-  box-shadow: 0 8px 24px 0 rgba(17, 24, 39, 0.06);
+.pastel-card-purple {
+  background: linear-gradient(135deg, #F0ECFD 0%, #E3DAFC 100%);
+  border: 1px solid #D1C4FA;
 }
 
-.glass-panel-elevated {
-  background: rgba(20, 26, 38, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 242, 254, 0.2);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+.pastel-card-gold {
+  background: linear-gradient(135deg, #FEF7E5 0%, #FDEFCB 100%);
+  border: 1px solid #F9DF9E;
 }
 
-:root:not(.dark) .glass-panel-elevated {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(14, 165, 233, 0.25);
-  box-shadow: 0 12px 30px 0 rgba(17, 24, 39, 0.08);
+.pastel-card-lime {
+  background: linear-gradient(135deg, #F0FBDC 0%, #E4F7C3 100%);
+  border: 1px solid #CEEFA4;
 }
 
-/* Futuristic Glow Utilities */
-.glow-cyan {
-  box-shadow: 0 0 25px -4px rgba(0, 242, 254, 0.35);
+.pastel-card-magenta {
+  background: linear-gradient(135deg, #FDF0F8 0%, #F9DCED 100%);
+  border: 1px solid #F4BFDF;
 }
 
-.glow-cyan-border {
-  border-color: rgba(0, 242, 254, 0.45) !important;
-  box-shadow: 0 0 16px -2px rgba(0, 242, 254, 0.3);
+/* Dark mode overrides for top cards (Vision reference: sleek high-contrast matte) */
+.dark .pastel-card-mint {
+  background: #141824;
+  border-color: #1F283B;
 }
 
-.glow-amber {
-  box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.35);
+.dark .pastel-card-purple {
+  background: #141824;
+  border-color: #1F283B;
 }
 
-.glow-red {
-  box-shadow: 0 0 25px -4px rgba(239, 68, 68, 0.4);
+.dark .pastel-card-gold {
+  background: #141824;
+  border-color: #1F283B;
 }
 
-/* 3D Depth Utilities */
-.perspective-1000 {
-  perspective: 1000px;
+.dark .pastel-card-lime {
+  background: #141824;
+  border-color: #1F283B;
 }
 
-.perspective-1400 {
-  perspective: 1400px;
+.dark .pastel-card-magenta {
+  background: #141824;
+  border-color: #1F283B;
 }
 
-.preserve-3d {
-  transform-style: preserve-3d;
+/* 3D Orb Animation */
+.vision-dark-orb {
+  background: radial-gradient(circle at 35% 30%, #374151 0%, #181E29 45%, #0A0C10 90%);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.7), inset -4px -4px 10px rgba(0, 0, 0, 0.5), inset 4px 4px 10px rgba(255, 255, 255, 0.2);
 }
-
-/* Subtle futuristic pulse animation */
-@keyframes radarSweep {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-radar-sweep {
-  animation: radarSweep 10s linear infinite;
-}
-
-@keyframes subtleFloat {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.animate-float {
-  animation: subtleFloat 4s ease-in-out infinite;
-}
-
-/* Accessible focus ring */
-:focus-visible {
-  outline: 2px solid var(--accent-brand);
-  outline-offset: 2px;
-}
-
-/* Respect user preference for reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-

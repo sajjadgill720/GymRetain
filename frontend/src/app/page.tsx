@@ -4,9 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AppLayout } from '../components/AppLayout';
 import { api } from '../lib/api';
-import { DashboardSummary, AttendanceTrendPoint } from '../types';
+import { DashboardSummary, AttendanceTrendPoint, MemberRiskDetails } from '../types';
 import { Retention3DRadar, RadarSegment } from '../components/dashboard/Retention3DRadar';
-import { InterventionModal, InterventionMember } from '../components/dashboard/InterventionModal';
 import {
   Users,
   UserCheck,
@@ -23,112 +22,21 @@ import {
   ShieldCheck,
   QrCode,
   CheckCircle,
-  CurrencyDollar,
-  Phone,
-  User,
-  CreditCard,
-  Plus,
-  Funnel,
-  ArrowsClockwise,
+  Activity,
+  DotsThree,
 } from '@/components/icons';
-
-const INITIAL_PRIORITY_MEMBERS: InterventionMember[] = [
-  {
-    memberId: 'mem-2',
-    memberCode: 'GR-1002',
-    fullName: 'Ayesha Malik',
-    phone: '+923331122334',
-    planName: 'Standard Monthly Pass',
-    planPrice: 4500,
-    riskScore: 88,
-    riskLevel: 'HIGH',
-    daysInactive: 16,
-    usualCadence: 'Mon, Wed, Fri at 7:00 PM (4.5x/wk)',
-    recentCadence: '0 visits in last 14 days (-100%)',
-    disengagementReason: 'Routine collapsed: Missed 6 consecutive evening sessions after 5-month consistent habit.',
-    assignedStaff: 'Coach Bilal',
-    status: 'NEEDS_OUTREACH',
-  },
-  {
-    memberId: 'mem-7',
-    memberCode: 'GR-1007',
-    fullName: 'Omer Farooq',
-    phone: '+923005544332',
-    planName: 'Pro Strength Pass',
-    planPrice: 6500,
-    riskScore: 78,
-    riskLevel: 'HIGH',
-    daysInactive: 12,
-    usualCadence: 'Tue, Thu, Sat at 6:30 AM (3.8x/wk)',
-    recentCadence: '1 visit in last 14 days (-74%)',
-    disengagementReason: 'Early morning habit broken; membership expired 4 days ago without renewal.',
-    assignedStaff: 'Coach Sarah',
-    status: 'NEEDS_OUTREACH',
-  },
-  {
-    memberId: 'mem-8',
-    memberCode: 'GR-1008',
-    fullName: 'Sana Tariq',
-    phone: '+923219988776',
-    planName: 'Standard Monthly Pass',
-    planPrice: 4500,
-    riskScore: 68,
-    riskLevel: 'HIGH',
-    daysInactive: 10,
-    usualCadence: 'Mon & Thu at 5:00 PM (2.5x/wk)',
-    recentCadence: '1 visit in last 14 days (-60%)',
-    disengagementReason: 'Slipping frequency: Missed 3 consecutive weeks of leg-day routine.',
-    assignedStaff: 'Coach Sarah',
-    status: 'NEEDS_OUTREACH',
-  },
-  {
-    memberId: 'mem-9',
-    memberCode: 'GR-1009',
-    fullName: 'Hamza Tariq',
-    phone: '+923341122998',
-    planName: 'Pro Strength & Cardio',
-    planPrice: 6500,
-    riskScore: 62,
-    riskLevel: 'HIGH',
-    daysInactive: 9,
-    usualCadence: 'Daily Lunch Session at 1:30 PM (5.0x/wk)',
-    recentCadence: '2 visits in last 14 days (-60%)',
-    disengagementReason: 'Streak broken at 18 days; card payment renewal pending.',
-    assignedStaff: 'Coach Bilal',
-    status: 'NEEDS_OUTREACH',
-  },
-  {
-    memberId: 'mem-12',
-    memberCode: 'GR-1012',
-    fullName: 'Mustafa Khan',
-    phone: '+923004455881',
-    planName: 'Standard Monthly Pass',
-    planPrice: 4500,
-    riskScore: 54,
-    riskLevel: 'MEDIUM',
-    daysInactive: 8,
-    usualCadence: 'Weekends at 10:00 AM (2.0x/wk)',
-    recentCadence: '1 visit in last 14 days (-50%)',
-    disengagementReason: 'Weekend morning habit disruption; missed 2 consecutive Saturdays.',
-    assignedStaff: 'Front Desk Team',
-    status: 'NEEDS_OUTREACH',
-  },
-];
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [trendData, setTrendData] = useState<AttendanceTrendPoint[]>([]);
   const [timeframe, setTimeframe] = useState<'7D' | '14D' | '30D' | '90D'>('30D');
   const [hoveredPoint, setHoveredPoint] = useState<{ label: string; date: string; val: number; x: number; y: number } | null>(null);
-  const [priorityMembers, setPriorityMembers] = useState<InterventionMember[]>(INITIAL_PRIORITY_MEMBERS);
-  const [radarSegment, setRadarSegment] = useState<RadarSegment>('ALL');
-  const [selectedInterventionMember, setSelectedInterventionMember] = useState<InterventionMember | null>(null);
-  const [recentActions, setRecentActions] = useState<Array<{ id: string; time: string; text: string; memberCode: string }>>([
-    { id: 'act-1', time: '25m ago', text: 'Coach Bilal dispatched personalized WhatsApp recovery check-in', memberCode: 'GR-1002' },
-    { id: 'act-2', time: '1h ago', text: 'Front desk recorded renewal payment and restored habit streak', memberCode: 'GR-1005' },
-    { id: 'act-3', time: '3h ago', text: 'Coach Sarah scheduled retention catch-up consultation', memberCode: 'GR-1007' },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [nudgedMembers, setNudgedMembers] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Radar interactive segment filter
+  const [radarSegment, setRadarSegment] = useState<RadarSegment>('ALL');
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -139,7 +47,11 @@ export default function DashboardPage() {
     try {
       const sum = await api.getDashboardSummary();
       setSummary(sum);
-    } catch {}
+    } catch {
+      // Fallback
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -151,48 +63,109 @@ export default function DashboardPage() {
     api
       .getAttendanceTrends(days)
       .then((data) => {
-        if (data && data.length > 0) setTrendData(data);
+        if (data && data.length > 0) {
+          setTrendData(data);
+        }
       })
       .catch(() => {});
   }, [timeframe]);
 
-  // Handle completed intervention
-  const handleInterventionComplete = (memberId: string, newStatus: InterventionMember['status'], actionSummary: string) => {
-    setPriorityMembers((prev) =>
-      prev.map((m) => (m.memberId === memberId ? { ...m, status: newStatus } : m))
-    );
-    const target = priorityMembers.find((m) => m.memberId === memberId);
-    setRecentActions((prev) => [
-      {
-        id: `act-${Date.now()}`,
-        time: 'Just now',
-        text: actionSummary,
-        memberCode: target?.memberCode || 'GR-MEM',
-      },
-      ...prev,
-    ]);
-    showToast(`Action recorded: ${actionSummary}`);
+  // KPIs
+  const activeMembers = summary?.kpis?.activeMembers || 142;
+  const todayCheckIns = summary?.kpis?.todayCheckIns || 38;
+  const highRiskCount = summary?.kpis?.highRiskCount || 6;
+  const topStreakLeader = summary?.streakLeaders?.[0] || {
+    memberName: 'Hamza Sheikh',
+    currentStreak: 12,
+    memberCode: 'GR-1001',
   };
 
-  // Filter members based on radar segment
-  const filteredPriorityMembers = priorityMembers.filter((m) => {
+  // Recent at-risk preview fallback
+  const baseAtRiskMembers: MemberRiskDetails[] =
+    summary?.recentAtRiskPreview && summary.recentAtRiskPreview.length > 0
+      ? summary.recentAtRiskPreview.slice(0, 6)
+      : [
+          {
+            memberId: 'mem-2',
+            memberCode: 'GR-1002',
+            fullName: 'Ayesha Malik',
+            phone: '+923331122334',
+            riskScore: 88,
+            riskLevel: 'HIGH',
+            factors: { daysSinceLastCheckIn: 16 } as any,
+          },
+          {
+            memberId: 'mem-7',
+            memberCode: 'GR-1007',
+            fullName: 'Omer Farooq',
+            phone: '+923005544332',
+            riskScore: 78,
+            riskLevel: 'HIGH',
+            factors: { daysSinceLastCheckIn: 12 } as any,
+          },
+          {
+            memberId: 'mem-8',
+            memberCode: 'GR-1008',
+            fullName: 'Sana Tariq',
+            phone: '+923219988776',
+            riskScore: 68,
+            riskLevel: 'HIGH',
+            factors: { daysSinceLastCheckIn: 10 } as any,
+          },
+          {
+            memberId: 'mem-9',
+            memberCode: 'GR-1009',
+            fullName: 'Hamza Tariq',
+            phone: '+923341122998',
+            riskScore: 62,
+            riskLevel: 'HIGH',
+            factors: { daysSinceLastCheckIn: 9 } as any,
+          },
+          {
+            memberId: 'mem-3',
+            memberCode: 'GR-1003',
+            fullName: 'Zaid Siddiqui',
+            phone: '+923451122334',
+            riskScore: 48,
+            riskLevel: 'MEDIUM',
+            factors: { daysSinceLastCheckIn: 5 } as any,
+          },
+          {
+            memberId: 'mem-4',
+            memberCode: 'GR-1004',
+            fullName: 'Fatima Zahra',
+            phone: '+923121122334',
+            riskScore: 42,
+            riskLevel: 'MEDIUM',
+            factors: { daysSinceLastCheckIn: 4 } as any,
+          },
+        ];
+
+  // Filter members based on 3D Retention Radar segment selection
+  const atRiskMembers = baseAtRiskMembers.filter((m) => {
     if (radarSegment === 'ALL') return true;
     if (radarSegment === 'URGENT') return m.riskScore >= 70;
     if (radarSegment === 'SLIPPING') return m.riskScore >= 40 && m.riskScore < 70;
-    if (radarSegment === 'HABIT_DISRUPTED') return m.disengagementReason.toLowerCase().includes('routine') || m.disengagementReason.toLowerCase().includes('habit');
+    if (radarSegment === 'HABIT_DISRUPTED') return m.riskLevel === 'MEDIUM';
     if (radarSegment === 'HEALTHY') return m.riskScore < 40;
     return true;
   });
 
-  // KPIs
-  const activeMembers = summary?.kpis?.activeMembers || 142;
-  const todayCheckIns = summary?.kpis?.todayCheckIns || 38;
-  const highRiskCount = priorityMembers.filter((m) => m.riskScore >= 70).length;
-  const urgentRevenueAtRisk = priorityMembers.filter((m) => m.riskScore >= 70).reduce((acc, m) => acc + m.planPrice, 0);
-  const slippingRevenueAtRisk = priorityMembers.filter((m) => m.riskScore >= 40 && m.riskScore < 70).reduce((acc, m) => acc + m.planPrice, 0);
-  const totalRevenueAtRisk = urgentRevenueAtRisk + slippingRevenueAtRisk;
+  // Handle WhatsApp Nudge simulation
+  const handleNudge = async (member: MemberRiskDetails) => {
+    try {
+      setNudgedMembers((prev) => new Set(prev).add(member.memberId));
+      await api.simulateWhatsAppMessage({
+        memberId: member.memberId,
+        messageType: 'MISSED_VISIT',
+      });
+      showToast(`Personalized WhatsApp retention nudge sent to ${member.fullName}!`);
+    } catch {
+      showToast(`Nudge logged for ${member.fullName}.`);
+    }
+  };
 
-  // Chart Points & Bezier Smoothing
+  // Trend Chart Calculation
   const chartPoints = trendData.length > 0 ? trendData : [
     { date: '2026-09-03', checkIns: 28 },
     { date: '2026-09-08', checkIns: 34 },
@@ -200,7 +173,7 @@ export default function DashboardPage() {
     { date: '2026-09-18', checkIns: 31 },
     { date: '2026-09-23', checkIns: 45 },
     { date: '2026-09-28', checkIns: 39 },
-    { date: '2026-10-03', checkIns: todayCheckIns },
+    { date: '2026-10-02', checkIns: todayCheckIns },
   ];
 
   const maxVal = Math.max(...chartPoints.map((p) => p.checkIns), 45);
@@ -208,7 +181,7 @@ export default function DashboardPage() {
   const valRange = maxVal - minVal || 1;
 
   const svgWidth = 800;
-  const svgHeight = 220;
+  const svgHeight = 240;
   const paddingX = 35;
   const paddingY = 25;
 
@@ -218,6 +191,7 @@ export default function DashboardPage() {
     return { x, y, pt };
   });
 
+  // Quadratic Bezier smoothing for SVG Path
   let pathD = '';
   if (coords.length > 0) {
     pathD = `M ${coords[0].x},${coords[0].y}`;
@@ -233,37 +207,33 @@ export default function DashboardPage() {
     ? `${pathD} L ${coords[coords.length - 1].x},${svgHeight - paddingY} L ${coords[0].x},${svgHeight - paddingY} Z`
     : '';
 
+  const avgDailyVisits = Math.round(
+    chartPoints.reduce((acc, p) => acc + p.checkIns, 0) / chartPoints.length
+  );
+
   return (
     <AppLayout onRefreshData={loadData}>
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl glass-panel-elevated text-content-primary shadow-2xl animate-in slide-in-from-bottom-5 duration-200">
-          <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" weight="fill" />
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-surface border border-surface-border text-content-primary shadow-2xl animate-in slide-in-from-bottom-5 duration-200">
+          <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" weight="fill" />
           <span className="text-xs font-semibold">{toastMessage}</span>
         </div>
       )}
 
-      {/* Intervention & Outreach Modal */}
-      <InterventionModal
-        member={selectedInterventionMember}
-        isOpen={!!selectedInterventionMember}
-        onClose={() => setSelectedInterventionMember(null)}
-        onInterventionComplete={handleInterventionComplete}
-      />
-
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
         {/* ============================================================
-            1. TOP HEADER & WHO NEEDS ATTENTION TODAY ALERT
+            1. TOP HEADER & HIGH-IMPACT CONTROLS
             ============================================================ */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-surface-border">
           <div>
             <div className="flex items-center gap-2.5 mb-1">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-content-primary font-sans">
-                Silent Churn Command Center
+                Retention Dashboard
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-content-secondary">
-              Identify members disengaging before they churn, analyze routine disruptions, and execute tailored retention outreach.
+              Real-time attendance tracking, member streak milestones, and automated churn prevention.
             </p>
           </div>
 
@@ -273,16 +243,16 @@ export default function DashboardPage() {
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/15 text-purple-600 dark:text-cyan-400 border border-purple-500/20 text-xs font-bold transition-all btn-shadow"
             >
               <Sparkle className="w-4 h-4" weight="fill" />
-              <span>AI Copilot Insights</span>
+              <span>AI Insights</span>
             </Link>
 
             <Link
               href="/retention"
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-content-primary transition-all btn-shadow"
             >
-              <Warning className="w-4 h-4 text-red-500" weight="fill" />
-              <span>Full At-Risk Queue</span>
-              <span className="px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-mono font-bold">
+              <Warning className="w-4 h-4 text-amber-500" weight="fill" />
+              <span>At-Risk Queue</span>
+              <span className="px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-mono font-bold">
                 {highRiskCount}
               </span>
             </Link>
@@ -298,248 +268,143 @@ export default function DashboardPage() {
         </div>
 
         {/* ============================================================
-            2. HIGH-IMPACT ATTENTION & REVENUE AT RISK BANNER
+            2. COHESIVE 4-KPI METRIC OVERVIEW
             ============================================================ */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Attention Today Callout (7 Cols) */}
-          <div className="lg:col-span-7 p-5 rounded-3xl glass-panel-elevated border border-red-500/30 flex flex-col justify-between glow-red">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-red-500 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  Who Needs Your Attention Today?
-                </span>
-                <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-500 border border-red-500/20">
-                  {highRiskCount} Members Urgent
-                </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1: Active Members */}
+          <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
+                Active Members
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-cyan-400 flex items-center justify-center">
+                <Users className="w-4 h-4" weight="duotone" />
               </div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-content-primary tracking-tight font-sans mb-1">
-                4 Members Exhibiting Severe Habit Dropouts
-              </h2>
-              <p className="text-xs text-content-secondary leading-relaxed">
-                Members with prolonged absence (&gt;10 days) and collapsed routine velocity. Taking proactive action within 48 hours restores 74% of disengaged gym members.
-              </p>
             </div>
-
-            <div className="pt-4 border-t border-surface-border/80 mt-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-content-tertiary">Quick Priority Triage:</span>
-                <span className="font-bold text-content-primary">Ayesha Malik (16d)</span>
-                <span className="text-content-tertiary">·</span>
-                <span className="font-bold text-content-primary">Omer Farooq (12d)</span>
-              </div>
-              <button
-                onClick={() => setSelectedInterventionMember(priorityMembers[0])}
-                className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all btn-shadow flex items-center gap-1.5"
-              >
-                <span>Intervene Top Risk</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-2xl sm:text-3xl font-extrabold text-content-primary tracking-tight font-sans">
+                {activeMembers}
+              </span>
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
+                <TrendUp className="w-3.5 h-3.5" weight="bold" />
+                +8.2%
+              </span>
             </div>
+            <p className="text-[11px] text-content-tertiary">
+              Enrolled members with active monthly subscriptions
+            </p>
           </div>
 
-          {/* Revenue at Risk Calculation Card (5 Cols) */}
-          <div className="lg:col-span-5 p-5 rounded-3xl glass-panel border border-surface-border flex flex-col justify-between btn-shadow">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-content-tertiary uppercase tracking-wider">
-                  Estimated Revenue at Risk
-                </span>
-                <span className="p-1.5 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <CurrencyDollar className="w-4 h-4" weight="duotone" />
-                </span>
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-500 font-mono tracking-tight mb-1">
-                ₨{totalRevenueAtRisk.toLocaleString()}/mo
-              </div>
-              <div className="p-2.5 rounded-xl bg-surface-subtle border border-surface-border text-[11px] text-content-secondary leading-snug">
-                <span className="font-bold text-content-primary block mb-0.5">How this is calculated:</span>
-                Sum of monthly plan fees for 4 High-Risk members (₨{urgentRevenueAtRisk.toLocaleString()}) + 1 Slipping member (₨{slippingRevenueAtRisk.toLocaleString()}).
-                <span className="text-red-500 font-semibold block mt-1">
-                  Projected 6-month churn LTV loss: ₨{(totalRevenueAtRisk * 6).toLocaleString()}
-                </span>
+          {/* Card 2: Today's Check-Ins */}
+          <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
+                Today Check-Ins
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <UserCheck className="w-4 h-4" weight="duotone" />
               </div>
             </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-2xl sm:text-3xl font-extrabold text-content-primary tracking-tight font-sans">
+                {todayCheckIns}
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-cyan-400">
+                Peak: 6-8 PM
+              </span>
+            </div>
+            <p className="text-[11px] text-content-tertiary">
+              Floor capacity: 54% · Average duration 62 mins
+            </p>
+          </div>
 
-            <div className="pt-3 border-t border-surface-border mt-3 flex items-center justify-between text-[11px]">
-              <span className="text-content-tertiary">Protection Target:</span>
-              <span className="font-extrabold text-emerald-500">85% Recoverable with Nudges</span>
+          {/* Card 3: At-Risk Members */}
+          <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
+                At-Risk Queue
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center">
+                <Warning className="w-4 h-4" weight="duotone" />
+              </div>
             </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-2xl sm:text-3xl font-extrabold text-red-600 dark:text-red-400 tracking-tight font-sans">
+                {highRiskCount}
+              </span>
+              <span className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-0.5">
+                <TrendDown className="w-3.5 h-3.5" weight="bold" />
+                Urgent Action
+              </span>
+            </div>
+            <p className="text-[11px] text-content-tertiary">
+              Members absent &gt;8 days · Est. ₨18,800 monthly at risk
+            </p>
+          </div>
+
+          {/* Card 4: Retention Benchmark */}
+          <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
+                30D Retention Rate
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                <Medal className="w-4 h-4" weight="duotone" />
+              </div>
+            </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-2xl sm:text-3xl font-extrabold text-content-primary tracking-tight font-sans">
+                91.4%
+              </span>
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                +9.4% vs industry
+              </span>
+            </div>
+            <p className="text-[11px] text-content-tertiary">
+              Streak rewards &amp; WhatsApp reminders active
+            </p>
           </div>
         </div>
 
         {/* ============================================================
-            3. DISTINCTIVE INTERACTIVE 3D RETENTION RADAR
+            3. INTERACTIVE 3D RETENTION ORBITAL RADAR
             ============================================================ */}
-        <Retention3DRadar
-          activeSegment={radarSegment}
-          onSelectSegment={setRadarSegment}
-          urgentCount={highRiskCount}
-          slippingCount={priorityMembers.filter((m) => m.riskScore >= 40 && m.riskScore < 70).length}
-          habitDisruptedCount={2}
-          healthyCount={activeMembers - 6}
-          urgentRevenueAtRisk={urgentRevenueAtRisk}
-          slippingRevenueAtRisk={slippingRevenueAtRisk}
-        />
-
-        {/* ============================================================
-            4. PRIORITIZED DISENGAGEMENT LIST WITH EVIDENCE & OUTREACH
-            ============================================================ */}
-        <div className="p-5 sm:p-6 rounded-3xl glass-panel-elevated border border-surface-border space-y-4 btn-shadow">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-extrabold text-content-primary tracking-tight font-sans">
-                  Prioritized Member Interventions ({filteredPriorityMembers.length})
-                </h3>
-                {radarSegment !== 'ALL' && (
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                    FILTERED: {radarSegment}
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-content-secondary">
-                Ranked by disengagement velocity, broken routine signals, and revenue exposure. Click Prepare Outreach to customize recovery action.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Link
-                href="/retention"
-                className="text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
-              >
-                <span>Full Retention Pipeline →</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Members Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-surface-border text-content-tertiary uppercase text-[10px] font-bold">
-                  <th className="py-3 px-3">Member &amp; Plan</th>
-                  <th className="py-3 px-3">Disengagement Diagnosis</th>
-                  <th className="py-3 px-3">Routine Shift</th>
-                  <th className="py-3 px-3">Handler &amp; Status</th>
-                  <th className="py-3 px-3 text-right">Intervention Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-surface-border/50">
-                {filteredPriorityMembers.map((member) => {
-                  const isHigh = member.riskScore >= 70;
-                  const isSlipping = member.riskScore >= 40 && member.riskScore < 70;
-
-                  return (
-                    <tr key={member.memberId} className="hover:bg-surface-subtle/50 transition-colors">
-                      {/* Member Info */}
-                      <td className="py-3.5 px-3">
-                        <div className="font-extrabold text-content-primary">
-                          {member.fullName}
-                        </div>
-                        <div className="text-[10px] text-content-tertiary font-mono">
-                          {member.memberCode} · ₨{member.planPrice.toLocaleString()}/mo
-                        </div>
-                        <div className="mt-1">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${
-                              isHigh
-                                ? 'bg-red-500/10 text-red-500 border-red-500/20'
-                                : isSlipping
-                                ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
-                            }`}
-                          >
-                            {member.riskScore}% Churn Risk
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Disengagement Diagnosis */}
-                      <td className="py-3.5 px-3 max-w-xs">
-                        <div className="font-bold text-red-600 dark:text-red-400 text-xs">
-                          {member.daysInactive} Days Absent
-                        </div>
-                        <p className="text-[11px] text-content-secondary mt-0.5 leading-snug">
-                          {member.disengagementReason}
-                        </p>
-                      </td>
-
-                      {/* Routine vs Velocity */}
-                      <td className="py-3.5 px-3">
-                        <div className="text-[11px] font-semibold text-content-primary">
-                          {member.usualCadence}
-                        </div>
-                        <div className="text-[10px] font-bold text-red-500 mt-0.5">
-                          {member.recentCadence}
-                        </div>
-                      </td>
-
-                      {/* Staff Handler & Status */}
-                      <td className="py-3.5 px-3">
-                        <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
-                          <User className="w-3.5 h-3.5 text-content-tertiary" />
-                          <span>{member.assignedStaff}</span>
-                        </div>
-                        <div className="mt-1">
-                          {member.status === 'NEEDS_OUTREACH' && (
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                              Needs Outreach
-                            </span>
-                          )}
-                          {member.status === 'CONTACTED' && (
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                              Contacted ✓
-                            </span>
-                          )}
-                          {member.status === 'SCHEDULED' && (
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
-                              Call Scheduled
-                            </span>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="py-3.5 px-3 text-right">
-                        <button
-                          onClick={() => setSelectedInterventionMember(member)}
-                          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all btn-shadow flex items-center gap-1.5 ml-auto ${
-                            member.status === 'CONTACTED'
-                              ? 'bg-surface-subtle border border-surface-border text-content-primary'
-                              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                          }`}
-                        >
-                          <ChatCircleDots className="w-3.5 h-3.5" weight="bold" />
-                          <span>{member.status === 'CONTACTED' ? 'Follow Up' : 'Prepare Outreach'}</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+        <div className="w-full">
+          <Retention3DRadar
+            activeSegment={radarSegment}
+            onSelectSegment={(segment) => {
+              setRadarSegment(segment);
+              if (segment !== 'ALL') {
+                showToast(`Filtered At-Risk Queue by ${segment} segment`);
+              }
+            }}
+            urgentCount={4}
+            slippingCount={2}
+            habitDisruptedCount={3}
+            healthyCount={133}
+            urgentRevenueAtRisk={20000}
+            slippingRevenueAtRisk={9000}
+          />
         </div>
 
         {/* ============================================================
-            5. ATTENDANCE TRAJECTORY & RECENT STAFF ACTIONS (8 / 4 COLS)
+            4. CORE ANALYTICS CENTERPIECE & GYM FLOOR PULSE (8 / 4 COLS)
             ============================================================ */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left: Attendance Trajectory (8 Cols) */}
-          <div className="lg:col-span-8 p-5 sm:p-6 rounded-3xl glass-panel border border-surface-border flex flex-col justify-between btn-shadow">
+          {/* Left: Attendance & Trajectory Chart (8 Cols) */}
+          <div className="lg:col-span-8 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-content-primary">
-                  Attendance Dynamics &amp; Churn Correlation
+                  Attendance &amp; Check-In Dynamics
                 </h3>
                 <p className="text-xs text-content-tertiary">
-                  Overall gym check-in volume against expected baseline routine
+                  Daily floor footfall trends and workout consistency across all membership tiers
                 </p>
               </div>
 
               {/* Timeframe Toggles */}
-              <div className="flex items-center gap-1 p-1 bg-surface-subtle border border-surface-border rounded-xl">
+              <div className="flex items-center gap-1 p-1 bg-surface-subtle border border-surface-border rounded-xl self-start sm:self-auto">
                 {(['7D', '14D', '30D', '90D'] as const).map((t) => (
                   <button
                     key={t}
@@ -556,8 +421,8 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* SVG Trajectory Chart */}
-            <div className="relative w-full h-[220px] select-none my-2">
+            {/* Interactive SVG Chart Canvas */}
+            <div className="relative w-full h-[240px] select-none my-2">
               <svg
                 viewBox={`0 0 ${svgWidth} ${svgHeight}`}
                 className="w-full h-full overflow-visible"
@@ -565,11 +430,12 @@ export default function DashboardPage() {
               >
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00F2FE" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#00F2FE" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#7C3AED" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
+                {/* Horizontal Guide Grid Lines */}
                 {[0.25, 0.5, 0.75].map((ratio, idx) => {
                   const y = paddingY + ratio * (svgHeight - paddingY * 2);
                   return (
@@ -586,19 +452,22 @@ export default function DashboardPage() {
                   );
                 })}
 
+                {/* Shaded Area */}
                 {areaD && <path d={areaD} fill="url(#chartGradient)" />}
 
+                {/* Line Path */}
                 {pathD && (
                   <path
                     d={pathD}
                     fill="none"
-                    stroke="#00F2FE"
+                    stroke="#7C3AED"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 )}
 
+                {/* Data Points & Hover Targets */}
                 {coords.map((c, i) => {
                   const isHovered = hoveredPoint?.date === c.pt.date;
                   return (
@@ -609,10 +478,11 @@ export default function DashboardPage() {
                         r={isHovered ? 6 : 3.5}
                         className={`transition-all duration-150 ${
                           isHovered
-                            ? 'fill-cyan-400 stroke-surface stroke-2'
-                            : 'fill-cyan-400 stroke-surface stroke-1'
+                            ? 'fill-purple-600 stroke-surface stroke-2'
+                            : 'fill-purple-600 stroke-surface stroke-1'
                         }`}
                       />
+                      {/* Invisible wider target for smooth hovering */}
                       <rect
                         x={c.x - 18}
                         y={0}
@@ -639,93 +509,306 @@ export default function DashboardPage() {
                 })}
               </svg>
 
+              {/* Tooltip Overlay */}
               {hoveredPoint && (
                 <div
-                  className="absolute pointer-events-none -translate-x-1/2 -translate-y-full px-3 py-1.5 rounded-xl glass-panel-elevated border border-cyan-500/30 shadow-xl z-20 text-center"
+                  className="absolute pointer-events-none -translate-x-1/2 -translate-y-full px-3 py-1.5 rounded-xl bg-surface border border-surface-border shadow-xl z-20 transition-all text-center"
                   style={{
                     left: `${(hoveredPoint.x / svgWidth) * 100}%`,
                     top: `${(hoveredPoint.y / svgHeight) * 100 - 8}%`,
                   }}
                 >
-                  <div className="text-[10px] text-content-tertiary">{hoveredPoint.label}</div>
-                  <div className="text-xs font-extrabold text-cyan-400 font-mono">
-                    {hoveredPoint.val} Check-Ins
+                  <div className="text-[10px] text-content-tertiary font-medium">
+                    {hoveredPoint.label}
+                  </div>
+                  <div className="text-sm font-extrabold text-content-primary font-mono">
+                    {hoveredPoint.val} check-ins
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-surface-border text-center">
-              <div>
-                <span className="text-[10px] text-content-tertiary uppercase font-bold block">
-                  Daily Check-in Avg
+            {/* Bottom Summary Bar */}
+            <div className="pt-3 border-t border-surface-border flex items-center justify-between text-xs text-content-tertiary">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block" />
+                <span className="font-medium text-content-secondary">
+                  Daily Check-In Volume
                 </span>
-                <span className="text-sm font-extrabold text-content-primary font-mono">
-                  34.4 visits/day
-                </span>
+                <span className="text-[11px]">({timeframe} period)</span>
               </div>
-              <div>
-                <span className="text-[10px] text-content-tertiary uppercase font-bold block">
-                  Peak Floor Volume
-                </span>
-                <span className="text-sm font-extrabold text-cyan-400 font-mono">
-                  Friday (42 visits)
-                </span>
-              </div>
-              <div>
-                <span className="text-[10px] text-content-tertiary uppercase font-bold block">
-                  Routine Adherence
-                </span>
-                <span className="text-sm font-extrabold text-emerald-500 font-mono">
-                  88.2% on schedule
-                </span>
+              <div className="font-mono text-content-primary font-bold">
+                Avg: {avgDailyVisits} visits/day
               </div>
             </div>
           </div>
 
-          {/* Right: Recent Staff Actions Feed (4 Cols) */}
-          <div className="lg:col-span-4 p-5 sm:p-6 rounded-3xl glass-panel border border-surface-border flex flex-col justify-between btn-shadow">
+          {/* Right: Gym Floor Live Pulse (4 Cols) */}
+          <div className="lg:col-span-4 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-base font-bold text-content-primary">
-                    Recent Staff Actions
+                    Gym Floor Live Pulse
                   </h3>
                   <p className="text-xs text-content-tertiary">
-                    Live audit trail of retention interventions
+                    Current occupancy &amp; front-desk throughput
                   </p>
                 </div>
-                <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
-                  <ShieldCheck className="w-4 h-4" weight="duotone" />
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Now
+                </span>
+              </div>
+
+              {/* Occupancy Radial Indicator */}
+              <div className="p-4 rounded-xl bg-surface-subtle border border-surface-border mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-content-secondary">
+                    Floor Occupancy
+                  </span>
+                  <span className="text-xs font-mono font-bold text-content-primary">
+                    {todayCheckIns} / 70 Capacity
+                  </span>
+                </div>
+                <div className="w-full bg-surface rounded-full h-2 overflow-hidden border border-surface-border">
+                  <div
+                    className="bg-purple-600 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.round((todayCheckIns / 70) * 100))}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] text-content-tertiary mt-2">
+                  <span>Quiet</span>
+                  <span className="font-bold text-purple-600 dark:text-cyan-400">Moderate Pace</span>
+                  <span>Peak Cap</span>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                {recentActions.map((act) => (
-                  <div
-                    key={act.id}
-                    className="p-3 rounded-2xl bg-surface-subtle/80 border border-surface-border/70 space-y-1"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono font-bold text-cyan-400 px-1.5 py-0.5 rounded bg-cyan-500/10">
-                        {act.memberCode}
-                      </span>
-                      <span className="text-[10px] text-content-tertiary">{act.time}</span>
-                    </div>
-                    <p className="text-xs text-content-secondary leading-snug">
-                      {act.text}
-                    </p>
-                  </div>
-                ))}
+              {/* Peak Hours Forecast */}
+              <div className="space-y-2.5">
+                <div className="text-xs font-bold text-content-secondary uppercase tracking-wider">
+                  Upcoming Rush Hours
+                </div>
+                <div className="flex items-center justify-between text-xs py-1.5 border-b border-surface-border/50">
+                  <span className="text-content-secondary">5:00 PM – 6:30 PM</span>
+                  <span className="font-mono text-content-primary font-bold">~42 members (High)</span>
+                </div>
+                <div className="flex items-center justify-between text-xs py-1.5 border-b border-surface-border/50">
+                  <span className="text-content-secondary">6:30 PM – 8:00 PM</span>
+                  <span className="font-mono text-amber-600 dark:text-amber-400 font-bold">~58 members (Peak)</span>
+                </div>
+                <div className="flex items-center justify-between text-xs py-1.5">
+                  <span className="text-content-secondary">8:00 PM – 9:30 PM</span>
+                  <span className="font-mono text-content-primary font-bold">~25 members (Low)</span>
+                </div>
               </div>
             </div>
 
             <div className="pt-4 border-t border-surface-border mt-4">
               <Link
-                href="/retention"
-                className="w-full py-2 text-center rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary transition-all btn-shadow block"
+                href="/check-in"
+                className="w-full py-2 px-3 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary flex items-center justify-center gap-2 transition-all btn-shadow"
               >
-                View Complete Activity History
+                <QrCode className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                <span>Open Front-Desk Scanner</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================
+            5. PROACTIVE RETENTION TRIAGE & AUTOMATED CAMPAIGNS (7 / 5 COLS)
+            ============================================================ */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: Urgent Retention Queue (7 Cols) */}
+          <div className="lg:col-span-7 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-content-primary">
+                      Urgent Retention Queue
+                    </h3>
+                    {radarSegment !== 'ALL' && (
+                      <button
+                        onClick={() => setRadarSegment('ALL')}
+                        className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold hover:bg-cyan-500/20 transition-colors"
+                      >
+                        Segment: {radarSegment} (Reset ✕)
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-content-tertiary">
+                    High probability churn candidates needing direct staff outreach
+                  </p>
+                </div>
+                <Link
+                  href="/retention"
+                  className="text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
+                >
+                  <span>View All</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              {/* Clean At-Risk Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-surface-border text-content-tertiary uppercase text-[10px] font-bold">
+                      <th className="py-2.5 px-3">Member</th>
+                      <th className="py-2.5 px-3">Inactive</th>
+                      <th className="py-2.5 px-3">Risk Score</th>
+                      <th className="py-2.5 px-3 text-right">Quick Nudge</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-surface-border/50">
+                    {atRiskMembers.map((member) => {
+                      const isNudged = nudgedMembers.has(member.memberId);
+                      return (
+                        <tr key={member.memberId} className="hover:bg-surface-subtle/50 transition-colors">
+                          <td className="py-3 px-3">
+                            <div className="font-bold text-content-primary">{member.fullName}</div>
+                            <div className="text-[10px] text-content-tertiary font-mono">
+                              {member.memberCode}
+                            </div>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="font-semibold text-content-secondary">
+                              {member.factors?.daysSinceLastCheckIn ?? 12} days
+                            </span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                              {member.riskScore}% High
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <button
+                              onClick={() => handleNudge(member)}
+                              disabled={isNudged}
+                              className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all btn-shadow ${
+                                isNudged
+                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default'
+                                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                              }`}
+                            >
+                              {isNudged ? 'Nudge Sent ✓' : 'WhatsApp Nudge'}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-surface-border mt-3 text-right">
+              <Link
+                href="/retention"
+                className="text-xs font-bold text-content-secondary hover:text-content-primary transition-colors"
+              >
+                Open full at-risk queue with factor breakdowns →
+              </Link>
+            </div>
+          </div>
+
+          {/* Right: Retention Loops & Streak Champions (5 Cols) */}
+          <div className="lg:col-span-5 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-base font-bold text-content-primary">
+                    Automated Retention Loops
+                  </h3>
+                  <p className="text-xs text-content-tertiary">
+                    Rule triggers running in background
+                  </p>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <ShieldCheck className="w-4 h-4" weight="duotone" />
+                </div>
+              </div>
+
+              {/* Loop Status Items */}
+              <div className="space-y-3 mb-5">
+                {[
+                  {
+                    title: 'Missed Visit Outreach',
+                    desc: 'Sends WhatsApp message after 5+ days absence',
+                    stat: '18 sent this week',
+                    active: true,
+                  },
+                  {
+                    title: 'Streak Milestone Celebrations',
+                    desc: 'Unlocks shakes & discounts at 7d / 14d / 30d',
+                    stat: '6 redeemed',
+                    active: true,
+                  },
+                  {
+                    title: 'Expiry & Renewal Reminders',
+                    desc: 'Alerts members 3 days before expiry',
+                    stat: '3 due soon',
+                    active: true,
+                  },
+                ].map((loop, i) => (
+                  <div
+                    key={i}
+                    className="p-3 rounded-xl bg-surface-subtle border border-surface-border flex items-center justify-between gap-3"
+                  >
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-xs font-bold text-content-primary">{loop.title}</span>
+                      </div>
+                      <p className="text-[10px] text-content-tertiary mt-0.5">{loop.desc}</p>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-content-secondary px-2 py-0.5 rounded-lg bg-surface border border-surface-border flex-shrink-0">
+                      {loop.stat}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Top Streak Champion Box */}
+              <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <Fire className="w-5 h-5" weight="fill" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
+                      Gym Leader of the Month
+                    </span>
+                    <div className="text-xs font-extrabold text-content-primary">
+                      {topStreakLeader.memberName} ({topStreakLeader.memberCode})
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono">
+                    {topStreakLeader.currentStreak} Days
+                  </div>
+                  <span className="text-[9px] text-content-tertiary font-bold">Unbroken</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-surface-border mt-4 flex items-center justify-between">
+              <Link
+                href="/rewards/winners"
+                className="text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
+              >
+                <span>View Streak Leaderboard</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+
+              <Link
+                href="/rewards"
+                className="text-xs font-semibold text-content-tertiary hover:text-content-primary transition-colors"
+              >
+                Configure Rules →
               </Link>
             </div>
           </div>

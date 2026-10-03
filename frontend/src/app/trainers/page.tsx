@@ -242,15 +242,15 @@ export default function TrainersPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
-                <Dumbbell className="w-5 h-5 text-purple-600 dark:text-neon-cyan" />
-                Trainers & Nutrition Hub
+                <Dumbbell className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
+                Trainers &amp; Member Coaching
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-subtle text-content-secondary border border-surface-border">
-                {trainers.length} Certified Trainers
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-subtle text-content-secondary border border-surface-border">
+                {trainers.length} Trainers
               </span>
             </div>
             <p className="text-xs text-content-secondary mt-1">
-              Trainer assignments, active client streak monitoring, and structured nutrition plan builder.
+              Personal trainer assignments, member workout streaks, and meal plan tracking.
             </p>
           </div>
 
@@ -258,73 +258,73 @@ export default function TrainersPage() {
           <div className="flex items-center gap-1 bg-surface-subtle p-1 rounded-xl border border-surface-border shrink-0 self-start sm:self-auto">
             <button
               onClick={() => setViewMode('CLIENTS')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all btn-shadow ${
                 viewMode === 'CLIENTS'
                   ? 'bg-surface text-content-primary shadow-sm font-semibold'
                   : 'text-content-secondary hover:text-content-primary'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>My Assigned Clients ({clients.length})</span>
+              <span>Assigned Members ({clients.length})</span>
             </button>
             <button
               onClick={() => setViewMode('ROSTER')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all btn-shadow ${
                 viewMode === 'ROSTER'
                   ? 'bg-surface text-content-primary shadow-sm font-semibold'
                   : 'text-content-secondary hover:text-content-primary'
               }`}
             >
               <Shield className="w-3.5 h-3.5" />
-              <span>Trainer Roster ({trainers.length})</span>
+              <span>Trainer Staff ({trainers.length})</span>
             </button>
           </div>
         </div>
 
         {/* 2. Top Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm">
+          <div className="bg-surface border border-surface-border rounded-2xl p-4 btn-shadow">
             <div className="flex items-center justify-between text-xs text-content-secondary">
-              <span className="font-medium">Active Trainer Roster</span>
+              <span className="font-semibold">Trainer Staff</span>
               <Dumbbell className="w-4 h-4 text-content-tertiary" />
             </div>
-            <div className="mt-2 text-2xl font-semibold tracking-tight text-content-primary font-mono">
+            <div className="mt-2 text-2xl font-bold tracking-tight text-content-primary font-mono">
               {trainers.length}
             </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Qualified coaching staff</p>
+            <p className="text-[11px] text-content-tertiary mt-1">Active gym fitness coaches</p>
           </div>
 
-          <div className="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm">
+          <div className="bg-surface border border-surface-border rounded-2xl p-4 btn-shadow">
             <div className="flex items-center justify-between text-xs text-content-secondary">
-              <span className="font-medium">Assigned Clients</span>
+              <span className="font-semibold">Assigned Members</span>
               <Users className="w-4 h-4 text-content-tertiary" />
             </div>
-            <div className="mt-2 text-2xl font-semibold tracking-tight text-content-primary font-mono">
+            <div className="mt-2 text-2xl font-bold tracking-tight text-content-primary font-mono">
               {clients.length}
             </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Under direct trainer guidance</p>
+            <p className="text-[11px] text-content-tertiary mt-1">Members paired with a trainer</p>
           </div>
 
-          <div className="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm">
+          <div className="bg-surface border border-surface-border rounded-2xl p-4 btn-shadow">
             <div className="flex items-center justify-between text-xs text-content-secondary">
-              <span className="font-medium">Active Diet Plans</span>
-              <Utensils className="w-4 h-4 text-emerald-500" />
+              <span className="font-semibold">Active Meal Plans</span>
+              <Utensils className="w-4 h-4 text-content-tertiary" />
             </div>
-            <div className="mt-2 text-2xl font-semibold tracking-tight text-emerald-600 dark:text-emerald-400 font-mono">
+            <div className="mt-2 text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400 font-mono">
               {clients.filter((c) => c.dietPlan.status === 'ACTIVE_PLAN').length}
             </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Structured meals assigned</p>
+            <p className="text-[11px] text-content-tertiary mt-1">Personalized nutrition guides shared</p>
           </div>
 
-          <div className="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm">
+          <div className="bg-surface border border-surface-border rounded-2xl p-4 btn-shadow">
             <div className="flex items-center justify-between text-xs text-content-secondary">
-              <span className="font-medium">Plans Pending Setup</span>
-              <AlertCircle className="w-4 h-4 text-amber-500" />
+              <span className="font-semibold">Consistent Streaks</span>
+              <Flame className="w-4 h-4 text-amber-500" />
             </div>
-            <div className="mt-2 text-2xl font-semibold tracking-tight text-amber-600 dark:text-amber-400 font-mono">
-              {clients.filter((c) => c.dietPlan.status === 'NO_PLAN').length}
+            <div className="mt-2 text-2xl font-bold tracking-tight text-amber-600 dark:text-amber-400 font-mono">
+              {clients.filter((c) => c.member.currentStreak > 0).length}
             </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Requires nutrition assignment</p>
+            <p className="text-[11px] text-content-tertiary mt-1">Members visiting on schedule</p>
           </div>
         </div>
 

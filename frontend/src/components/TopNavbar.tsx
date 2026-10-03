@@ -152,7 +152,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
               title="Test WhatsApp member response"
             >
               <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="hidden lg:inline">WhatsApp Simulator</span>
+              <span className="hidden lg:inline">Test WhatsApp</span>
             </button>
 
             {/* Theme Toggle (Sun / Moon) */}
@@ -183,7 +183,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
           <div className="bg-surface max-w-sm w-full rounded-2xl p-5 border border-surface-border shadow-2xl relative animate-in fade-in zoom-in-95 duration-100">
             <button
               onClick={() => setIsSimulatorOpen(false)}
-              className="absolute right-3.5 top-3.5 p-1 rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-subtle"
+              className="absolute right-3.5 top-3.5 p-1 rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-subtle btn-shadow"
             >
               <X className="w-4 h-4" />
             </button>
@@ -193,8 +193,8 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 <MessageCircle className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-content-primary">WhatsApp Simulator</h3>
-                <p className="text-[11px] text-content-tertiary">Inbound retention keywords</p>
+                <h3 className="text-sm font-semibold text-content-primary">Test WhatsApp Messages</h3>
+                <p className="text-[11px] text-content-tertiary">See how members receive automatic check-ins and streak updates</p>
               </div>
             </div>
 

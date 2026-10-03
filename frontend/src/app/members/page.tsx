@@ -171,12 +171,12 @@ export default function MembersPage() {
                 <Users className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
                 Member Directory
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-subtle text-content-secondary border border-surface-border">
-                {members.length} Enrolled
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-subtle text-content-secondary border border-surface-border">
+                {members.length} Total Members
               </span>
             </div>
             <p className="text-xs text-content-tertiary mt-1">
-              Manage gym members, assigned trainers, nutrition protocols, attendance streaks, and active plans.
+              View member attendance streaks, assigned trainers, workout consistency, and active membership plans.
             </p>
           </div>
           <button
@@ -209,9 +209,9 @@ export default function MembersPage() {
               className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
             >
               <option value="">All Statuses</option>
-              <option value="ACTIVE">Active Only</option>
-              <option value="INACTIVE">Inactive Only</option>
-              <option value="FROZEN">Frozen Only</option>
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+              <option value="FROZEN">Frozen (On Hold)</option>
             </select>
           </div>
         </div>
@@ -224,11 +224,11 @@ export default function MembersPage() {
                 <tr>
                   <th className="py-3 px-4">Member</th>
                   <th className="py-3 px-4">Contact</th>
-                  <th className="py-3 px-4">Current Streak</th>
-                  <th className="py-3 px-4">Assigned Trainer</th>
-                  <th className="py-3 px-4">Active Membership</th>
+                  <th className="py-3 px-4">Workout Streak</th>
+                  <th className="py-3 px-4">Trainer</th>
+                  <th className="py-3 px-4">Membership Plan</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Story</th>
+                  <th className="py-3 px-4 text-right">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-border">
@@ -315,7 +315,7 @@ export default function MembersPage() {
                       {/* Status */}
                       <td className="py-3.5 px-4">
                         <span
-                          className={`text-[10px] px-2 py-0.5 rounded-md font-medium uppercase ${
+                          className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-0.5 rounded-full font-semibold ${
                             member.status === 'ACTIVE'
                               ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20'
                               : member.status === 'FROZEN'
@@ -323,7 +323,20 @@ export default function MembersPage() {
                               : 'bg-surface-subtle text-content-tertiary border border-surface-border'
                           }`}
                         >
-                          {member.status}
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              member.status === 'ACTIVE'
+                                ? 'bg-emerald-500'
+                                : member.status === 'FROZEN'
+                                ? 'bg-amber-500'
+                                : 'bg-zinc-400'
+                            }`}
+                          />
+                          {member.status === 'ACTIVE'
+                            ? 'Active'
+                            : member.status === 'FROZEN'
+                            ? 'Frozen'
+                            : 'Inactive'}
                         </span>
                       </td>
 
@@ -331,9 +344,9 @@ export default function MembersPage() {
                       <td className="py-3.5 px-4 text-right">
                         <button
                           type="button"
-                          className="inline-flex items-center gap-1 text-xs text-content-tertiary hover:text-content-primary font-medium transition-colors"
+                          className="inline-flex items-center gap-1 text-xs text-content-secondary hover:text-content-primary font-medium px-2.5 py-1 rounded-lg hover:bg-surface-subtle border border-surface-border transition-colors btn-shadow"
                         >
-                          <span>Story</span>
+                          <span>View profile</span>
                           <ChevronRight className="w-3.5 h-3.5 text-content-tertiary" />
                         </button>
                       </td>
@@ -346,7 +359,7 @@ export default function MembersPage() {
         </div>
       </div>
 
-      {/* MEMBER'S STORY AT A GLANCE (Drawer / Modal) */}
+      {/* MEMBER'S PROFILE & ATTENDANCE AT A GLANCE (Drawer / Modal) */}
       {selectedMember && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-surface max-w-2xl w-full rounded-3xl p-5 sm:p-6 border border-surface-border shadow-2xl relative max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-100 space-y-5">
@@ -380,8 +393,8 @@ export default function MembersPage() {
 
             {/* Attendance & Streak Quick Glance */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border">
-                <div className="text-[11px] text-content-tertiary">Current Streak</div>
+              <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border btn-shadow">
+                <div className="text-[11px] text-content-tertiary font-medium">Current Streak</div>
                 <div className="mt-1 flex items-baseline gap-1.5">
                   <Flame className="w-4 h-4 text-amber-500 shrink-0" />
                   <span className="text-xl font-bold font-mono text-content-primary">
@@ -391,15 +404,15 @@ export default function MembersPage() {
                 </div>
               </div>
 
-              <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border">
-                <div className="text-[11px] text-content-tertiary">Longest Streak</div>
+              <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border btn-shadow">
+                <div className="text-[11px] text-content-tertiary font-medium">Longest Streak</div>
                 <div className="mt-1 text-xl font-bold font-mono text-content-primary">
                   {selectedMember.streak?.longestStreak || 0} <span className="text-[10px] text-content-tertiary font-normal">days</span>
                 </div>
               </div>
 
-              <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border">
-                <div className="text-[11px] text-content-tertiary">Membership</div>
+              <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border btn-shadow">
+                <div className="text-[11px] text-content-tertiary font-medium">Membership Tier</div>
                 <div className="mt-1 text-sm font-semibold text-content-primary truncate">
                   {selectedMember.memberships?.[0]?.planName || 'Monthly Gold'}
                 </div>
@@ -411,7 +424,7 @@ export default function MembersPage() {
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
                   <Dumbbell className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
-                  <span>Assigned Certified Trainer</span>
+                  <span>Assigned Trainer</span>
                 </div>
                 <button
                   onClick={() => setIsReassignOpen(true)}
@@ -423,13 +436,13 @@ export default function MembersPage() {
 
               <div className="flex items-center gap-3 pt-1">
                 <div className="w-8 h-8 rounded-xl bg-surface border border-surface-border flex items-center justify-center text-xs font-bold text-content-secondary">
-                  CT
+                  TR
                 </div>
                 <div>
                   <div className="text-sm font-medium text-content-primary">
                     {selectedMember.trainerAssignments?.find((a) => a.isActive)?.trainer?.name || 'Coach Tariq Mehmood'}
                   </div>
-                  <div className="text-[11px] text-content-tertiary">Strength & Conditioning • Assigned for ongoing retention</div>
+                  <div className="text-[11px] text-content-tertiary">Personal trainer assigned for regular guidance and workout accountability</div>
                 </div>
               </div>
             </div>
@@ -439,17 +452,17 @@ export default function MembersPage() {
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
                   <Utensils className="w-4 h-4 text-emerald-500" />
-                  <span>Active Nutrition & Diet Plan</span>
+                  <span>Diet &amp; Meal Plan</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-content-tertiary">Cloning from template:</span>
+                  <span className="text-[10px] text-content-tertiary">Quick assign:</span>
                   {templates.slice(0, 2).map((tpl) => (
                     <button
                       key={tpl.id}
                       onClick={() => handleQuickCloneTemplate(tpl.id)}
-                      className="px-2 py-0.5 rounded bg-surface hover:bg-surface-subtle text-content-primary text-[10px] border border-surface-border btn-shadow"
+                      className="px-2 py-0.5 rounded bg-surface hover:bg-surface-subtle text-content-primary text-[10px] font-medium border border-surface-border btn-shadow"
                     >
-                      {tpl.goal === 'WEIGHT_LOSS' ? 'Cut (1800k)' : 'Bulk (2800k)'}
+                      {tpl.goal === 'WEIGHT_LOSS' ? 'Fat Loss (1800 kcal)' : 'Muscle Gain (2800 kcal)'}
                     </button>
                   ))}
                 </div>
@@ -461,11 +474,11 @@ export default function MembersPage() {
                     <div>
                       <h4 className="text-sm font-semibold text-content-primary">{memberDietPlans[0].title}</h4>
                       <p className="text-[11px] text-content-tertiary">
-                        Assigned by {memberDietPlans[0].createdBy?.name || 'Assigned Coach'}
+                        Prepared by {memberDietPlans[0].createdBy?.name || 'Assigned Coach'}
                       </p>
                     </div>
                     <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">
-                      {memberDietPlans[0].goal}
+                      {memberDietPlans[0].goal.replace('_', ' ')}
                     </span>
                   </div>
 
@@ -478,7 +491,7 @@ export default function MembersPage() {
                   {/* Meals Breakdown Table */}
                   <div className="space-y-1.5">
                     <div className="text-[11px] font-medium text-content-tertiary uppercase tracking-wider">
-                      Daily Structured Meals:
+                      Daily Meals:
                     </div>
                     <div className="divide-y divide-surface-border rounded-xl border border-surface-border bg-surface overflow-hidden text-xs">
                       {memberDietPlans[0].meals?.map((meal: any, idx: number) => (
@@ -491,7 +504,7 @@ export default function MembersPage() {
                           </div>
                           {(meal.calories || meal.proteinG) && (
                             <span className="text-content-tertiary font-mono text-[11px] shrink-0">
-                              {meal.calories ? `${meal.calories} kcal` : ''} {meal.proteinG ? `• ${meal.proteinG}g P` : ''}
+                              {meal.calories ? `${meal.calories} kcal` : ''} {meal.proteinG ? `• ${meal.proteinG}g protein` : ''}
                             </span>
                           )}
                         </div>
@@ -502,9 +515,9 @@ export default function MembersPage() {
               ) : (
                 <div className="py-6 text-center">
                   <Utensils className="w-7 h-7 text-content-tertiary mx-auto mb-1.5" />
-                  <p className="text-xs font-medium text-content-secondary">No active diet plan assigned yet</p>
+                  <p className="text-xs font-medium text-content-secondary">No diet plan assigned yet</p>
                   <p className="text-[11px] text-content-tertiary mt-0.5">
-                    Click a template above or visit the Trainers & Diets hub to build a custom protocol.
+                    Select a quick plan above or use Diet Planner to create a personalized meal plan.
                   </p>
                 </div>
               )}
@@ -567,8 +580,8 @@ export default function MembersPage() {
                 <Plus className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-content-primary">Enroll New Gym Member</h3>
-                <p className="text-[11px] text-content-tertiary">Scoped strictly to current gym tenant</p>
+                <h3 className="text-sm font-semibold text-content-primary">Add New Gym Member</h3>
+                <p className="text-[11px] text-content-tertiary">Enter details to create member profile and start tracking check-ins</p>
               </div>
             </div>
 

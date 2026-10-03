@@ -121,10 +121,10 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
 
       // 1. Draw 3D Radial Depth Grid Rings
       const rings = [
-        { r: 70, stroke: 'rgba(239, 68, 68, 0.25)', dash: [4, 4], label: 'CRITICAL ZONE (<70% DROP)' },
-        { r: 115, stroke: 'rgba(245, 158, 11, 0.22)', dash: [6, 4], label: 'SLIPPING ZONE' },
-        { r: 160, stroke: 'rgba(168, 85, 247, 0.2)', dash: [8, 4], label: 'HABIT DISRUPTION' },
-        { r: 200, stroke: 'rgba(0, 242, 254, 0.25)', dash: [], label: 'HEALTHY RETENTION BASELINE' },
+        { r: 70, stroke: 'rgba(239, 68, 68, 0.28)', dash: [4, 4], label: 'Absent 10+ days (Needs urgent contact)' },
+        { r: 115, stroke: 'rgba(245, 158, 11, 0.25)', dash: [6, 4], label: 'Visits dropped by half' },
+        { r: 160, stroke: 'rgba(168, 85, 247, 0.22)', dash: [8, 4], label: 'Schedule changed' },
+        { r: 200, stroke: 'rgba(0, 242, 254, 0.25)', dash: [], label: 'Regular attendance' },
       ];
 
       rings.forEach((ring) => {
@@ -259,24 +259,21 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
       <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Header & Interactive Segment Controls */}
+      {/* Top Header & Interactive Group Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-surface-border/80 relative z-10">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <span className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
               <Planet className="w-5 h-5" weight="duotone" />
             </span>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base sm:text-lg font-extrabold text-content-primary tracking-tight font-sans">
-                  3D Spatial Retention Radar
+                  Members who may stop attending
                 </h3>
-                <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                  REAL-TIME ORBIT
-                </span>
               </div>
-              <p className="text-xs text-content-secondary">
-                Spatial map of silent dropouts relative to personal baseline routines. Click any segment to filter members below.
+              <p className="text-xs text-content-secondary mt-0.5">
+                See whose attendance has dropped compared with their usual routine. Select a group to view its members.
               </p>
             </div>
           </div>
@@ -287,17 +284,17 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
           <button
             onClick={() => setViewMode(viewMode === '3D' ? 'ACCESSIBLE' : '3D')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-subtle hover:bg-surface border border-surface-border text-xs font-bold text-content-primary transition-all btn-shadow"
-            title={viewMode === '3D' ? 'Switch to accessible table alternative' : 'Switch back to 3D radar'}
+            title={viewMode === '3D' ? 'Switch to list table view' : 'Switch back to visual chart'}
           >
             {viewMode === '3D' ? (
               <>
                 <Table className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
-                <span>Accessible Table View</span>
+                <span>View as table</span>
               </>
             ) : (
               <>
                 <Planet className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
-                <span>3D Spatial View</span>
+                <span>View as visual chart</span>
               </>
             )}
           </button>
@@ -306,7 +303,8 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
             <button
               onClick={() => setIsRotating(!isRotating)}
               className="p-2 rounded-xl bg-surface-subtle hover:bg-surface border border-surface-border text-content-secondary hover:text-content-primary transition-all btn-shadow"
-              title={isRotating ? 'Pause radar orbit rotation' : 'Resume radar orbit rotation'}
+              title={isRotating ? 'Pause chart rotation' : 'Resume chart rotation'}
+              aria-label={isRotating ? 'Pause rotation' : 'Resume rotation'}
             >
               <ArrowsClockwise className={`w-4 h-4 ${isRotating ? 'animate-spin' : ''}`} />
             </button>
@@ -326,19 +324,19 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
               onMouseMove={handleMouseMove}
               onMouseLeave={() => setHoveredNode(null)}
               className="w-full max-w-[560px] h-[320px] cursor-crosshair drop-shadow-2xl"
-              aria-label="3D Retention Radar showing concentric risk orbits"
+              aria-label="Attendance visual chart showing members categorized by attendance consistency"
             />
 
             {/* Hover Tooltip Overlay */}
             {hoveredNode && (
-              <div className="absolute top-4 right-4 z-20 p-3 rounded-2xl glass-panel border border-cyan-500/30 text-xs shadow-2xl animate-in fade-in duration-150 max-w-[220px]">
+              <div className="absolute top-4 right-4 z-20 p-3 rounded-2xl bg-surface border border-surface-border text-xs shadow-2xl animate-in fade-in duration-150 max-w-[220px]">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-extrabold text-content-primary">{hoveredNode.name}</span>
                   <span
                     className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded"
                     style={{ backgroundColor: `${hoveredNode.color}20`, color: hoveredNode.color }}
                   >
-                    {hoveredNode.riskScore}% Risk
+                    {hoveredNode.riskScore}% risk
                   </span>
                 </div>
                 <div className="text-[10px] text-content-tertiary font-mono mb-1">{hoveredNode.code}</div>
@@ -346,8 +344,16 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                   {hoveredNode.label}
                 </p>
                 <div className="mt-2 pt-1.5 border-t border-surface-border flex items-center justify-between text-[10px]">
-                  <span className="text-content-tertiary">Orbit Segment:</span>
-                  <span className="font-bold text-content-primary">{hoveredNode.segment}</span>
+                  <span className="text-content-tertiary">Group:</span>
+                  <span className="font-bold text-content-primary">
+                    {hoveredNode.segment === 'URGENT'
+                      ? 'Needs urgent contact'
+                      : hoveredNode.segment === 'SLIPPING'
+                      ? 'Attendance slipping'
+                      : hoveredNode.segment === 'HABIT_DISRUPTED'
+                      ? 'Routine changing'
+                      : 'Regular attendance'}
+                  </span>
                 </div>
               </div>
             )}
@@ -356,7 +362,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
           {/* Interactive Filtering Segments & Legend (5 Cols) */}
           <div className="lg:col-span-5 space-y-3">
             <div className="text-xs font-bold text-content-tertiary uppercase tracking-wider mb-1">
-              Filter Members by Orbit Segment
+              Select an attendance group
             </div>
 
             {/* Segment 1: Urgent High Risk */}
@@ -364,7 +370,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
               onClick={() => onSelectSegment(activeSegment === 'URGENT' ? 'ALL' : 'URGENT')}
               className={`w-full p-3.5 rounded-2xl text-left transition-all flex items-center justify-between border btn-shadow ${
                 activeSegment === 'URGENT'
-                  ? 'bg-red-500/15 border-red-500 text-content-primary glow-red'
+                  ? 'bg-red-500/15 border-red-500 text-content-primary'
                   : 'bg-surface hover:bg-surface-subtle border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
@@ -372,19 +378,19 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 <span className="w-3.5 h-3.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-content-primary flex items-center gap-1.5">
-                    <span>Critical Churn Zone</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-600 dark:text-red-400 font-mono">
-                      &gt;70% Risk
+                    <span>Needs urgent contact</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-600 dark:text-red-400 font-mono font-semibold">
+                      10+ days absent
                     </span>
                   </div>
                   <p className="text-[10px] text-content-tertiary mt-0.5">
-                    Absent &gt;10d or routine collapsed · Needs urgent intervention
+                    Absent 10+ days or payment is overdue · Call or message today
                   </p>
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
                 <span className="text-sm font-extrabold text-red-600 dark:text-red-400 font-mono">
-                  {urgentCount} Members
+                  {urgentCount} members
                 </span>
                 <span className="text-[10px] text-content-tertiary block">
                   ₨{urgentRevenueAtRisk.toLocaleString()} at risk
@@ -397,7 +403,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
               onClick={() => onSelectSegment(activeSegment === 'SLIPPING' ? 'ALL' : 'SLIPPING')}
               className={`w-full p-3.5 rounded-2xl text-left transition-all flex items-center justify-between border btn-shadow ${
                 activeSegment === 'SLIPPING'
-                  ? 'bg-amber-500/15 border-amber-500 text-content-primary glow-amber'
+                  ? 'bg-amber-500/15 border-amber-500 text-content-primary'
                   : 'bg-surface hover:bg-surface-subtle border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
@@ -405,19 +411,19 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 <span className="w-3.5 h-3.5 rounded-full bg-amber-500 flex-shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-content-primary flex items-center gap-1.5">
-                    <span>Slipping Routine Ring</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 font-mono">
-                      40-70% Risk
+                    <span>Attendance is slipping</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 font-mono font-semibold">
+                      Visits halved
                     </span>
                   </div>
                   <p className="text-[10px] text-content-tertiary mt-0.5">
-                    Weekly visits dropped &gt;50% · Nudge before disengagement
+                    Weekly visits dropped by half · Send a friendly reminder
                   </p>
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
                 <span className="text-sm font-extrabold text-amber-600 dark:text-amber-400 font-mono">
-                  {slippingCount} Members
+                  {slippingCount} members
                 </span>
                 <span className="text-[10px] text-content-tertiary block">
                   ₨{slippingRevenueAtRisk.toLocaleString()} at risk
@@ -438,18 +444,18 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 <span className="w-3.5 h-3.5 rounded-full bg-purple-500 flex-shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-content-primary">
-                    Habit Disruption Orbit
+                    Routine has changed
                   </div>
                   <p className="text-[10px] text-content-tertiary mt-0.5">
-                    Missed customary training days or broken streak
+                    Missed regular workout days or recently stopped a streak
                   </p>
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
                 <span className="text-sm font-extrabold text-purple-600 dark:text-purple-400 font-mono">
-                  {habitDisruptedCount} Members
+                  {habitDisruptedCount} members
                 </span>
-                <span className="text-[10px] text-content-tertiary block">Habit alert</span>
+                <span className="text-[10px] text-content-tertiary block">Routine alert</span>
               </div>
             </button>
 
@@ -458,26 +464,26 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
               onClick={() => onSelectSegment(activeSegment === 'HEALTHY' ? 'ALL' : 'HEALTHY')}
               className={`w-full p-3.5 rounded-2xl text-left transition-all flex items-center justify-between border btn-shadow ${
                 activeSegment === 'HEALTHY'
-                  ? 'bg-cyan-500/15 border-cyan-500 text-content-primary glow-cyan'
+                  ? 'bg-emerald-500/15 border-emerald-500 text-content-primary'
                   : 'bg-surface hover:bg-surface-subtle border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="w-3.5 h-3.5 rounded-full bg-cyan-400 flex-shrink-0" />
+                <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 flex-shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-content-primary">
-                    Retained Baseline
+                    Regular attendance
                   </div>
                   <p className="text-[10px] text-content-tertiary mt-0.5">
-                    Consistent workout routine · Unbroken habits
+                    Visiting consistently according to their usual schedule
                   </p>
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <span className="text-sm font-extrabold text-emerald-600 dark:text-cyan-400 font-mono">
-                  {healthyCount} Members
+                <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                  {healthyCount} members
                 </span>
-                <span className="text-[10px] text-content-tertiary block">Low churn risk</span>
+                <span className="text-[10px] text-content-tertiary block">Attending normally</span>
               </div>
             </button>
 
@@ -487,7 +493,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 onClick={() => onSelectSegment('ALL')}
                 className="w-full py-2 text-center text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline"
               >
-                ← Reset to Show All Disengaging Members
+                ← Show all members
               </button>
             )}
           </div>
@@ -495,94 +501,98 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
       ) : (
         /* Accessible High-Contrast Alternative View */
         <div className="my-4 overflow-x-auto">
-          <table className="w-full text-left text-xs" aria-label="Accessible Retention Segments Table">
+          <table className="w-full text-left text-xs" aria-label="Attendance Groups Summary Table">
             <thead>
               <tr className="border-b border-surface-border text-content-tertiary uppercase text-[10px] font-bold">
-                <th className="py-2.5 px-3">Segment Name</th>
-                <th className="py-2.5 px-3">Risk Criteria</th>
-                <th className="py-2.5 px-3">Member Count</th>
-                <th className="py-2.5 px-3">Revenue Impact</th>
-                <th className="py-2.5 px-3 text-right">Filter Action</th>
+                <th className="py-2.5 px-3">Attendance group</th>
+                <th className="py-2.5 px-3">Description</th>
+                <th className="py-2.5 px-3">Member count</th>
+                <th className="py-2.5 px-3">Monthly dues at risk</th>
+                <th className="py-2.5 px-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-border/60">
               <tr className="hover:bg-surface-subtle/50">
-                <td className="py-3 px-3 font-bold text-red-600 dark:text-red-400">
-                  Critical Churn Zone
+                <td className="py-3 px-3 font-bold text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+                  <span>Needs urgent contact</span>
                 </td>
                 <td className="py-3 px-3 text-content-secondary">
-                  Absent &gt;10 days, severe frequency collapse (&gt;70% risk)
+                  Absent 10+ days or membership renewal is overdue
                 </td>
-                <td className="py-3 px-3 font-mono font-bold">{urgentCount}</td>
+                <td className="py-3 px-3 font-mono font-bold">{urgentCount} members</td>
                 <td className="py-3 px-3 font-mono text-red-600 dark:text-red-400 font-bold">
                   ₨{urgentRevenueAtRisk.toLocaleString()}/mo
                 </td>
                 <td className="py-3 px-3 text-right">
                   <button
                     onClick={() => onSelectSegment('URGENT')}
-                    className="px-3 py-1 rounded-lg bg-red-600 text-white font-bold text-xs btn-shadow"
+                    className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs btn-shadow"
                   >
-                    View Urgent
+                    View members
                   </button>
                 </td>
               </tr>
               <tr className="hover:bg-surface-subtle/50">
-                <td className="py-3 px-3 font-bold text-amber-600 dark:text-amber-400">
-                  Slipping Routine Ring
+                <td className="py-3 px-3 font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+                  <span>Attendance is slipping</span>
                 </td>
                 <td className="py-3 px-3 text-content-secondary">
-                  Absence 4-7 days, weekly visits halved (40-70% risk)
+                  Visits dropped by half compared with previous month
                 </td>
-                <td className="py-3 px-3 font-mono font-bold">{slippingCount}</td>
+                <td className="py-3 px-3 font-mono font-bold">{slippingCount} members</td>
                 <td className="py-3 px-3 font-mono text-amber-600 dark:text-amber-400 font-bold">
                   ₨{slippingRevenueAtRisk.toLocaleString()}/mo
                 </td>
                 <td className="py-3 px-3 text-right">
                   <button
                     onClick={() => onSelectSegment('SLIPPING')}
-                    className="px-3 py-1 rounded-lg bg-amber-600 text-white font-bold text-xs btn-shadow"
+                    className="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs btn-shadow"
                   >
-                    View Slipping
+                    View members
                   </button>
                 </td>
               </tr>
               <tr className="hover:bg-surface-subtle/50">
-                <td className="py-3 px-3 font-bold text-purple-600 dark:text-purple-400">
-                  Habit Disruption Orbit
+                <td className="py-3 px-3 font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />
+                  <span>Routine has changed</span>
                 </td>
                 <td className="py-3 px-3 text-content-secondary">
-                  Missed customary workout days, streak broken
+                  Missed regular workout days or workout streak ended
                 </td>
-                <td className="py-3 px-3 font-mono font-bold">{habitDisruptedCount}</td>
+                <td className="py-3 px-3 font-mono font-bold">{habitDisruptedCount} members</td>
                 <td className="py-3 px-3 font-mono text-content-secondary font-bold">
-                  Pre-churn risk
+                  Under observation
                 </td>
                 <td className="py-3 px-3 text-right">
                   <button
                     onClick={() => onSelectSegment('HABIT_DISRUPTED')}
-                    className="px-3 py-1 rounded-lg bg-purple-600 text-white font-bold text-xs btn-shadow"
+                    className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs btn-shadow"
                   >
-                    View Disrupted
+                    View members
                   </button>
                 </td>
               </tr>
               <tr className="hover:bg-surface-subtle/50">
-                <td className="py-3 px-3 font-bold text-emerald-600 dark:text-cyan-400">
-                  Retained Baseline
+                <td className="py-3 px-3 font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                  <span>Regular attendance</span>
                 </td>
                 <td className="py-3 px-3 text-content-secondary">
-                  Attending regularly according to routine (&lt;40% risk)
+                  Checking in consistently on their normal schedule
                 </td>
-                <td className="py-3 px-3 font-mono font-bold">{healthyCount}</td>
+                <td className="py-3 px-3 font-mono font-bold">{healthyCount} members</td>
                 <td className="py-3 px-3 font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                  Protected
+                  Active
                 </td>
                 <td className="py-3 px-3 text-right">
                   <button
                     onClick={() => onSelectSegment('HEALTHY')}
                     className="px-3 py-1 rounded-lg bg-surface-subtle border border-surface-border text-content-primary font-bold text-xs btn-shadow"
                   >
-                    View Retained
+                    View members
                   </button>
                 </td>
               </tr>
@@ -593,3 +603,4 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
     </div>
   );
 };
+

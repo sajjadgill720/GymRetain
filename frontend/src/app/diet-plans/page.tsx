@@ -392,14 +392,14 @@ export default function DietPlansPage() {
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-content-primary flex items-center gap-2">
                 <Utensils className="w-6 h-6 text-purple-600 dark:text-cyan-400" />
-                Diet Planner &amp; Nutrition Suite
+                Diet &amp; Meal Plans
               </h1>
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20 font-mono">
                 {plans.length} Active Plans
               </span>
             </div>
             <p className="text-xs text-content-tertiary mt-1">
-              Design customized meal plans, track daily calories &amp; macros, and automate WhatsApp deliveries to members.
+              Create customized meal plans, set daily calories and protein targets, and send meal schedules to members on WhatsApp.
             </p>
           </div>
 
@@ -414,7 +414,7 @@ export default function DietPlansPage() {
               className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all btn-shadow"
             >
               <Plus className="w-4 h-4" />
-              <span>Create Diet Plan</span>
+              <span>Create Meal Plan</span>
             </button>
           </div>
         </div>

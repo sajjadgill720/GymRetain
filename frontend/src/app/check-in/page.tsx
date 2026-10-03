@@ -86,11 +86,11 @@ export default function CheckInKioskPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-surface-border">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-purple-600 dark:text-neon-cyan" />
-              Front-Desk Check-In Kiosk
+              <UserCheck className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
+              Front Desk Check-In
             </h1>
             <p className="text-xs text-content-secondary mt-1">
-              Front reception terminal: scan member QR code, barcode, or enter member ID.
+              Quickly record member attendance by entering member code, phone number, or scanning their QR code.
             </p>
           </div>
         </div>

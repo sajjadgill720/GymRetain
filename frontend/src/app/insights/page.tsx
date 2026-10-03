@@ -47,23 +47,23 @@ interface ConversationItem {
 const STARTER_PROMPTS = [
   {
     icon: TrendingDown,
-    title: 'Retention Diagnosis',
-    prompt: 'Why is member retention at risk this month, and what are the main churn triggers?',
+    title: 'Attendance Drop-Offs',
+    prompt: 'Why are members visiting less often this month, and who should we check in on first?',
   },
   {
     icon: Users,
-    title: 'At-Risk Queue Analysis',
-    prompt: 'Who are my highest-risk members right now and what interventions do you recommend?',
+    title: 'Members Needing Attention',
+    prompt: 'Which members have missed their workouts recently and what friendly message should I send?',
   },
   {
     icon: Calendar,
     title: '30-Day Attendance Trends',
-    prompt: 'Summarize our check-in volume and attendance patterns over the last 30 days.',
+    prompt: 'Summarize our member check-in volume and attendance patterns over the last 30 days.',
   },
   {
     icon: DollarSign,
-    title: 'Overdue Renewals',
-    prompt: 'Which memberships are currently overdue or expired, and how much revenue is at risk?',
+    title: 'Unpaid & Overdue Dues',
+    prompt: 'Which memberships are currently overdue or expired, and what is the total amount pending?',
   },
 ];
 
@@ -299,14 +299,14 @@ export default function InsightsPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-lg font-bold text-content-primary">
-                  Gym Intelligence &amp; AI Insights
+                  Gym Insights &amp; AI Assistant
                 </h1>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
-                  Live Copilot
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
+                  AI Assistant
                 </span>
               </div>
               <p className="text-[11px] text-content-tertiary">
-                Real-time predictive churn analysis, attendance velocity, and GPT-style Groq streaming
+                Ask questions about gym attendance, check members needing follow-up, and see peak workout times.
               </p>
             </div>
           </div>
@@ -315,38 +315,38 @@ export default function InsightsPage() {
             <div className="flex items-center p-1 bg-surface-subtle border border-surface-border rounded-xl">
               <button
                 onClick={() => setActiveTab('COPILOT')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
                   activeTab === 'COPILOT'
                     ? 'bg-purple-600 text-white shadow-sm'
                     : 'text-content-secondary hover:text-content-primary'
                 }`}
               >
                 <Bot className="w-3.5 h-3.5" />
-                <span>AI Copilot</span>
+                <span>Ask AI</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('PREDICTIVE')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
                   activeTab === 'PREDICTIVE'
                     ? 'bg-purple-600 text-white shadow-sm'
                     : 'text-content-secondary hover:text-content-primary'
                 }`}
               >
                 <BarChart3 className="w-3.5 h-3.5" />
-                <span>Predictive Churn</span>
+                <span>Attendance Risks</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('ATTENDANCE')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
                   activeTab === 'ATTENDANCE'
                     ? 'bg-purple-600 text-white shadow-sm'
                     : 'text-content-secondary hover:text-content-primary'
                 }`}
               >
                 <Clock className="w-3.5 h-3.5" />
-                <span>Attendance Heatmap</span>
+                <span>Busiest Hours</span>
               </button>
             </div>
           </div>
@@ -549,46 +549,46 @@ export default function InsightsPage() {
           </div>
         )}
 
-        {/* TAB 2: Deep Predictive Churn Modeling */}
+        {/* TAB 2: Attendance Risk Breakdown */}
         {activeTab === 'PREDICTIVE' && (
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-2xl bg-surface border border-surface-border shadow-sm space-y-2">
-                <span className="text-xs font-semibold text-content-secondary">30-Day Retention Benchmark</span>
+              <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
+                <span className="text-xs font-semibold text-content-secondary">Monthly Attendance Retention</span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
                     {retentionData?.retentionRate || 91.4}%
                   </span>
-                  <span className="text-xs text-content-tertiary">vs 85% target</span>
+                  <span className="text-xs text-content-tertiary">vs 85% goal</span>
                 </div>
                 <div className="w-full bg-surface-subtle h-2 rounded-full overflow-hidden">
                   <div className="bg-emerald-500 h-full rounded-full" style={{ width: '91.4%' }} />
                 </div>
                 <div className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 pt-1 font-medium">
                   <ArrowUpRight className="w-3.5 h-3.5" />
-                  <span>+6.4% above Pakistani gym industry average</span>
+                  <span>+6.4% higher than regional gym average</span>
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-surface border border-surface-border shadow-sm space-y-2">
-                <span className="text-xs font-semibold text-content-secondary">At-Risk Churn Queue</span>
+              <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
+                <span className="text-xs font-semibold text-content-secondary">Members Needing Attention</span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-black text-red-600 dark:text-red-400 font-mono">
                     {summaryData?.kpis?.atRiskMembersTotal || 19}
                   </span>
-                  <span className="text-xs text-content-tertiary">members flagged</span>
+                  <span className="text-xs text-content-tertiary">members need check-in</span>
                 </div>
                 <div className="text-[11px] text-content-tertiary">
-                  {summaryData?.kpis?.highRiskCount || 6} High Risk (&gt;12 days absent) • {summaryData?.kpis?.mediumRiskCount || 13} Medium Risk
+                  {summaryData?.kpis?.highRiskCount || 6} absent 12+ days • {summaryData?.kpis?.mediumRiskCount || 13} visits dropped
                 </div>
                 <div className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1 pt-1 font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>Immediate WhatsApp intervention suggested</span>
+                  <span>Friendly WhatsApp message recommended</span>
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-surface border border-surface-border shadow-sm space-y-2">
-                <span className="text-xs font-semibold text-content-secondary">Streak Habit Health</span>
+              <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
+                <span className="text-xs font-semibold text-content-secondary">Regular Gym Attendees</span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-black text-purple-600 dark:text-cyan-400 font-mono">
                     110
@@ -596,31 +596,31 @@ export default function InsightsPage() {
                   <span className="text-xs text-content-tertiary">members on active streaks</span>
                 </div>
                 <div className="text-[11px] text-content-tertiary">
-                  77% of active members maintaining workout rhythm
+                  77% of active members maintain regular weekly visits
                 </div>
                 <div className="text-[11px] text-purple-600 dark:text-cyan-400 flex items-center gap-1 pt-1 font-medium">
                   <Flame className="w-3.5 h-3.5" />
-                  <span>Streak champions driving 62% of all check-ins</span>
+                  <span>Consistent members make up 62% of all check-ins</span>
                 </div>
               </div>
             </div>
 
             {/* Inactivity Spectrum & Churn Probability Model */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="p-6 rounded-2xl bg-surface border border-surface-border shadow-sm space-y-4">
+              <div className="p-6 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-4">
                 <div>
-                  <h3 className="text-base font-bold text-content-primary">Inactivity Spectrum Analysis</h3>
+                  <h3 className="text-base font-bold text-content-primary">Member Absence Breakdown</h3>
                   <p className="text-xs text-content-tertiary mt-0.5">
-                    Member distribution by days elapsed since last check-in.
+                    Breakdown of members by days since their last visit.
                   </p>
                 </div>
 
                 <div className="space-y-3">
                   {[
-                    { label: 'Healthy (1–3 Days)', count: 84, pct: 59, color: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
-                    { label: 'Warning Window (4–7 Days)', count: 28, pct: 20, color: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
-                    { label: 'High Risk Churn (8–14 Days)', count: 18, pct: 13, color: 'bg-orange-500', text: 'text-orange-600 dark:text-orange-400' },
-                    { label: 'Critical Drop-Off (15+ Days)', count: 12, pct: 8, color: 'bg-red-500', text: 'text-red-600 dark:text-red-400' },
+                    { label: 'Attending Regularly (1–3 Days)', count: 84, pct: 59, color: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
+                    { label: 'Warning (4–7 Days Absent)', count: 28, pct: 20, color: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+                    { label: 'Needs Follow-Up (8–14 Days Absent)', count: 18, pct: 13, color: 'bg-orange-500', text: 'text-orange-600 dark:text-orange-400' },
+                    { label: 'Urgent Contact (15+ Days Absent)', count: 12, pct: 8, color: 'bg-red-500', text: 'text-red-600 dark:text-red-400' },
                   ].map((item) => (
                     <div key={item.label} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
@@ -635,20 +635,20 @@ export default function InsightsPage() {
                 </div>
               </div>
 
-              <div className="p-6 rounded-2xl bg-surface border border-surface-border shadow-sm space-y-4">
+              <div className="p-6 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-4">
                 <div>
-                  <h3 className="text-base font-bold text-content-primary">Predictive Churn Probability Matrix</h3>
+                  <h3 className="text-base font-bold text-content-primary">Drop-Out Risk by Days Absent</h3>
                   <p className="text-xs text-content-tertiary mt-0.5">
-                    Statistical likelihood of permanent membership drop-off without intervention.
+                    Estimated chance of a member quitting if they do not receive a follow-up.
                   </p>
                 </div>
 
                 <div className="space-y-2.5">
                   {[
-                    { window: '1–3 Absent Days', prob: '4%', badge: 'Negligible', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
-                    { window: '4–7 Absent Days', prob: '28%', badge: 'Early Risk', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
-                    { window: '8–14 Absent Days', prob: '68%', badge: 'Critical Spike', color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' },
-                    { window: '15+ Absent Days', prob: '91%', badge: 'Silent Churn', color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' },
+                    { window: '1–3 Days Absent', prob: '4%', badge: 'Low Risk', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
+                    { window: '4–7 Days Absent', prob: '28%', badge: 'Early Warning', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
+                    { window: '8–14 Days Absent', prob: '68%', badge: 'Needs Follow-Up', color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' },
+                    { window: '15+ Days Absent', prob: '91%', badge: 'Urgent Contact', color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' },
                   ].map((row) => (
                     <div
                       key={row.window}
@@ -656,10 +656,10 @@ export default function InsightsPage() {
                     >
                       <div>
                         <div className="text-xs font-bold text-content-primary">{row.window}</div>
-                        <div className="text-[11px] text-content-tertiary">Retention recovery window</div>
+                        <div className="text-[11px] text-content-tertiary">Ideal time to send a message</div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-extrabold font-mono text-content-primary">{row.prob} Churn Odds</span>
+                        <span className="text-sm font-extrabold font-mono text-content-primary">{row.prob} Risk</span>
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${row.color}`}>
                           {row.badge}
                         </span>
@@ -672,26 +672,26 @@ export default function InsightsPage() {
           </div>
         )}
 
-        {/* TAB 3: Peak Attendance & Velocity Heatmap */}
+        {/* TAB 3: Peak Hours & Gym Floor Traffic */}
         {activeTab === 'ATTENDANCE' && (
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
-            <div className="p-6 rounded-2xl bg-surface border border-surface-border shadow-sm space-y-4">
+            <div className="p-6 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-4">
               <div>
                 <h3 className="text-base font-bold text-content-primary flex items-center gap-2">
                   <Clock className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
-                  Hourly Member Check-In Density
+                  Peak Hours &amp; Gym Floor Traffic
                 </h3>
                 <p className="text-xs text-content-tertiary mt-0.5">
-                  Peak floor capacity and equipment turnover distributions across the operating day.
+                  See the busiest times of day to schedule trainers and keep equipment moving smoothly.
                 </p>
               </div>
 
               <div className="space-y-3 pt-2">
                 {[
-                  { hour: '6:00 AM – 9:00 AM', label: 'Morning Cardio & Professionals Rush', checkIns: '22% of daily visits', level: 'High', width: '65%', color: 'bg-blue-500' },
-                  { hour: '9:00 AM – 1:00 PM', label: 'Mid-Morning Open Floor & General Fitness', checkIns: '14% of daily visits', level: 'Moderate', width: '38%', color: 'bg-emerald-500' },
-                  { hour: '1:00 PM – 4:30 PM', label: 'Afternoon Lull & Personal Training Sessions', checkIns: '8% of daily visits', level: 'Low', width: '22%', color: 'bg-amber-500' },
-                  { hour: '4:30 PM – 8:30 PM', label: 'Prime Evening Rush & Strength Training', checkIns: '44% of daily visits', level: 'Peak (Overload Risk)', width: '92%', color: 'bg-purple-600 dark:bg-cyan-400' },
+                  { hour: '6:00 AM – 9:00 AM', label: 'Morning Workout Rush', checkIns: '22% of daily visits', level: 'High', width: '65%', color: 'bg-blue-500' },
+                  { hour: '9:00 AM – 1:00 PM', label: 'Mid-Morning General Fitness', checkIns: '14% of daily visits', level: 'Moderate', width: '38%', color: 'bg-emerald-500' },
+                  { hour: '1:00 PM – 4:30 PM', label: 'Afternoon Training Sessions', checkIns: '8% of daily visits', level: 'Quiet', width: '22%', color: 'bg-amber-500' },
+                  { hour: '4:30 PM – 8:30 PM', label: 'Prime Evening Rush', checkIns: '44% of daily visits', level: 'Busiest Time', width: '92%', color: 'bg-purple-600 dark:bg-cyan-400' },
                   { hour: '8:30 PM – 11:00 PM', label: 'Late Night Workout Shift', checkIns: '12% of daily visits', level: 'Moderate', width: '30%', color: 'bg-indigo-500' },
                 ].map((slot) => (
                   <div key={slot.hour} className="p-4 rounded-xl bg-surface-subtle border border-surface-border space-y-2">
@@ -711,14 +711,14 @@ export default function InsightsPage() {
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-start gap-3">
+            <div className="p-5 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-start gap-3 btn-shadow">
               <Sparkles className="w-5 h-5 text-purple-600 dark:text-cyan-400 shrink-0 mt-0.5" />
               <div className="text-xs space-y-1">
                 <span className="font-bold text-content-primary block">
-                  AI Operations Recommendation for Floor Management:
+                  Staffing &amp; Equipment Tip:
                 </span>
                 <p className="text-content-secondary leading-relaxed">
-                  Evening rush accounts for 44% of check-ins between 4:30 PM – 8:30 PM. Ensuring front-desk kiosk lines remain under 30 seconds and floor trainers are proactively available during this window correlates directly with a 24% lower 60-day dropout rate.
+                  Evening rush accounts for 44% of visits between 4:30 PM and 8:30 PM. Having floor trainers available to greet members and assist during this window helps members stay motivated and reduces drop-out rates by 24%.
                 </p>
               </div>
             </div>

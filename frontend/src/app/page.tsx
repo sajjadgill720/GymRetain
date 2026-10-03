@@ -223,17 +223,17 @@ export default function DashboardPage() {
 
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
         {/* ============================================================
-            1. TOP HEADER & HIGH-IMPACT CONTROLS
+            1. TOP HEADER & KEY ACTIONS
             ============================================================ */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-surface-border">
           <div>
             <div className="flex items-center gap-2.5 mb-1">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-content-primary font-sans">
-                Retention Dashboard
+                Gym Dashboard
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-content-secondary">
-              Real-time attendance tracking, member streak milestones, and automated churn prevention.
+              See today&apos;s check-ins, member workout streaks, and members who need a friendly follow-up.
             </p>
           </div>
 
@@ -243,7 +243,7 @@ export default function DashboardPage() {
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/15 text-purple-600 dark:text-cyan-400 border border-purple-500/20 text-xs font-bold transition-all btn-shadow"
             >
               <Sparkle className="w-4 h-4" weight="fill" />
-              <span>AI Insights</span>
+              <span>Ask AI</span>
             </Link>
 
             <Link
@@ -251,7 +251,7 @@ export default function DashboardPage() {
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-content-primary transition-all btn-shadow"
             >
               <Warning className="w-4 h-4 text-amber-500" weight="fill" />
-              <span>At-Risk Queue</span>
+              <span>Needs Attention</span>
               <span className="px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-mono font-bold">
                 {highRiskCount}
               </span>
@@ -262,13 +262,13 @@ export default function DashboardPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-xl btn-shadow-primary text-xs font-bold transition-all"
             >
               <UserCheck className="w-4 h-4" weight="bold" />
-              <span>+ Quick Check-In</span>
+              <span>+ Check In Member</span>
             </Link>
           </div>
         </div>
 
         {/* ============================================================
-            2. COHESIVE 4-KPI METRIC OVERVIEW
+            2. 4 KEY GYM METRICS
             ============================================================ */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Active Members */}
@@ -291,7 +291,7 @@ export default function DashboardPage() {
               </span>
             </div>
             <p className="text-[11px] text-content-tertiary">
-              Enrolled members with active monthly subscriptions
+              Members with an active gym pass
             </p>
           </div>
 
@@ -299,7 +299,7 @@ export default function DashboardPage() {
           <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Today Check-Ins
+                Today&apos;s Check-Ins
               </span>
               <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <UserCheck className="w-4 h-4" weight="duotone" />
@@ -314,7 +314,7 @@ export default function DashboardPage() {
               </span>
             </div>
             <p className="text-[11px] text-content-tertiary">
-              Floor capacity: 54% · Average duration 62 mins
+              Floor capacity: 54% · Average workout: 62 mins
             </p>
           </div>
 
@@ -322,7 +322,7 @@ export default function DashboardPage() {
           <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                At-Risk Queue
+                Needs Attention
               </span>
               <div className="w-8 h-8 rounded-xl bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center">
                 <Warning className="w-4 h-4" weight="duotone" />
@@ -334,11 +334,11 @@ export default function DashboardPage() {
               </span>
               <span className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-0.5">
                 <TrendDown className="w-3.5 h-3.5" weight="bold" />
-                Urgent Action
+                Follow up
               </span>
             </div>
             <p className="text-[11px] text-content-tertiary">
-              Members absent &gt;8 days · Est. ₨18,800 monthly at risk
+              Absent over a week · Est. ₨18,800 monthly dues at risk
             </p>
           </div>
 
@@ -346,7 +346,7 @@ export default function DashboardPage() {
           <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                30D Retention Rate
+                Monthly Retention
               </span>
               <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                 <Medal className="w-4 h-4" weight="duotone" />
@@ -361,13 +361,13 @@ export default function DashboardPage() {
               </span>
             </div>
             <p className="text-[11px] text-content-tertiary">
-              Streak rewards &amp; WhatsApp reminders active
+              Members who renewed or stayed active this month
             </p>
           </div>
         </div>
 
         {/* ============================================================
-            3. INTERACTIVE 3D RETENTION ORBITAL RADAR
+            3. INTERACTIVE RETENTION RADAR
             ============================================================ */}
         <div className="w-full">
           <Retention3DRadar
@@ -375,7 +375,7 @@ export default function DashboardPage() {
             onSelectSegment={(segment) => {
               setRadarSegment(segment);
               if (segment !== 'ALL') {
-                showToast(`Filtered At-Risk Queue by ${segment} segment`);
+                showToast(`Filtered member list to ${segment.toLowerCase().replace('_', ' ')} group`);
               }
             }}
             urgentCount={4}
@@ -388,18 +388,18 @@ export default function DashboardPage() {
         </div>
 
         {/* ============================================================
-            4. CORE ANALYTICS CENTERPIECE & GYM FLOOR PULSE (8 / 4 COLS)
+            4. ATTENDANCE TRENDS & GYM FLOOR ACTIVITY (8 / 4 COLS)
             ============================================================ */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left: Attendance & Trajectory Chart (8 Cols) */}
+          {/* Left: Attendance Chart (8 Cols) */}
           <div className="lg:col-span-8 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-content-primary">
-                  Attendance &amp; Check-In Dynamics
+                  Daily gym attendance
                 </h3>
                 <p className="text-xs text-content-tertiary">
-                  Daily floor footfall trends and workout consistency across all membership tiers
+                  Number of members checking in each day across all membership tiers
                 </p>
               </div>
 
@@ -415,7 +415,7 @@ export default function DashboardPage() {
                         : 'text-content-tertiary hover:text-content-primary'
                     }`}
                   >
-                    {t}
+                    {t === '7D' ? '7 Days' : t === '14D' ? '14 Days' : t === '30D' ? '30 Days' : '90 Days'}
                   </button>
                 ))}
               </div>
@@ -533,12 +533,12 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block" />
                 <span className="font-medium text-content-secondary">
-                  Daily Check-In Volume
+                  Daily check-in volume
                 </span>
-                <span className="text-[11px]">({timeframe} period)</span>
+                <span className="text-[11px]">({timeframe === '7D' ? '7 days' : timeframe === '14D' ? '14 days' : timeframe === '30D' ? '30 days' : '90 days'})</span>
               </div>
               <div className="font-mono text-content-primary font-bold">
-                Avg: {avgDailyVisits} visits/day
+                Average: {avgDailyVisits} visits/day
               </div>
             </div>
           </div>
@@ -549,15 +549,15 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-base font-bold text-content-primary">
-                    Gym Floor Live Pulse
+                    Current gym floor activity
                   </h3>
                   <p className="text-xs text-content-tertiary">
-                    Current occupancy &amp; front-desk throughput
+                    Live occupancy and today&apos;s busiest workout hours
                   </p>
                 </div>
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Now
+                  Live now
                 </span>
               </div>
 
@@ -565,10 +565,10 @@ export default function DashboardPage() {
               <div className="p-4 rounded-xl bg-surface-subtle border border-surface-border mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-semibold text-content-secondary">
-                    Floor Occupancy
+                    Gym floor occupancy
                   </span>
                   <span className="text-xs font-mono font-bold text-content-primary">
-                    {todayCheckIns} / 70 Capacity
+                    {todayCheckIns} of 70 spots filled
                   </span>
                 </div>
                 <div className="w-full bg-surface rounded-full h-2 overflow-hidden border border-surface-border">
@@ -579,19 +579,19 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex justify-between text-[10px] text-content-tertiary mt-2">
                   <span>Quiet</span>
-                  <span className="font-bold text-purple-600 dark:text-cyan-400">Moderate Pace</span>
-                  <span>Peak Cap</span>
+                  <span className="font-bold text-purple-600 dark:text-cyan-400">Moderate pace</span>
+                  <span>Full</span>
                 </div>
               </div>
 
               {/* Peak Hours Forecast */}
               <div className="space-y-2.5">
                 <div className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                  Upcoming Rush Hours
+                  Busiest hours today
                 </div>
                 <div className="flex items-center justify-between text-xs py-1.5 border-b border-surface-border/50">
                   <span className="text-content-secondary">5:00 PM – 6:30 PM</span>
-                  <span className="font-mono text-content-primary font-bold">~42 members (High)</span>
+                  <span className="font-mono text-content-primary font-bold">~42 members (Busy)</span>
                 </div>
                 <div className="flex items-center justify-between text-xs py-1.5 border-b border-surface-border/50">
                   <span className="text-content-secondary">6:30 PM – 8:00 PM</span>
@@ -599,7 +599,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center justify-between text-xs py-1.5">
                   <span className="text-content-secondary">8:00 PM – 9:30 PM</span>
-                  <span className="font-mono text-content-primary font-bold">~25 members (Low)</span>
+                  <span className="font-mono text-content-primary font-bold">~25 members (Quiet)</span>
                 </div>
               </div>
             </div>
@@ -610,14 +610,14 @@ export default function DashboardPage() {
                 className="w-full py-2 px-3 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary flex items-center justify-center gap-2 transition-all btn-shadow"
               >
                 <QrCode className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
-                <span>Open Front-Desk Scanner</span>
+                <span>Open front-desk scanner</span>
               </Link>
             </div>
           </div>
         </div>
 
         {/* ============================================================
-            5. PROACTIVE RETENTION TRIAGE & AUTOMATED CAMPAIGNS (7 / 5 COLS)
+            5. MEMBERS NEEDING ATTENTION & AUTOMATIC FOLLOW-UPS (7 / 5 COLS)
             ============================================================ */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left: Urgent Retention Queue (7 Cols) */}
@@ -627,44 +627,46 @@ export default function DashboardPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-bold text-content-primary">
-                      Urgent Retention Queue
+                      Members who need a follow-up
                     </h3>
                     {radarSegment !== 'ALL' && (
                       <button
                         onClick={() => setRadarSegment('ALL')}
                         className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold hover:bg-cyan-500/20 transition-colors"
                       >
-                        Segment: {radarSegment} (Reset ✕)
+                        Filtered group (Show all ✕)
                       </button>
                     )}
                   </div>
                   <p className="text-xs text-content-tertiary">
-                    High probability churn candidates needing direct staff outreach
+                    Members who haven&apos;t visited recently. Reach out with a quick message to keep them on track.
                   </p>
                 </div>
                 <Link
                   href="/retention"
                   className="text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
                 >
-                  <span>View All</span>
+                  <span>View all</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
-              {/* Clean At-Risk Table */}
+              {/* Clean Member List Table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="border-b border-surface-border text-content-tertiary uppercase text-[10px] font-bold">
                       <th className="py-2.5 px-3">Member</th>
-                      <th className="py-2.5 px-3">Inactive</th>
-                      <th className="py-2.5 px-3">Risk Score</th>
-                      <th className="py-2.5 px-3 text-right">Quick Nudge</th>
+                      <th className="py-2.5 px-3">Days absent</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3 text-right">Send message</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-surface-border/50">
                     {atRiskMembers.map((member) => {
                       const isNudged = nudgedMembers.has(member.memberId);
+                      const daysAbsent = member.factors?.daysSinceLastCheckIn ?? 12;
+                      const isCritical = daysAbsent >= 10;
                       return (
                         <tr key={member.memberId} className="hover:bg-surface-subtle/50 transition-colors">
                           <td className="py-3 px-3">
@@ -675,12 +677,17 @@ export default function DashboardPage() {
                           </td>
                           <td className="py-3 px-3">
                             <span className="font-semibold text-content-secondary">
-                              {member.factors?.daysSinceLastCheckIn ?? 12} days
+                              {daysAbsent} days away
                             </span>
                           </td>
                           <td className="py-3 px-3">
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
-                              {member.riskScore}% High
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                              isCritical
+                                ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
+                                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${isCritical ? 'bg-red-500' : 'bg-amber-500'}`} />
+                              <span>{isCritical ? 'Needs call or message' : 'Attendance slipping'}</span>
                             </span>
                           </td>
                           <td className="py-3 px-3 text-right">
@@ -693,7 +700,7 @@ export default function DashboardPage() {
                                   : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                               }`}
                             >
-                              {isNudged ? 'Nudge Sent ✓' : 'WhatsApp Nudge'}
+                              {isNudged ? 'Message sent ✓' : 'Send WhatsApp'}
                             </button>
                           </td>
                         </tr>
@@ -709,7 +716,7 @@ export default function DashboardPage() {
                 href="/retention"
                 className="text-xs font-bold text-content-secondary hover:text-content-primary transition-colors"
               >
-                Open full at-risk queue with factor breakdowns →
+                View all members who need attention →
               </Link>
             </div>
           </div>
@@ -720,10 +727,10 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-base font-bold text-content-primary">
-                    Automated Retention Loops
+                    Automatic messages &amp; reminders
                   </h3>
                   <p className="text-xs text-content-tertiary">
-                    Rule triggers running in background
+                    Helpful messages sent automatically to keep members motivated
                   </p>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
@@ -735,20 +742,20 @@ export default function DashboardPage() {
               <div className="space-y-3 mb-5">
                 {[
                   {
-                    title: 'Missed Visit Outreach',
-                    desc: 'Sends WhatsApp message after 5+ days absence',
+                    title: 'Missed workout reminder',
+                    desc: 'Friendly WhatsApp message sent after 5 days away',
                     stat: '18 sent this week',
                     active: true,
                   },
                   {
-                    title: 'Streak Milestone Celebrations',
-                    desc: 'Unlocks shakes & discounts at 7d / 14d / 30d',
+                    title: 'Workout streak rewards',
+                    desc: 'Congratulates members and awards bonuses at 7, 14, and 30 days',
                     stat: '6 redeemed',
                     active: true,
                   },
                   {
-                    title: 'Expiry & Renewal Reminders',
-                    desc: 'Alerts members 3 days before expiry',
+                    title: 'Membership renewal notice',
+                    desc: 'Reminds members 3 days before their pass expires',
                     stat: '3 due soon',
                     active: true,
                   },
@@ -779,7 +786,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-                      Gym Leader of the Month
+                      Longest active workout streak
                     </span>
                     <div className="text-xs font-extrabold text-content-primary">
                       {topStreakLeader.memberName} ({topStreakLeader.memberCode})
@@ -790,7 +797,7 @@ export default function DashboardPage() {
                   <div className="text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono">
                     {topStreakLeader.currentStreak} Days
                   </div>
-                  <span className="text-[9px] text-content-tertiary font-bold">Unbroken</span>
+                  <span className="text-[9px] text-content-tertiary font-bold">In a row</span>
                 </div>
               </div>
             </div>
@@ -800,7 +807,7 @@ export default function DashboardPage() {
                 href="/rewards/winners"
                 className="text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
               >
-                <span>View Streak Leaderboard</span>
+                <span>View streak leaderboard</span>
                 <ArrowRight className="w-3 h-3" />
               </Link>
 
@@ -808,7 +815,7 @@ export default function DashboardPage() {
                 href="/rewards"
                 className="text-xs font-semibold text-content-tertiary hover:text-content-primary transition-colors"
               >
-                Configure Rules →
+                Reward settings →
               </Link>
             </div>
           </div>

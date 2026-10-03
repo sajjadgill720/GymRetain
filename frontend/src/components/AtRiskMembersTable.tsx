@@ -52,14 +52,14 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-semibold text-content-primary tracking-tight flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
-              Member Churn Risk Detection
+              Members needing follow-up
             </h2>
             <span className="text-[11px] font-medium text-red-600 dark:text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
-              Follow-Up Queue
+              Priority list
             </span>
           </div>
           <p className="text-xs text-content-tertiary mt-1">
-            Members exhibiting silent churn indicators: prolonged absence, frequency collapse, or overdue payments.
+            Members who haven&apos;t visited lately, are coming much less often, or have overdue fees.
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   : 'text-content-tertiary hover:text-red-500'
               }`}
             >
-              High ({members.filter((m) => m.riskLevel === 'HIGH').length})
+              Needs urgent contact ({members.filter((m) => m.riskLevel === 'HIGH').length})
             </button>
             <button
               onClick={() => setSelectedFilter('MEDIUM')}
@@ -93,7 +93,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   : 'text-content-tertiary hover:text-amber-500'
               }`}
             >
-              Medium ({members.filter((m) => m.riskLevel === 'MEDIUM').length})
+              Attendance slipping ({members.filter((m) => m.riskLevel === 'MEDIUM').length})
             </button>
           </div>
         )}
@@ -116,28 +116,29 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   </div>
                 </div>
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded font-medium uppercase shrink-0 ${
+                  className={`text-[10px] px-2 py-0.5 rounded font-semibold shrink-0 flex items-center gap-1 ${
                     isHigh
                       ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
                       : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                   }`}
                 >
-                  {m.riskLevel} ({m.riskScore})
+                  <span className={`w-1.5 h-1.5 rounded-full ${isHigh ? 'bg-red-500' : 'bg-amber-500'}`} />
+                  {isHigh ? 'Needs urgent contact' : 'Attendance slipping'}
                 </span>
               </div>
 
               <div className="flex items-center justify-between text-xs text-content-tertiary pt-2 border-t border-surface-border">
                 <div className="flex items-center gap-1.5 text-red-600 dark:text-red-400 font-medium">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>{m.factors.daysSinceLastCheckIn}d inactive</span>
+                  <span>{m.factors.daysSinceLastCheckIn} days absent</span>
                 </div>
                 {m.factors.isPaymentOverdue ? (
-                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 font-medium">
-                    Payment Overdue
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 font-medium">
+                    Overdue fee
                   </span>
                 ) : (
                   <span className="text-[10px] text-content-tertiary font-mono">
-                    -{m.factors.frequencyDropPercentage}% visits
+                    Visits down {m.factors.frequencyDropPercentage}%
                   </span>
                 )}
               </div>
@@ -147,7 +148,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                 className="w-full py-2 rounded-xl bg-surface hover:bg-surface-subtle text-emerald-600 dark:text-emerald-400 border border-surface-border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm btn-shadow"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
-                <span>Send WhatsApp Nudge</span>
+                <span>Send WhatsApp</span>
               </button>
             </div>
           );
@@ -160,10 +161,10 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
           <thead>
             <tr className="border-b border-surface-border text-content-tertiary text-[11px] uppercase tracking-wider font-semibold">
               <th className="pb-2.5 pl-1">Member</th>
-              <th className="pb-2.5">Risk Score</th>
-              <th className="pb-2.5">Inactivity</th>
-              <th className="pb-2.5">Frequency Drop</th>
-              <th className="pb-2.5">Payment / Streak</th>
+              <th className="pb-2.5">Attendance status</th>
+              <th className="pb-2.5">Days absent</th>
+              <th className="pb-2.5">Visit change</th>
+              <th className="pb-2.5">Payment &amp; streak</th>
               <th className="pb-2.5 text-right pr-1">Action</th>
             </tr>
           </thead>
@@ -185,32 +186,25 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Risk Score Progress */}
+                  {/* Attendance Status */}
                   <td className="py-2.5">
-                    <div className="flex items-center gap-2">
-                      <div className="w-12 h-1.5 rounded-full bg-surface-subtle overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${
-                            isHigh ? 'bg-red-500' : 'bg-amber-500'
-                          }`}
-                          style={{ width: `${m.riskScore}%` }}
-                        />
-                      </div>
-                      <span
-                        className={`text-xs font-mono font-medium ${
-                          isHigh ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'
-                        }`}
-                      >
-                        {m.riskScore}
-                      </span>
-                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${
+                        isHigh
+                          ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
+                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                      }`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${isHigh ? 'bg-red-500' : 'bg-amber-500'}`} />
+                      {isHigh ? 'Needs urgent contact' : 'Attendance slipping'}
+                    </span>
                   </td>
 
                   {/* Days Inactive */}
                   <td className="py-2.5">
                     <div className="flex items-center gap-1.5 text-content-secondary">
                       <Clock className="w-3.5 h-3.5 text-content-tertiary" />
-                      <span>{m.factors.daysSinceLastCheckIn} days</span>
+                      <span>{m.factors.daysSinceLastCheckIn} days absent</span>
                     </div>
                   </td>
 
@@ -218,7 +212,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   <td className="py-2.5">
                     <div className="flex items-center gap-1 text-red-600 dark:text-red-400 font-mono">
                       <ArrowDownRight className="w-3.5 h-3.5" />
-                      <span>-{m.factors.frequencyDropPercentage}%</span>
+                      <span>Down {m.factors.frequencyDropPercentage}%</span>
                     </div>
                   </td>
 
@@ -226,18 +220,18 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                   <td className="py-2.5">
                     <div className="flex items-center gap-1.5">
                       {m.factors.isPaymentOverdue ? (
-                        <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
-                          Overdue
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                          Overdue fee
                         </span>
                       ) : (
-                        <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                          Paid
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          Paid up
                         </span>
                       )}
 
                       {m.factors.isRecentlyBrokenStreak && (
-                        <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                          Streak Lost
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          Streak broken
                         </span>
                       )}
                     </div>
@@ -250,7 +244,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle text-emerald-600 dark:text-emerald-400 border border-surface-border text-xs font-semibold transition-all shadow-sm btn-shadow"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
-                      <span>Nudge</span>
+                      <span>Send WhatsApp</span>
                     </button>
                   </td>
                 </tr>
@@ -260,7 +254,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
         </table>
       </div>
 
-      {/* WhatsApp Nudge Preview Modal (Phase 2 Preview) */}
+      {/* WhatsApp Message Preview Modal */}
       {activeNudgeMember && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-surface max-w-md w-full rounded-3xl p-6 border border-surface-border shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
@@ -276,25 +270,25 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-content-primary">WhatsApp Re-Engagement Nudge</h3>
-                <p className="text-xs text-content-tertiary">Direct WhatsApp Outreach</p>
+                <h3 className="text-base font-bold text-content-primary">Send friendly WhatsApp check-in</h3>
+                <p className="text-xs text-content-tertiary">Personal message to welcome them back</p>
               </div>
             </div>
 
             {/* Recipient info */}
             <div className="p-3.5 rounded-2xl bg-surface-subtle border border-surface-border mb-4 text-xs space-y-1.5">
               <div className="flex justify-between text-content-tertiary">
-                <span>Recipient:</span>
+                <span>Member:</span>
                 <span className="font-semibold text-content-primary">{activeNudgeMember.fullName}</span>
               </div>
               <div className="flex justify-between text-content-tertiary">
-                <span>Phone:</span>
+                <span>Phone number:</span>
                 <span className="font-mono text-emerald-600 dark:text-emerald-400">{activeNudgeMember.phone}</span>
               </div>
               <div className="flex justify-between text-content-tertiary">
-                <span>Risk Reason:</span>
+                <span>Follow-up reason:</span>
                 <span className="text-red-600 dark:text-red-400 font-bold">
-                  {activeNudgeMember.factors.daysSinceLastCheckIn} days absent (Score: {activeNudgeMember.riskScore})
+                  {activeNudgeMember.factors.daysSinceLastCheckIn} days absent
                 </span>
               </div>
             </div>
@@ -314,7 +308,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                 catch-up workout! 💪
               </p>
               <div className="text-[10px] text-content-tertiary text-right mt-2 font-mono">
-                Automated Member Retention Message
+                Friendly check-in reminder
               </div>
             </div>
 
@@ -334,12 +328,12 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
                 {nudgeSent ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-white" />
-                    <span>Nudge Dispatched!</span>
+                    <span>Message sent successfully!</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4 text-white" />
-                    <span>Send Automated Nudge</span>
+                    <span>Send WhatsApp message</span>
                   </>
                 )}
               </button>

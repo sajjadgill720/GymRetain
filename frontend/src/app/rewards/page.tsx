@@ -78,14 +78,14 @@ export default function RewardsPage() {
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
                 <Award className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
-                Streak Reward Rules
+                Attendance Rewards &amp; Milestones
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-subtle text-content-secondary border border-surface-border">
-                {rewards.length} Active Rules
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-subtle text-content-secondary border border-surface-border">
+                {rewards.length} Active Rewards
               </span>
             </div>
             <p className="text-xs text-content-tertiary mt-1">
-              Configure streak milestones to gamify gym loyalty, boost attendance consistency, and unlock member rewards.
+              Set workout streak milestones to reward consistent members with fee discounts, shakes, and gym perks.
             </p>
           </div>
 
@@ -95,7 +95,7 @@ export default function RewardsPage() {
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-amber-600 dark:text-amber-400 transition-colors btn-shadow"
             >
               <Trophy className="w-3.5 h-3.5 text-amber-500" />
-              <span>View Streak Winners</span>
+              <span>View Rewarded Members</span>
               <ArrowRight className="w-3.5 h-3.5 text-content-tertiary" />
             </Link>
 
@@ -104,7 +104,7 @@ export default function RewardsPage() {
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Create Rule</span>
+              <span>Add Reward Milestone</span>
             </button>
           </div>
         </div>

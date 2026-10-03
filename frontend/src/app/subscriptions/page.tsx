@@ -339,14 +339,14 @@ export default function SubscriptionsPage() {
           <div>
             <div className="flex items-center gap-2.5 mb-1">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-content-primary font-sans">
-                Subscriptions &amp; Payments
+                Memberships &amp; Payments
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
-                Internal Register
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
+                Payment Register
               </span>
             </div>
             <p className="text-xs sm:text-sm text-content-secondary">
-              Track membership tiers, monitor expiry dates, and record cash &amp; transfer payments at the front desk.
+              Track active gym memberships, check upcoming renewal dates, and record fee payments at the desk.
             </p>
           </div>
 
@@ -369,7 +369,7 @@ export default function SubscriptionsPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-xl btn-shadow-primary text-xs font-bold transition-all"
             >
               <Plus className="w-4 h-4" weight="bold" />
-              <span>+ Assign Subscription</span>
+              <span>+ Assign Membership</span>
             </button>
           </div>
         </div>
@@ -381,7 +381,7 @@ export default function SubscriptionsPage() {
           <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Active Subscriptions
+                Active Memberships
               </span>
               <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center">
                 <Users className="w-4 h-4" weight="duotone" />
@@ -391,7 +391,7 @@ export default function SubscriptionsPage() {
               {metrics.activeSubscriptions} Members
             </div>
             <p className="text-[11px] text-content-tertiary">
-              Enrolled across monthly, quarterly &amp; annual tiers
+              Enrolled in monthly, quarterly, or annual plans
             </p>
           </div>
 
@@ -408,14 +408,14 @@ export default function SubscriptionsPage() {
               {metrics.expiringWithin7Days} Renewals
             </div>
             <p className="text-[11px] text-content-tertiary">
-              WhatsApp renewal nudge automations queued
+              Friendly renewal reminders ready to send
             </p>
           </div>
 
           <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Recorded Revenue (Month)
+                Fees Collected (Month)
               </span>
               <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <CurrencyDollar className="w-4 h-4" weight="duotone" />
@@ -425,24 +425,24 @@ export default function SubscriptionsPage() {
               ₨{metrics.totalRevenueRecorded.toLocaleString()}
             </div>
             <p className="text-[11px] text-content-tertiary">
-              Counter cash, bank transfers &amp; wallet payments
+              Cash, bank transfer, and mobile payments
             </p>
           </div>
 
           <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Pending Invoices
+                Unpaid Dues
               </span>
               <div className="w-8 h-8 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center">
                 <Warning className="w-4 h-4" weight="duotone" />
               </div>
             </div>
             <div className="text-2xl sm:text-3xl font-extrabold text-red-600 dark:text-red-400 tracking-tight font-sans mb-1">
-              {metrics.pendingPayments} Unpaid
+              {metrics.pendingPayments} Pending
             </div>
             <p className="text-[11px] text-content-tertiary">
-              ₨31,000 pending desk collection
+              ₨31,000 awaiting desk collection
             </p>
           </div>
         </div>
@@ -459,9 +459,9 @@ export default function SubscriptionsPage() {
                 : 'text-content-tertiary hover:text-content-primary'
             }`}
           >
-            Member Subscriptions ({subscriptions.length})
+            <span>Active Memberships</span>
             {activeTab === 'SUBSCRIPTIONS' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400 rounded-full" />
             )}
           </button>
 
@@ -473,9 +473,9 @@ export default function SubscriptionsPage() {
                 : 'text-content-tertiary hover:text-content-primary'
             }`}
           >
-            Payment Transactions History ({payments.length})
+            <span>Payment Records ({payments.length})</span>
             {activeTab === 'PAYMENTS' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400 rounded-full" />
             )}
           </button>
 
@@ -487,9 +487,9 @@ export default function SubscriptionsPage() {
                 : 'text-content-tertiary hover:text-content-primary'
             }`}
           >
-            Plans &amp; Pricing Setup ({DEFAULT_PLANS.length})
+            <span>Membership Plans ({DEFAULT_PLANS.length})</span>
             {activeTab === 'PLANS' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400 rounded-full" />
             )}
           </button>
         </div>
@@ -514,17 +514,23 @@ export default function SubscriptionsPage() {
 
               {/* Status Filter Buttons */}
               <div className="flex items-center gap-1 p-1 bg-surface-subtle border border-surface-border rounded-xl">
-                {(['ALL', 'ACTIVE', 'PENDING_PAYMENT', 'EXPIRED', 'CANCELLED'] as const).map((st) => (
+                {[
+                  { id: 'ALL', label: 'All' },
+                  { id: 'ACTIVE', label: 'Active' },
+                  { id: 'PENDING_PAYMENT', label: 'Pending Payment' },
+                  { id: 'EXPIRED', label: 'Expired' },
+                  { id: 'CANCELLED', label: 'Cancelled' },
+                ].map((st) => (
                   <button
-                    key={st}
-                    onClick={() => setStatusFilter(st)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                      statusFilter === st
+                    key={st.id}
+                    onClick={() => setStatusFilter(st.id as any)}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all btn-shadow ${
+                      statusFilter === st.id
                         ? 'bg-surface text-purple-600 dark:text-cyan-400 shadow-sm border border-surface-border'
                         : 'text-content-tertiary hover:text-content-primary'
                     }`}
                   >
-                    {st.replace('_', ' ')}
+                    {st.label}
                   </button>
                 ))}
               </div>
@@ -537,11 +543,11 @@ export default function SubscriptionsPage() {
                   <thead>
                     <tr className="border-b border-surface-border bg-surface-subtle/50 text-content-tertiary uppercase text-[10px] font-bold">
                       <th className="py-3 px-4">Member</th>
-                      <th className="py-3 px-4">Plan Name &amp; Tier</th>
-                      <th className="py-3 px-4">Pricing</th>
-                      <th className="py-3 px-4">Validity Range</th>
+                      <th className="py-3 px-4">Membership Plan</th>
+                      <th className="py-3 px-4">Price &amp; Billing</th>
+                      <th className="py-3 px-4">Valid Period</th>
                       <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Latest Payment</th>
+                      <th className="py-3 px-4">Last Payment</th>
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -584,28 +590,32 @@ export default function SubscriptionsPage() {
                               {new Date(sub.endDate).toLocaleDateString()}
                             </div>
                             <div className="text-[10px] text-content-tertiary">
-                              {isExpired ? 'Terminated' : 'Valid period'}
+                              {isExpired ? 'Ended' : 'Active window'}
                             </div>
                           </td>
 
                           <td className="py-3.5 px-4">
                             {sub.status === 'ACTIVE' && (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 Active
                               </span>
                             )}
                             {isPending && (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                 Pending Payment
                               </span>
                             )}
                             {isExpired && (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                                 Expired
                               </span>
                             )}
                             {isCancelled && (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-surface-subtle text-content-tertiary border border-surface-border">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-surface-subtle text-content-tertiary border border-surface-border">
+                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
                                 Cancelled
                               </span>
                             )}
@@ -631,14 +641,14 @@ export default function SubscriptionsPage() {
                               {isPending ? (
                                 <button
                                   onClick={() => handleOpenPaymentForSub(sub)}
-                                  className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all btn-shadow"
+                                  className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-all btn-shadow"
                                 >
-                                  Collect
+                                  Record Fee
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => handleRenewSub(sub)}
-                                  className="px-2.5 py-1 rounded-lg text-xs font-bold bg-surface hover:bg-surface-subtle border border-surface-border text-content-primary transition-all btn-shadow"
+                                  className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-subtle border border-surface-border text-content-primary transition-all btn-shadow"
                                   title="Renew for 1 month"
                                 >
                                   Renew

@@ -42,49 +42,52 @@ export default function RetentionPage() {
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-500" />
-                Churn Prevention &amp; Member Retention
+                Members who may stop attending
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                {highRisk.length} High Risk Priority
+                {highRisk.length} need urgent contact
               </span>
             </div>
             <p className="text-xs text-content-tertiary mt-1">
-              Automated early warning queue detecting silent gym dropouts before memberships expire.
+              See which members have stopped visiting or fallen behind on their schedule, and send a friendly message before they quit.
             </p>
           </div>
         </div>
 
         {/* 3 Clean Summary Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-          <div className="p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-content-tertiary">
-              High Risk (Critical)
+          <div className="p-4 rounded-2xl bg-surface border border-surface-border btn-shadow">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-red-600 dark:text-red-400 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-red-500" />
+              Needs urgent contact
             </span>
-            <div className="text-2xl font-semibold text-red-600 dark:text-red-400 font-mono mt-1">
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400 font-mono mt-1">
               {highRisk.length} <span className="text-xs font-normal text-content-tertiary">members</span>
             </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Absent &gt;14 days or overdue payment</p>
+            <p className="text-[11px] text-content-tertiary mt-1">Absent for 14+ days or has overdue fees</p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-content-tertiary">
-              Moderate Attention
+          <div className="p-4 rounded-2xl bg-surface border border-surface-border btn-shadow">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              Attendance slipping
             </span>
-            <div className="text-2xl font-semibold text-amber-600 dark:text-amber-400 font-mono mt-1">
+            <div className="text-2xl font-bold text-amber-600 dark:text-amber-400 font-mono mt-1">
               {mediumRisk.length} <span className="text-xs font-normal text-content-tertiary">members</span>
             </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Noticeable 50%+ visit frequency drop</p>
+            <p className="text-[11px] text-content-tertiary mt-1">Visits dropped by half or more recently</p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-content-tertiary">
-              Estimated At-Risk Revenue
+          <div className="p-4 rounded-2xl bg-surface border border-surface-border btn-shadow">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              Monthly dues at risk
             </span>
-            <div className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 font-mono mt-1">
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-1">
               PKR 35,000<span className="text-xs font-normal text-content-tertiary">/mo</span>
             </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Saved via proactive WhatsApp re-engagement</p>
+            <p className="text-[11px] text-content-tertiary mt-1">Can be protected with a quick friendly check-in</p>
           </div>
         </div>
 

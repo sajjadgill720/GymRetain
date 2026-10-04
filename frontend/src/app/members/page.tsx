@@ -31,6 +31,7 @@ export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [trainerFilter, setTrainerFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -104,14 +105,19 @@ export default function MembersPage() {
     setLoading(true);
     try {
       const [membersRes, trainersRes, templatesRes] = await Promise.all([
-        api.getMembers(search, statusFilter),
+        api.getMembers({
+          search,
+          status: statusFilter || undefined,
+          trainerId: trainerFilter && trainerFilter !== 'unassigned' ? trainerFilter : undefined,
+          unassigned: trainerFilter === 'unassigned',
+        }),
         api.getTrainers(),
         api.getDietTemplates(),
       ]);
-      setMembers(membersRes.members);
-      setTrainers(trainersRes);
-      setTemplates(templatesRes);
-      if (trainersRes.length > 0 && !targetTrainerId) {
+      setMembers(membersRes?.members || []);
+      setTrainers(trainersRes || []);
+      setTemplates(templatesRes || []);
+      if (trainersRes && trainersRes.length > 0 && !targetTrainerId) {
         setTargetTrainerId(trainersRes[0].id);
       }
     } finally {
@@ -121,7 +127,7 @@ export default function MembersPage() {
 
   useEffect(() => {
     fetchMembers();
-  }, [search, statusFilter]);
+  }, [search, statusFilter, trainerFilter]);
 
   const handleOpenMemberStory = async (member: Member) => {
     setSelectedMember(member);
@@ -139,12 +145,34 @@ export default function MembersPage() {
     setReassigning(true);
     try {
       await api.reassignTrainer(selectedMember.id, targetTrainerId);
-      setToastMessage(`Assigned coach to ${selectedMember.firstName} successfully.`);
+      const coach = trainers.find((t) => t.id === targetTrainerId);
+      setToastMessage(`${selectedMember.firstName} is now assigned to Coach ${coach?.name || 'Selected Coach'}.`);
       setIsReassignOpen(false);
       await fetchMembers();
       // refresh story
       const updatedMember = members.find((m) => m.id === selectedMember.id) || selectedMember;
       setSelectedMember(updatedMember);
+    } finally {
+      setReassigning(false);
+    }
+  };
+
+  const handleUnassignCurrentMember = async () => {
+    if (!selectedMember) return;
+    setReassigning(true);
+    try {
+      await api.unassignMember(selectedMember.id);
+      setToastMessage(`${selectedMember.firstName} is now unassigned from any coach.`);
+      setIsReassignOpen(false);
+      await fetchMembers();
+      setSelectedMember((prev) =>
+        prev
+          ? {
+              ...prev,
+              trainerAssignments: [],
+            }
+          : null,
+      );
     } finally {
       setReassigning(false);
     }
@@ -248,17 +276,31 @@ export default function MembersPage() {
             />
           </div>
 
-          <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0">
+          <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-auto shrink-0">
             <Filter className="w-3.5 h-3.5 text-content-tertiary" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+              className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-purple-500"
             >
               <option value="">All Statuses</option>
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive</option>
               <option value="FROZEN">Frozen (On Hold)</option>
+            </select>
+
+            <select
+              value={trainerFilter}
+              onChange={(e) => setTrainerFilter(e.target.value)}
+              className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-purple-500"
+            >
+              <option value="">All Coaches</option>
+              <option value="unassigned">Unassigned Members</option>
+              {trainers.map((t) => (
+                <option key={t.id} value={t.id}>
+                  Coach {t.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -282,9 +324,8 @@ export default function MembersPage() {
                 {members.map((member) => {
                   const currentStreak = member.streak?.currentStreak || 0;
                   const activePlan = member.memberships?.[0];
-                  const assignedTrainer =
-                    member.trainerAssignments?.find((a) => a.isActive)?.trainer ||
-                    (member.id === 'mem-1' ? { name: 'Coach Tariq Mehmood' } : null);
+                  const activeAssignment = member.trainerAssignments?.find((a) => a.isActive);
+                  const assignedTrainer = activeAssignment?.trainer;
 
                   return (
                     <tr
@@ -336,12 +377,14 @@ export default function MembersPage() {
                       {/* Assigned Trainer Column */}
                       <td className="py-3.5 px-4">
                         {assignedTrainer ? (
-                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-surface-subtle border border-surface-border text-content-primary text-xs font-medium">
-                            <Dumbbell className="w-3 h-3 text-content-tertiary" />
-                            <span>{assignedTrainer.name}</span>
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-700 dark:text-cyan-400 border border-purple-500/20 text-xs font-medium">
+                            <Dumbbell className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400" />
+                            <span>Coach {assignedTrainer.name}</span>
                           </span>
                         ) : (
-                          <span className="text-content-tertiary text-xs italic">Unassigned</span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-surface-subtle text-content-tertiary border border-surface-border italic">
+                            Unassigned
+                          </span>
                         )}
                       </td>
 
@@ -467,32 +510,55 @@ export default function MembersPage() {
             </div>
 
             {/* Assigned Trainer Section */}
-            <div className="p-4 rounded-2xl bg-surface-subtle border border-surface-border space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
-                  <Dumbbell className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
-                  <span>Assigned Trainer</span>
-                </div>
-                <button
-                  onClick={() => setIsReassignOpen(true)}
-                  className="px-2.5 py-1 rounded-xl bg-surface hover:bg-surface-subtle text-content-primary text-xs font-medium border border-surface-border btn-shadow transition-colors"
-                >
-                  Change / Reassign
-                </button>
-              </div>
+            {(() => {
+              const activeAssign = selectedMember.trainerAssignments?.find((a) => a.isActive);
+              const coach = activeAssign?.trainer;
 
-              <div className="flex items-center gap-3 pt-1">
-                <div className="w-8 h-8 rounded-xl bg-surface border border-surface-border flex items-center justify-center text-xs font-bold text-content-secondary">
-                  TR
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-content-primary">
-                    {selectedMember.trainerAssignments?.find((a) => a.isActive)?.trainer?.name || 'Coach Tariq Mehmood'}
+              return (
+                <div className="p-4 rounded-2xl bg-surface-subtle border border-surface-border space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
+                      <Dumbbell className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                      <span>Coaching &amp; Personal Training</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setIsReassignOpen(true)}
+                        className="px-2.5 py-1 rounded-xl bg-surface hover:bg-surface-subtle text-content-primary text-xs font-medium border border-surface-border btn-shadow transition-colors"
+                      >
+                        {coach ? 'Change Coach' : '+ Assign Coach'}
+                      </button>
+                      {coach && (
+                        <button
+                          onClick={handleUnassignCurrentMember}
+                          className="px-2.5 py-1 rounded-xl bg-surface hover:bg-rose-500/10 text-content-secondary hover:text-rose-500 text-xs font-medium border border-surface-border btn-shadow transition-colors"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-[11px] text-content-tertiary">Personal trainer assigned for regular guidance and workout accountability</div>
+
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="w-9 h-9 rounded-xl bg-surface border border-surface-border flex items-center justify-center text-xs font-bold text-content-secondary">
+                      {coach ? coach.name.split(' ').map((n) => n[0]).join('').slice(0, 2) : '—'}
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-content-primary">
+                        {coach
+                          ? `${selectedMember.firstName} is assigned to Coach ${coach.name}`
+                          : `${selectedMember.firstName} has no coach assigned`}
+                      </div>
+                      <div className="text-[11px] text-content-tertiary">
+                        {coach
+                          ? 'Personal trainer assigned for regular guidance and workout accountability.'
+                          : 'Assign an active gym trainer to guide workouts and nutrition.'}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Member QR Attendance Credential Card */}
             <div className="p-4 rounded-2xl bg-surface-subtle border border-surface-border space-y-3">
@@ -646,17 +712,22 @@ export default function MembersPage() {
       {isReassignOpen && selectedMember && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-surface max-w-sm w-full rounded-2xl p-5 border border-surface-border shadow-2xl relative">
-            <h3 className="text-sm font-semibold text-content-primary mb-3">Assign / Change Coach</h3>
+            <h3 className="text-sm font-semibold text-content-primary mb-1">Assign Primary Coach</h3>
+            <p className="text-xs text-content-secondary mb-3">
+              Assigning coach for {selectedMember.firstName} {selectedMember.lastName}
+            </p>
             <select
               value={targetTrainerId}
               onChange={(e) => setTargetTrainerId(e.target.value)}
-              className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary mb-4 focus:outline-none"
+              className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary mb-4 focus:outline-none focus:border-purple-500"
             >
-              {trainers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
+              {trainers
+                .filter((t) => t.isActive && !t.isArchived)
+                .map((t) => (
+                  <option key={t.id} value={t.id}>
+                    Coach {t.name}
+                  </option>
+                ))}
             </select>
 
             <div className="flex items-center justify-end gap-2">
@@ -671,9 +742,9 @@ export default function MembersPage() {
                 type="button"
                 disabled={reassigning}
                 onClick={handleConfirmReassign}
-                className="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs btn-shadow disabled:opacity-50"
+                className="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs btn-shadow disabled:opacity-50"
               >
-                {reassigning ? 'Assigning...' : 'Confirm'}
+                {reassigning ? 'Saving...' : 'Confirm Assignment'}
               </button>
             </div>
           </div>

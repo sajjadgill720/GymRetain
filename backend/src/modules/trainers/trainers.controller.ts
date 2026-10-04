@@ -3,14 +3,21 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Param,
   Body,
+  Query,
   UseGuards,
   ForbiddenException,
 } from '@nestjs/common';
 import { TrainersService } from './trainers.service';
+import { CreateTrainerDto } from './dto/create-trainer.dto';
+import { UpdateTrainerDto } from './dto/update-trainer.dto';
+import { RemoveTrainerDto } from './dto/remove-trainer.dto';
 import { AssignTrainerDto } from './dto/assign-trainer.dto';
 import { ReassignTrainerDto } from './dto/reassign-trainer.dto';
+import { BulkAssignTrainerDto } from './dto/bulk-assign-trainer.dto';
+import { UnassignMemberDto } from './dto/unassign-member.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { TenantAccessGuard } from '../../common/guards/tenant-access.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -25,16 +32,46 @@ export class TrainersController {
   constructor(private readonly trainersService: TrainersService) {}
 
   /**
-   * List all trainers with member counts (Owner/Manager view)
+   * List all trainers with member counts
    */
   @Get()
   @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
-  async listTrainers(@CurrentGymId() gymId: string) {
-    return this.trainersService.listTrainers(gymId);
+  async listTrainers(
+    @CurrentGymId() gymId: string,
+    @Query('search') search?: string,
+    @Query('status') status?: 'active' | 'inactive' | 'all',
+    @Query('includeArchived') includeArchived?: string,
+  ) {
+    return this.trainersService.listTrainers(gymId, {
+      search,
+      status,
+      includeArchived: includeArchived === 'true',
+    });
   }
 
   /**
-   * Assign a trainer to a member (Owner/Manager only - no self-assignment)
+   * Get unassigned members (available for coach assignment)
+   */
+  @Get('unassigned-members')
+  @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
+  async getUnassignedMembers(@CurrentGymId() gymId: string) {
+    return this.trainersService.getUnassignedMembers(gymId);
+  }
+
+  /**
+   * Create a new trainer profile (does NOT create a staff login account)
+   */
+  @Post()
+  @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
+  async createTrainer(
+    @CurrentGymId() gymId: string,
+    @Body() dto: CreateTrainerDto,
+  ) {
+    return this.trainersService.createTrainer(gymId, dto);
+  }
+
+  /**
+   * Assign a trainer to a member
    */
   @Post('assign')
   @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
@@ -46,7 +83,19 @@ export class TrainersController {
   }
 
   /**
-   * Reassign a member to a new trainer (Owner/Manager only)
+   * Bulk assign members to a trainer
+   */
+  @Post('bulk-assign')
+  @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
+  async bulkAssignMembers(
+    @CurrentGymId() gymId: string,
+    @Body() dto: BulkAssignTrainerDto,
+  ) {
+    return this.trainersService.bulkAssignMembers(gymId, dto);
+  }
+
+  /**
+   * Reassign a member to a new trainer
    */
   @Post('reassign')
   @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
@@ -58,7 +107,19 @@ export class TrainersController {
   }
 
   /**
-   * Deactivate a trainer assignment
+   * Remove trainer assignment from a member
+   */
+  @Post('unassign')
+  @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
+  async unassignMember(
+    @CurrentGymId() gymId: string,
+    @Body() dto: UnassignMemberDto,
+  ) {
+    return this.trainersService.unassignMember(gymId, dto.memberId);
+  }
+
+  /**
+   * Deactivate a trainer assignment by assignment ID
    */
   @Patch('assignments/:id/deactivate')
   @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
@@ -82,8 +143,49 @@ export class TrainersController {
   }
 
   /**
+   * Get single trainer details
+   */
+  @Get(':id')
+  @Roles('TRAINER', 'GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
+  async getTrainer(
+    @CurrentGymId() gymId: string,
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    if (user.role === 'TRAINER' && user.sub !== id) {
+      throw new ForbiddenException('Access denied');
+    }
+    return this.trainersService.getTrainer(gymId, id);
+  }
+
+  /**
+   * Update trainer details
+   */
+  @Patch(':id')
+  @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
+  async updateTrainer(
+    @CurrentGymId() gymId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdateTrainerDto,
+  ) {
+    return this.trainersService.updateTrainer(gymId, id, dto);
+  }
+
+  /**
+   * Remove trainer with reassignment or unassign confirmation and archiving
+   */
+  @Delete(':id')
+  @Roles('GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
+  async removeTrainer(
+    @CurrentGymId() gymId: string,
+    @Param('id') id: string,
+    @Body() dto?: RemoveTrainerDto,
+  ) {
+    return this.trainersService.removeTrainer(gymId, id, dto);
+  }
+
+  /**
    * View members assigned to a specific trainer
-   * Trainers can only view their own; Owners/Managers can view any trainer's assigned members
    */
   @Get(':trainerId/members')
   @Roles('TRAINER', 'GYM_OWNER', 'GYM_MANAGER', 'SUPER_ADMIN')
@@ -110,7 +212,6 @@ export class TrainersController {
     @Param('memberId') memberId: string,
     @CurrentUser() user: JwtPayload,
   ) {
-    // If trainer, verify this member is or was assigned to them
     if (user.role === 'TRAINER') {
       const history = await this.trainersService.getMemberAssignments(gymId, memberId);
       const isAssigned = history.some((h) => h.trainerId === user.sub);

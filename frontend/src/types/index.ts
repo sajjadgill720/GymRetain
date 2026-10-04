@@ -29,6 +29,31 @@ export interface User {
   gymSlug?: string | null;
 }
 
+export interface Trainer {
+  id: string;
+  gymId: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  specialties: string[];
+  photoUrl?: string | null;
+  bio?: string | null;
+  isActive: boolean;
+  isArchived: boolean;
+  staffId?: string | null;
+  assignedMembersCount?: number;
+  assignedMembers?: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    memberCode: string;
+    phone: string;
+    status: string;
+  }>;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface TrainerStaff {
   id: string;
   name: string;

@@ -25,14 +25,22 @@ export class MembersService {
    */
   async listMembers(
     gymId: string,
-    options?: { status?: string; search?: string; skip?: number; take?: number; trainerId?: string },
+    options?: { status?: string; search?: string; skip?: number; take?: number; trainerId?: string; unassigned?: boolean },
   ) {
-    const { status, search, skip = 0, take = 50, trainerId } = options || {};
+    const { status, search, skip = 0, take = 50, trainerId, unassigned } = options || {};
 
     const where: any = {
       gymId,
       ...(status ? { status: status as any } : {}),
-      ...(trainerId
+      ...(unassigned || trainerId === 'unassigned'
+        ? {
+            trainerAssignments: {
+              none: {
+                isActive: true,
+              },
+            },
+          }
+        : trainerId
         ? {
             trainerAssignments: {
               some: {

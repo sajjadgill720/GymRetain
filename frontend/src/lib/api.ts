@@ -678,29 +678,37 @@ class ApiClient {
   }
 
   // Members List
-  async getMembers(search?: string, status?: string): Promise<{ members: Member[]; meta: any }> {
-    try {
-      let query = '';
-      if (search) query += `&search=${encodeURIComponent(search)}`;
-      if (status) query += `&status=${encodeURIComponent(status)}`;
-      return await this.request(`/members?${query}`);
-    } catch {
-      let list = [...MOCK_MEMBERS];
-      if (status) {
-        list = list.filter((m) => m.status === status);
-      }
-      if (search) {
-        const s = search.toLowerCase();
-        list = list.filter(
-          (m) =>
-            m.firstName.toLowerCase().includes(s) ||
-            m.lastName.toLowerCase().includes(s) ||
-            m.memberCode.toLowerCase().includes(s) ||
-            m.phone.includes(s),
-        );
-      }
-      return { members: list, meta: { total: list.length } };
-    }
+  async getMembers(
+    optionsOrSearch?:
+      | {
+          search?: string;
+          status?: string;
+          trainerId?: string;
+          unassigned?: boolean;
+          skip?: number;
+          take?: number;
+        }
+      | string,
+    statusArg?: string,
+  ): Promise<{ members: Member[]; meta: any }> {
+    let search = typeof optionsOrSearch === 'string' ? optionsOrSearch : optionsOrSearch?.search;
+    let status = typeof optionsOrSearch === 'string' ? statusArg : optionsOrSearch?.status;
+    let trainerId = typeof optionsOrSearch === 'object' ? optionsOrSearch?.trainerId : undefined;
+    let unassigned = typeof optionsOrSearch === 'object' ? optionsOrSearch?.unassigned : undefined;
+    let skip = typeof optionsOrSearch === 'object' ? optionsOrSearch?.skip : undefined;
+    let take = typeof optionsOrSearch === 'object' ? optionsOrSearch?.take : undefined;
+
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (status) params.append('status', status);
+    if (trainerId) params.append('trainerId', trainerId);
+    if (unassigned) params.append('unassigned', 'true');
+    if (skip !== undefined) params.append('skip', skip.toString());
+    if (take !== undefined) params.append('take', take.toString());
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const res = await this.request<any>(`/members${query}`);
+    return res.data || res;
   }
 
   // Create Member
@@ -1079,152 +1087,120 @@ class ApiClient {
     return res.data || res;
   }
 
-  // --- TRAINER ASSIGNMENT API METHODS ---
+  // --- TRAINER MANAGEMENT & ASSIGNMENT API METHODS ---
 
-  async getTrainers(): Promise<any[]> {
-    try {
-      const res = await this.request<any>('/trainers');
-      return res.data || res;
-    } catch {
-      return [
-        {
-          id: 'trainer-1',
-          name: 'Coach Tariq Mehmood',
-          email: 'tariq@ironhouse.pk',
-          phone: '+923001234567',
-          role: 'TRAINER',
-          isActive: true,
-          assignedMembersCount: 4,
-          createdAt: '2026-08-01T10:00:00Z',
-        },
-        {
-          id: 'trainer-2',
-          name: 'Coach Sarah Batool',
-          email: 'sarah@ironhouse.pk',
-          phone: '+923002345678',
-          role: 'TRAINER',
-          isActive: true,
-          assignedMembersCount: 3,
-          createdAt: '2026-08-15T10:00:00Z',
-        },
-        {
-          id: 'trainer-3',
-          name: 'Coach Kamran Gill',
-          email: 'kamran@ironhouse.pk',
-          phone: '+923003456789',
-          role: 'TRAINER',
-          isActive: true,
-          assignedMembersCount: 2,
-          createdAt: '2026-09-01T10:00:00Z',
-        },
-      ];
-    }
+  async getTrainers(options?: {
+    search?: string;
+    status?: 'active' | 'inactive' | 'all';
+    includeArchived?: boolean;
+  }): Promise<any[]> {
+    const params = new URLSearchParams();
+    if (options?.search) params.append('search', options.search);
+    if (options?.status) params.append('status', options.status);
+    if (options?.includeArchived) params.append('includeArchived', 'true');
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const res = await this.request<any>(`/trainers${query}`);
+    return res.data || res;
+  }
+
+  async getTrainer(id: string): Promise<any> {
+    const res = await this.request<any>(`/trainers/${id}`);
+    return res.data || res;
+  }
+
+  async createTrainer(data: {
+    name: string;
+    email?: string;
+    phone?: string;
+    specialties?: string[];
+    photoUrl?: string;
+    bio?: string;
+    isActive?: boolean;
+  }): Promise<any> {
+    const res = await this.request<any>('/trainers', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return res.data || res;
+  }
+
+  async updateTrainer(
+    id: string,
+    data: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      specialties?: string[];
+      photoUrl?: string;
+      bio?: string;
+      isActive?: boolean;
+    },
+  ): Promise<any> {
+    const res = await this.request<any>(`/trainers/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return res.data || res;
+  }
+
+  async removeTrainer(
+    id: string,
+    options?: { reassignTrainerId?: string; unassignMembers?: boolean },
+  ): Promise<any> {
+    const res = await this.request<any>(`/trainers/${id}`, {
+      method: 'DELETE',
+      body: JSON.stringify(options || {}),
+    });
+    return res.data || res;
   }
 
   async assignTrainer(memberId: string, trainerId: string): Promise<any> {
-    try {
-      return await this.request('/trainers/assign', {
-        method: 'POST',
-        body: JSON.stringify({ memberId, trainerId }),
-      });
-    } catch {
-      return { success: true, memberId, trainerId, isActive: true };
-    }
+    const res = await this.request<any>('/trainers/assign', {
+      method: 'POST',
+      body: JSON.stringify({ memberId, trainerId }),
+    });
+    return res.data || res;
+  }
+
+  async bulkAssignTrainer(trainerId: string, memberIds: string[]): Promise<any> {
+    const res = await this.request<any>('/trainers/bulk-assign', {
+      method: 'POST',
+      body: JSON.stringify({ trainerId, memberIds }),
+    });
+    return res.data || res;
   }
 
   async reassignTrainer(memberId: string, newTrainerId: string): Promise<any> {
-    try {
-      return await this.request('/trainers/reassign', {
-        method: 'POST',
-        body: JSON.stringify({ memberId, newTrainerId }),
-      });
-    } catch {
-      return { success: true, memberId, newTrainerId, isActive: true };
-    }
+    const res = await this.request<any>('/trainers/reassign', {
+      method: 'POST',
+      body: JSON.stringify({ memberId, newTrainerId }),
+    });
+    return res.data || res;
+  }
+
+  async unassignMember(memberId: string): Promise<any> {
+    const res = await this.request<any>('/trainers/unassign', {
+      method: 'POST',
+      body: JSON.stringify({ memberId }),
+    });
+    return res.data || res;
   }
 
   async getTrainerMembers(trainerId?: string): Promise<any[]> {
-    try {
-      const endpoint = trainerId ? `/trainers/${trainerId}/members` : '/trainers/my-members';
-      const res = await this.request<any>(endpoint);
-      return res.data || res;
-    } catch {
-      // Return mock assigned members with streak & diet status
-      return [
-        {
-          assignmentId: 'assign-1',
-          assignedAt: '2026-09-10T10:00:00Z',
-          member: {
-            id: 'mem-1',
-            firstName: 'Hamza',
-            lastName: 'Sheikh',
-            memberCode: 'GR-1001',
-            phone: '+923001234567',
-            status: 'ACTIVE',
-            currentStreak: 12,
-            longestStreak: 12,
-            totalCheckIns: 28,
-          },
-          dietPlan: {
-            id: 'dp-1',
-            title: 'Hypertrophy Power Surplus',
-            goal: 'MUSCLE_GAIN',
-            customGoal: null,
-            mealsCount: 4,
-            updatedAt: '2026-09-25T14:30:00Z',
-            status: 'ACTIVE_PLAN',
-          },
-        },
-        {
-          assignmentId: 'assign-2',
-          assignedAt: '2026-09-15T11:00:00Z',
-          member: {
-            id: 'mem-3',
-            firstName: 'Zaid',
-            lastName: 'Siddiqui',
-            memberCode: 'GR-1003',
-            phone: '+923003456789',
-            status: 'ACTIVE',
-            currentStreak: 9,
-            longestStreak: 14,
-            totalCheckIns: 22,
-          },
-          dietPlan: {
-            id: 'dp-2',
-            title: 'Calorie Deficit Starter',
-            goal: 'WEIGHT_LOSS',
-            customGoal: null,
-            mealsCount: 3,
-            updatedAt: '2026-09-16T09:00:00Z',
-            status: 'ACTIVE_PLAN',
-          },
-        },
-        {
-          assignmentId: 'assign-3',
-          assignedAt: '2026-09-20T12:00:00Z',
-          member: {
-            id: 'mem-4',
-            firstName: 'Fatima',
-            lastName: 'Zahra',
-            memberCode: 'GR-1004',
-            phone: '+923214567890',
-            status: 'ACTIVE',
-            currentStreak: 7,
-            longestStreak: 7,
-            totalCheckIns: 16,
-          },
-          dietPlan: {
-            id: null,
-            title: null,
-            goal: null,
-            customGoal: null,
-            mealsCount: 0,
-            updatedAt: null,
-            status: 'NO_PLAN',
-          },
-        },
-      ];
-    }
+    const endpoint = trainerId ? `/trainers/${trainerId}/members` : '/trainers/my-members';
+    const res = await this.request<any>(endpoint);
+    return res.data || res;
+  }
+
+  async getUnassignedMembers(): Promise<any[]> {
+    const res = await this.request<any>('/trainers/unassigned-members');
+    return res.data || res;
+  }
+
+  async getMemberAssignments(memberId: string): Promise<any[]> {
+    const res = await this.request<any>(`/trainers/members/${memberId}/history`);
+    return res.data || res;
   }
 
   // --- DIET PLAN BUILDER API METHODS ---

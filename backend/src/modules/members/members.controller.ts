@@ -29,14 +29,17 @@ export class MembersController {
     @Query('search') search?: string,
     @Query('skip') skip?: string,
     @Query('take') take?: string,
+    @Query('trainerId') queryTrainerId?: string,
+    @Query('unassigned') unassigned?: string,
   ) {
-    const trainerId = user?.role === 'TRAINER' ? user.sub : undefined;
+    const trainerId = user?.role === 'TRAINER' ? user.sub : queryTrainerId;
     return this.membersService.listMembers(gymId, {
       status,
       search,
       skip: skip ? parseInt(skip, 10) : 0,
       take: take ? parseInt(take, 10) : 50,
       trainerId,
+      unassigned: unassigned === 'true',
     });
   }
 

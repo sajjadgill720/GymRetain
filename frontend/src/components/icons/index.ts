@@ -47,6 +47,9 @@ import {
   Users,
   User,
   UserCheck,
+  UserPlus,
+  UserMinus,
+  IdentificationBadge,
   Shield,
   ShieldCheck,
   ShieldWarning,
@@ -73,6 +76,7 @@ import {
   ArrowUp,
   ArrowDownRight,
   ArrowUpRight,
+  ArrowsLeftRight,
   
   // Business, Billing & Stores
   CurrencyDollar,
@@ -93,11 +97,16 @@ import {
   WarningCircle,
   Check,
   CheckCircle,
+  CheckSquare,
+  Square,
   CircleNotch,
   StopCircle,
   Copy,
   PencilSimple,
+  PencilSimpleLine,
   Trash,
+  TrashSimple,
+  Archive,
   Eye,
   FileText,
   DownloadSimple,
@@ -147,6 +156,9 @@ export {
   Users,
   User,
   UserCheck,
+  UserPlus,
+  UserMinus,
+  IdentificationBadge,
   Shield,
   ShieldCheck,
   ShieldWarning,
@@ -169,6 +181,7 @@ export {
   ArrowUp,
   ArrowDownRight,
   ArrowUpRight,
+  ArrowsLeftRight,
   CurrencyDollar,
   CreditCard,
   Receipt,
@@ -185,11 +198,16 @@ export {
   WarningCircle,
   Check,
   CheckCircle,
+  CheckSquare,
+  Square,
   CircleNotch,
   StopCircle,
   Copy,
   PencilSimple,
+  PencilSimpleLine,
   Trash,
+  TrashSimple,
+  Archive,
   Eye,
   FileText,
   DownloadSimple,
@@ -201,7 +219,8 @@ export {
 };
 
 export type { IconProps, Icon };
-export type LucideIcon = Icon;
+export type PhosphorIcon = Icon;
+export type AppIcon = Icon;
 
 // Compatibility & Ergonomic Aliases
 export const LayoutDashboard = SquaresFour;

@@ -214,6 +214,7 @@ model Gym {
   whatsappLogs        WhatsAppMessageLog[]
   whatsappTemplates   WhatsAppTemplate[]
   auditLogs           AuditLog[]
+  trainers            Trainer[]
   trainerAssignments  TrainerAssignment[]
   dietPlans           DietPlan[]
   dietPlanTemplates   DietPlanTemplate[]
@@ -239,10 +240,10 @@ model GymStaff {
 
   // Relations
   gym                 Gym?                @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  trainerProfile      Trainer?
   manualCheckIns      CheckIn[]           @relation("StaffManualCheckIns")
   checkOuts           CheckIn[]           @relation("StaffCheckOuts")
   sentInvitations     StaffInvitation[]   @relation("StaffSentInvitations")
-  trainerAssignments  TrainerAssignment[] @relation("StaffTrainerAssignments")
   createdDietPlans    DietPlan[]          @relation("DietPlanCreatedBy")
 
   @@index([gymId])
@@ -512,6 +513,30 @@ model WhatsAppTemplate {
   @@map("whatsapp_templates")
 }
 
+model Trainer {
+  id          String              @id @default(uuid()) @db.Uuid
+  gymId       String              @map("gym_id") @db.Uuid
+  name        String              @db.VarChar(255)
+  email       String?             @db.VarChar(255)
+  phone       String?             @db.VarChar(30)
+  specialties String[]            @default([])
+  photoUrl    String?             @map("photo_url") @db.Text
+  bio         String?             @db.Text
+  isActive    Boolean             @default(true) @map("is_active")
+  isArchived  Boolean             @default(false) @map("is_archived")
+  staffId     String?             @unique @map("staff_id") @db.Uuid
+  createdAt   DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  gym         Gym                 @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  staff       GymStaff?           @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  assignments TrainerAssignment[]
+
+  @@index([gymId, isActive, isArchived])
+  @@map("trainers")
+}
+
 model TrainerAssignment {
   id          String    @id @default(uuid()) @db.Uuid
   gymId       String    @map("gym_id") @db.Uuid
@@ -523,7 +548,7 @@ model TrainerAssignment {
   // Relations
   gym         Gym       @relation(fields: [gymId], references: [id], onDelete: Cascade)
   member      Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  trainer     GymStaff  @relation("StaffTrainerAssignments", fields: [trainerId], references: [id], onDelete: Cascade)
+  trainer     Trainer   @relation(fields: [trainerId], references: [id], onDelete: Cascade)
 
   @@index([gymId, memberId, isActive])
   @@index([gymId, trainerId, isActive])

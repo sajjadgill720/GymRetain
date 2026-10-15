@@ -146,7 +146,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   navItems.sort((a,b) => navOrder.indexOf(a.href)-navOrder.indexOf(b.href));
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-surface-sidebar border-r border-surface-border select-none transition-colors duration-200">
+    <div className="workspace-rail flex flex-col h-full bg-surface-sidebar border-r border-surface-border select-none transition-colors duration-200">
       {/* Brand Logo & Collapse Toggle */}
       <div className={`flex items-center border-b border-surface-border ${collapsed ? 'flex-col gap-3 p-3' : 'p-4 sm:p-5 justify-between'}`}>
         <Link href="/" className="flex items-center gap-3 group">
@@ -256,7 +256,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               aria-current={isActive ? "page" : undefined}
               title={collapsed ? item.name : undefined}
               onClick={onCloseMobile}
-              className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+              className={`workspace-nav-link group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                 isActive
                   ? 'premium-nav-active'
                   : 'text-content-secondary hover:text-content-primary hover:bg-surface-subtle'

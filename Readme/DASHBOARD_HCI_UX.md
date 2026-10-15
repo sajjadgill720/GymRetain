@@ -189,3 +189,27 @@ Production checkout, automated delivery, account recovery, deployment security a
 - Visual review caught and fixed an old global header selector that made a primary button transparent. Header styling now targets the application navigation rather than every page header.
 
 No real member visit, payment or external message was submitted in browser verification. Source failures are covered by API regressions and explicit dashboard states; live outage injection, a screen-reader audit and production multi-tenant end-to-end tests remain outstanding.
+
+## 12. Reference-inspired visual revision
+
+The follow-up visual review examined the public homepages of [Gymdesk](https://gymdesk.com/), [Zen Planner](https://www.zenplanner.com/) and [PushPress](https://www.pushpress.com/). These were public marketing pages; no authenticated competitor workspace was inspected. The implementation adapts their visual hierarchy to a working management dashboard rather than reproducing their branding or assets.
+
+| Reference pattern | GymRetain adaptation |
+| --- | --- |
+| Gymdesk's dark opening surface and prominent contrasting action | Forest dashboard header with a mint Check in a member action and a secondary outlined Add member action |
+| Zen Planner's bold typography and framed dark navigation | Heavier Plus Jakarta Sans headings, a forest navigation rail and a clearly filled active destination |
+| PushPress's bright space, strong type and contrasting product navigation | Ivory workspace, white bordered panels, bold metric figures and a distinct navigation rail |
+
+The shared navigation now carries the forest treatment across application pages. Dashboard cards use restrained shadows, explicit boundaries and consistent corner radii. The attention filters have count chips, action arrows have visible hit areas, and metric icon tiles use semantic sage and red accents. Existing yellow warning states remain available through the shared status palette. Color supports the existing text labels and icons rather than replacing them.
+
+The hero uses subtle CSS arcs instead of a photograph so operational content stays legible and loads without an additional image request. Its primary action remains close to the heading on narrow screens. The visual revision changes CSS and navigation class hooks only; business calculations, APIs, task storage, permissions and destinations retain their existing behavior.
+
+Responsive review covered 1440px desktop, 390px mobile and 320px mobile widths. The mobile document remained within the viewport (384px and 314px respectively), check-in opened with focus in the member field, mobile navigation opened and closed, and both light and dark themes were inspected. The heading weight was checked in the rendered browser after resolving a competing global selector.
+
+Validation after the visual revision: all 19 frontend regressions passed, and the production build passed compilation, lint/type validation and generation of all 17 static pages. No backend files were changed.
+
+Updated visual previews:
+
+- [Desktop dashboard](previews/dashboard-reference-ui-desktop.png)
+- [Full dashboard](previews/dashboard-reference-ui-full.png)
+- [Mobile dashboard](previews/dashboard-reference-ui-mobile.png)

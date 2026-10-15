@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { AppLayout } from "../../components/AppLayout";
 import { Modal } from "../../components/ui/Modal";
 import { api } from "../../lib/api";
@@ -125,7 +126,8 @@ const DEFAULT_PLANS = [
   },
 ];
 
-export default function SubscriptionsPage() {
+function SubscriptionsContent() {
+  const params = useSearchParams();
   const [activeTab, setActiveTab] = useState<
     "SUBSCRIPTIONS" | "PAYMENTS" | "PLANS"
   >("SUBSCRIPTIONS");
@@ -177,6 +179,26 @@ export default function SubscriptionsPage() {
   const [newSubPrice, setNewSubPrice] = useState(6500);
   const [newSubDurationMonths, setNewSubDurationMonths] = useState(1);
   const [newSubAutoRenew, setNewSubAutoRenew] = useState(false);
+  useEffect(() => {
+    const status = params.get("status") || "ALL";
+    if (
+      ["ALL", "ACTIVE", "PENDING_PAYMENT", "EXPIRED", "CANCELLED"].includes(
+        status,
+      )
+    )
+      setStatusFilter(status as typeof statusFilter);
+    setSearchQuery(params.get("search") || "");
+    setActiveTab(
+      params.get("view") === "payments" ? "PAYMENTS" : "SUBSCRIPTIONS",
+    );
+    if (params.get("record") === "1") {
+      setSelectedSubForPayment(null);
+      setPayMemberCode("");
+      setMemberSearch("");
+      setPayReference("");
+      setIsRecordPaymentOpen(true);
+    }
+  }, [params]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -1336,5 +1358,13 @@ export default function SubscriptionsPage() {
         )}
       </Modal>
     </AppLayout>
+  );
+}
+
+export default function SubscriptionsPage() {
+  return (
+    <Suspense fallback={<p className="p-8">Loading memberships…</p>}>
+      <SubscriptionsContent />
+    </Suspense>
   );
 }

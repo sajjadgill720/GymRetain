@@ -70,6 +70,20 @@ function OperationsContent() {
   const [query, setQuery] = useState("");
   const [day, setDay] = useState(localDate());
   const [month, setMonth] = useState(localDate().slice(0, 7));
+  const stageFilter = stages.includes(params.get("stage") as Lead["stage"])
+    ? params.get("stage")
+    : "";
+  useEffect(() => {
+    setQuery(params.get("search") || "");
+    const date = params.get("date");
+    if (
+      date &&
+      /^\d{4}-\d{2}-\d{2}$/.test(date) &&
+      Number.isFinite(Date.parse(date)) &&
+      new Date(date).toISOString().slice(0, 10) === date
+    )
+      setDay(date);
+  }, [params]);
   const [editor, setEditor] = useState<{
     kind: OperationKind;
     id?: string;
@@ -263,10 +277,12 @@ function OperationsContent() {
     </label>
   );
   const booking = state.sessions.find((session) => session.id === bookingId);
-  const leadList = state.leads.filter((lead) =>
-    `${lead.name} ${lead.phone} ${lead.source}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
+  const leadList = state.leads.filter(
+    (lead) =>
+      (!stageFilter || lead.stage === stageFilter) &&
+      `${lead.name} ${lead.phone} ${lead.source}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
   );
   const sessions = state.sessions
     .filter(
@@ -489,7 +505,19 @@ function OperationsContent() {
                           onChange={(event) => setQuery(event.target.value)}
                         />
                       </div>
-                      <p>Move enquiries forward with a clear next step.</p>
+                      {stageFilter ? (
+                        <p>
+                          Showing {stageLabels[stageFilter as Lead["stage"]]} ·{" "}
+                          <Link
+                            className="underline"
+                            href="/operations?view=leads"
+                          >
+                            Clear stage filter
+                          </Link>
+                        </p>
+                      ) : (
+                        <p>Move enquiries forward with a clear next step.</p>
+                      )}
                     </div>
                     <div className="studio-kanban">
                       {stages.map((stage) => (

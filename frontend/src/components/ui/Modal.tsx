@@ -42,7 +42,7 @@ export const Modal: React.FC<ModalProps> = ({
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
-      (focusable()[0] || dialogRef.current)?.focus();
+      (dialogRef.current?.querySelector<HTMLElement>('[data-autofocus]') || focusable()[0] || dialogRef.current)?.focus();
     }
     return () => {
       document.body.style.overflow = previousOverflow;
@@ -81,7 +81,7 @@ export const Modal: React.FC<ModalProps> = ({
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 p-2 rounded-lg text-content-secondary hover:text-content-primary hover:bg-surface-subtle transition-all shadow-sm"
+          className="absolute right-4 top-4 min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg text-content-secondary hover:text-content-primary hover:bg-surface-subtle transition-all shadow-sm"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />

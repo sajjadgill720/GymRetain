@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { AppLayout } from '../../components/AppLayout';
-import { api } from '../../lib/api';
+import React, { useState, useEffect } from "react";
+import { AppLayout } from "../../components/AppLayout";
+import { Modal } from "../../components/ui/Modal";
+import { api } from "../../lib/api";
 import {
   CreditCard,
   CurrencyDollar,
@@ -23,18 +24,18 @@ import {
   DeviceMobile,
   Check,
   FileText,
-} from '@/components/icons';
+} from "@/components/icons";
 
 interface MemberSubscription {
   id: string;
   memberId: string;
   planName: string;
-  planType: 'MONTHLY' | 'QUARTERLY' | 'BIANNUAL' | 'ANNUAL' | 'SESSION_PASS';
+  planType: "MONTHLY" | "QUARTERLY" | "BIANNUAL" | "ANNUAL" | "SESSION_PASS";
   price: number;
   currency: string;
   startDate: string;
   endDate: string;
-  status: 'ACTIVE' | 'EXPIRED' | 'CANCELLED' | 'PENDING_PAYMENT';
+  status: "ACTIVE" | "EXPIRED" | "CANCELLED" | "PENDING_PAYMENT";
   autoRenew: boolean;
   member: {
     id: string;
@@ -56,8 +57,8 @@ interface PaymentRecord {
   memberId: string;
   amount: number;
   currency: string;
-  provider: 'CASH' | 'BANK_TRANSFER' | 'JAZZCASH' | 'EASYPAISA' | 'STRIPE';
-  status: 'COMPLETED' | 'PENDING' | 'FAILED';
+  provider: "CASH" | "BANK_TRANSFER" | "JAZZCASH" | "EASYPAISA" | "STRIPE";
+  status: "COMPLETED" | "PENDING" | "FAILED";
   providerReference?: string;
   paidAt?: string;
   createdAt: string;
@@ -76,69 +77,106 @@ interface PaymentRecord {
 
 const DEFAULT_PLANS = [
   {
-    name: 'Standard Fitness Pass',
-    type: 'MONTHLY',
-    duration: '1 Month',
+    name: "Standard Fitness Pass",
+    type: "MONTHLY",
+    duration: "1 Month",
     price: 4500,
-    features: ['Gym floor & cardio access', 'Locker room & shower', 'Basic fitness assessment'],
+    features: [
+      "Gym floor & cardio access",
+      "Locker room & shower",
+      "Basic fitness assessment",
+    ],
   },
   {
-    name: 'Pro Strength & Cardio',
-    type: 'MONTHLY',
-    duration: '1 Month',
+    name: "Pro Strength & Cardio",
+    type: "MONTHLY",
+    duration: "1 Month",
     price: 6500,
-    features: ['Unlimited floor access', 'Free trainer consultation', 'Diet plan tracker', 'Locker & towel service'],
+    features: [
+      "Unlimited floor access",
+      "Free trainer consultation",
+      "Diet plan tracker",
+      "Locker & towel service",
+    ],
   },
   {
-    name: 'Quarterly Body Transformation',
-    type: 'QUARTERLY',
-    duration: '3 Months',
+    name: "Quarterly Body Transformation",
+    type: "QUARTERLY",
+    duration: "3 Months",
     price: 16500,
-    features: ['15% quarterly discount', 'Personalized diet blueprint', 'Bi-weekly body composition check', 'Streak milestone perks'],
+    features: [
+      "15% quarterly discount",
+      "Personalized diet blueprint",
+      "Bi-weekly body composition check",
+      "Streak milestone perks",
+    ],
   },
   {
-    name: 'Annual VIP All-Access',
-    type: 'ANNUAL',
-    duration: '12 Months',
+    name: "Annual VIP All-Access",
+    type: "ANNUAL",
+    duration: "12 Months",
     price: 48000,
-    features: ['Maximum savings (2.5 months free)', 'Dedicated trainer pairing', 'Free guest passes (2/mo)', 'Priority kiosk check-in'],
+    features: [
+      "Maximum savings (2.5 months free)",
+      "Dedicated trainer pairing",
+      "Free guest passes (2/mo)",
+      "Priority kiosk check-in",
+    ],
   },
 ];
 
 export default function SubscriptionsPage() {
-  const [activeTab, setActiveTab] = useState<'SUBSCRIPTIONS' | 'PAYMENTS' | 'PLANS'>('SUBSCRIPTIONS');
+  const [activeTab, setActiveTab] = useState<
+    "SUBSCRIPTIONS" | "PAYMENTS" | "PLANS"
+  >("SUBSCRIPTIONS");
   const [subscriptions, setSubscriptions] = useState<MemberSubscription[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [metrics, setMetrics] = useState({
-    activeSubscriptions: 138,
-    pendingPayments: 6,
-    expiredSubscriptions: 4,
-    expiringWithin7Days: 8,
-    totalRevenueRecorded: 485000,
+    activeSubscriptions: 0,
+    pendingPayments: 0,
+    expiredSubscriptions: 0,
+    expiringWithin7Days: 0,
+    totalRevenueRecorded: 0,
   });
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'PENDING_PAYMENT' | 'EXPIRED' | 'CANCELLED'>('ALL');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<
+    "ALL" | "ACTIVE" | "PENDING_PAYMENT" | "EXPIRED" | "CANCELLED"
+  >("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [renewalSub, setRenewalSub] = useState<MemberSubscription | null>(null);
+  const [renewalPaid, setRenewalPaid] = useState(false);
+  const [renewalError, setRenewalError] = useState("");
+  const [loadError, setLoadError] = useState("");
+  const [memberOptions, setMemberOptions] = useState<any[]>([]);
+  const [memberSearch, setMemberSearch] = useState("");
 
   // Modals
   const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
   const [isNewSubOpen, setIsNewSubOpen] = useState(false);
-  const [selectedSubForPayment, setSelectedSubForPayment] = useState<MemberSubscription | null>(null);
+  const [selectedSubForPayment, setSelectedSubForPayment] =
+    useState<MemberSubscription | null>(null);
 
   // Record Payment Form State
-  const [payMemberCode, setPayMemberCode] = useState('GR-1002 (Ayesha Malik)');
+  const [payMemberCode, setPayMemberCode] = useState("");
   const [payAmount, setPayAmount] = useState(4500);
-  const [payProvider, setPayProvider] = useState<'CASH' | 'BANK_TRANSFER' | 'JAZZCASH' | 'EASYPAISA'>('CASH');
-  const [payReference, setPayReference] = useState('');
-  const [payNotes, setPayNotes] = useState('Cash received at front desk counter');
+  const [payProvider, setPayProvider] = useState<
+    "CASH" | "BANK_TRANSFER" | "JAZZCASH" | "EASYPAISA"
+  >("CASH");
+  const [payReference, setPayReference] = useState("");
+  const [payNotes, setPayNotes] = useState(
+    "Cash received at front desk counter",
+  );
 
   // New Subscription Form State
-  const [newSubMemberCode, setNewSubMemberCode] = useState('GR-1006 (Ali Raza)');
-  const [newSubPlanName, setNewSubPlanName] = useState('Pro Strength & Cardio');
-  const [newSubPlanType, setNewSubPlanType] = useState<'MONTHLY' | 'QUARTERLY' | 'ANNUAL'>('MONTHLY');
+  const [newSubMemberCode, setNewSubMemberCode] = useState("");
+  const [newSubPlanName, setNewSubPlanName] = useState("Pro Strength & Cardio");
+  const [newSubPlanType, setNewSubPlanType] = useState<
+    "MONTHLY" | "QUARTERLY" | "ANNUAL"
+  >("MONTHLY");
   const [newSubPrice, setNewSubPrice] = useState(6500);
   const [newSubDurationMonths, setNewSubDurationMonths] = useState(1);
-  const [newSubAutoRenew, setNewSubAutoRenew] = useState(true);
+  const [newSubAutoRenew, setNewSubAutoRenew] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -146,6 +184,7 @@ export default function SubscriptionsPage() {
   };
 
   const loadData = async () => {
+    setLoadError("");
     try {
       const subs = await api.getSubscriptions(statusFilter);
       setSubscriptions(subs);
@@ -153,19 +192,45 @@ export default function SubscriptionsPage() {
       setPayments(pays);
       const met = await api.getSubscriptionMetrics();
       setMetrics(met);
-    } catch {
-      // Fallback handled by API client
+    } catch (error: any) {
+      setLoadError(
+        error?.message ||
+          "Could not load the ledger. Refresh before making changes.",
+      );
     }
   };
 
   useEffect(() => {
     loadData();
   }, [statusFilter]);
+  useEffect(() => {
+    if (!isNewSubOpen && !isRecordPaymentOpen) return;
+    let active = true;
+    const timer = setTimeout(
+      () =>
+        api
+          .getMembers({ search: memberSearch, take: 50 })
+          .then((result) => {
+            if (active) setMemberOptions(result.members);
+          })
+          .catch((error) => {
+            if (active) {
+              setMemberOptions([]);
+              showToast(error?.message || "Could not find members.");
+            }
+          }),
+      200,
+    );
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [memberSearch, isNewSubOpen, isRecordPaymentOpen]);
 
   // Open payment modal for a specific subscription
   const handleOpenPaymentForSub = (sub: MemberSubscription) => {
     setSelectedSubForPayment(sub);
-    setPayMemberCode(`${sub.member.memberCode} (${sub.member.firstName} ${sub.member.lastName})`);
+    setPayMemberCode(sub.memberId);
     setPayAmount(sub.price);
     setPayReference(`RCPT-${Date.now().toString().slice(-6)}`);
     setIsRecordPaymentOpen(true);
@@ -174,91 +239,89 @@ export default function SubscriptionsPage() {
   // Submit Payment Record
   const handleSubmitPayment = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!api.hasSession()) {
+      showToast("Sign in to record payments in your gym ledger.");
+      return;
+    }
+    if (saving) return;
+    setSaving(true);
     try {
       await api.recordPayment({
-        memberId: selectedSubForPayment?.memberId || 'mem-2',
+        memberId: selectedSubForPayment?.memberId || payMemberCode,
         membershipId: selectedSubForPayment?.id,
         amount: payAmount,
         provider: payProvider,
-        providerReference: payReference || `RCPT-${Date.now().toString().slice(-6)}`,
+        providerReference:
+          payReference || `RCPT-${Date.now().toString().slice(-6)}`,
         notes: payNotes,
       });
 
-      // Update local state immediately
-      setPayments((prev) => [
-        {
-          id: `pay-${Date.now()}`,
-          memberId: selectedSubForPayment?.memberId || 'mem-2',
-          amount: payAmount,
-          currency: 'PKR',
-          provider: payProvider,
-          status: 'COMPLETED',
-          providerReference: payReference || `RCPT-${Date.now().toString().slice(-6)}`,
-          createdAt: new Date().toISOString(),
-          member: selectedSubForPayment?.member || {
-            id: 'mem-2',
-            memberCode: 'GR-1002',
-            firstName: 'Ayesha',
-            lastName: 'Malik',
-            phone: '+923331122334',
-          },
-          membership: {
-            planName: selectedSubForPayment?.planName || 'Monthly Pass',
-            planType: selectedSubForPayment?.planType || 'MONTHLY',
-          },
-        },
-        ...prev,
-      ]);
-
-      if (selectedSubForPayment) {
-        setSubscriptions((prev) =>
-          prev.map((s) => (s.id === selectedSubForPayment.id ? { ...s, status: 'ACTIVE' } : s))
-        );
-      }
-
+      await loadData();
       setIsRecordPaymentOpen(false);
-      showToast(`Payment of ₨${payAmount.toLocaleString()} recorded successfully!`);
-    } catch {
-      showToast('Payment recorded into local register.');
-      setIsRecordPaymentOpen(false);
+      showToast(
+        `Payment of ₨${payAmount.toLocaleString()} recorded successfully!`,
+      );
+    } catch (error: any) {
+      showToast(
+        error?.message || "Payment was not recorded. Please try again.",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
   // Renew Subscription
   const handleRenewSub = async (sub: MemberSubscription) => {
+    if (!api.hasSession()) {
+      showToast("Sign in to renew memberships.");
+      return;
+    }
+    if (saving) return;
+    setSaving(true);
     try {
-      await api.renewSubscription(sub.id, { durationMonths: 1, recordPayment: true, amount: sub.price });
-      setSubscriptions((prev) =>
-        prev.map((s) => {
-          if (s.id === sub.id) {
-            const nextDate = new Date();
-            nextDate.setMonth(nextDate.getMonth() + 1);
-            return {
-              ...s,
-              status: 'ACTIVE',
-              endDate: nextDate.toISOString().split('T')[0],
-            };
-          }
-          return s;
-        })
+      await api.renewSubscription(sub.id, {
+        durationMonths:
+          sub.planType === "ANNUAL" ? 12 : sub.planType === "QUARTERLY" ? 3 : 1,
+        recordPayment: renewalPaid,
+        ...(renewalPaid
+          ? { amount: sub.price, paymentProvider: payProvider }
+          : {}),
+      });
+      await loadData();
+      setRenewalSub(null);
+      showToast(
+        renewalPaid
+          ? "Renewal and received fee recorded."
+          : "Renewal saved. Record any outstanding fee to activate it.",
       );
-      showToast(`Subscription for ${sub.member.firstName} renewed for 1 month!`);
-    } catch {
-      showToast(`Subscription renewed.`);
+    } catch (error: any) {
+      setRenewalError(error?.message || "Renewal was not saved.");
+    } finally {
+      setSaving(false);
     }
   };
 
   // Cancel Subscription
   const handleCancelSub = async (id: string, name: string) => {
-    if (confirm(`Are you sure you want to cancel the subscription for ${name}?`)) {
+    if (!api.hasSession()) {
+      showToast("Sign in to change memberships.");
+      return;
+    }
+    if (saving) return;
+    if (
+      confirm(`Are you sure you want to cancel the subscription for ${name}?`)
+    ) {
+      setSaving(true);
       try {
         await api.cancelSubscription(id);
         setSubscriptions((prev) =>
-          prev.map((s) => (s.id === id ? { ...s, status: 'CANCELLED' } : s))
+          prev.map((s) => (s.id === id ? { ...s, status: "CANCELLED" } : s)),
         );
-        showToast('Subscription cancelled.');
-      } catch {
-        showToast('Subscription marked as cancelled.');
+        showToast("Subscription cancelled.");
+      } catch (error: any) {
+        showToast(error?.message || "Cancellation was not saved.");
+      } finally {
+        setSaving(false);
       }
     }
   };
@@ -266,59 +329,52 @@ export default function SubscriptionsPage() {
   // Create New Subscription
   const handleCreateSub = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!api.hasSession()) {
+      showToast("Sign in to assign a real membership.");
+      return;
+    }
+    if (saving) return;
+    setSaving(true);
     const start = new Date();
     const end = new Date();
     end.setMonth(end.getMonth() + newSubDurationMonths);
 
     const newSubPayload = {
-      memberId: 'mem-6',
+      memberId: newSubMemberCode,
       planName: newSubPlanName,
       planType: newSubPlanType,
       price: newSubPrice,
-      startDate: start.toISOString().split('T')[0],
-      endDate: end.toISOString().split('T')[0],
+      startDate: start.toISOString().split("T")[0],
+      endDate: end.toISOString().split("T")[0],
       autoRenew: newSubAutoRenew,
     };
 
     try {
       const created = await api.createSubscription(newSubPayload);
-      setSubscriptions((prev) => [
-        {
-          id: created.id || `sub-${Date.now()}`,
-          memberId: 'mem-6',
-          planName: newSubPlanName,
-          planType: newSubPlanType,
-          price: newSubPrice,
-          currency: 'PKR',
-          startDate: newSubPayload.startDate,
-          endDate: newSubPayload.endDate,
-          status: 'ACTIVE',
-          autoRenew: newSubAutoRenew,
-          member: {
-            id: 'mem-6',
-            memberCode: 'GR-1006',
-            firstName: 'Ali',
-            lastName: 'Raza',
-            phone: '+923004455667',
-          },
-        },
-        ...prev,
-      ]);
+      await loadData();
       setIsNewSubOpen(false);
-      showToast('New subscription activated successfully!');
-    } catch {
-      setIsNewSubOpen(false);
-      showToast('Subscription created.');
+      showToast(
+        created.status === "ACTIVE"
+          ? "Membership created."
+          : "Membership saved. Record the fee to activate it.",
+      );
+    } catch (error: any) {
+      showToast(error?.message || "Membership was not saved.");
+    } finally {
+      setSaving(false);
     }
   };
 
   // Filter subscriptions by search
   const filteredSubs = subscriptions.filter((s) => {
     const query = searchQuery.toLowerCase();
-    const fullName = `${s.member?.firstName} ${s.member?.lastName}`.toLowerCase();
-    const code = s.member?.memberCode?.toLowerCase() || '';
+    const fullName =
+      `${s.member?.firstName} ${s.member?.lastName}`.toLowerCase();
+    const code = s.member?.memberCode?.toLowerCase() || "";
     const plan = s.planName.toLowerCase();
-    return fullName.includes(query) || code.includes(query) || plan.includes(query);
+    return (
+      fullName.includes(query) || code.includes(query) || plan.includes(query)
+    );
   });
 
   return (
@@ -326,7 +382,10 @@ export default function SubscriptionsPage() {
       {/* Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-surface border border-surface-border text-content-primary shadow-2xl animate-in slide-in-from-bottom-5 duration-200">
-          <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" weight="fill" />
+          <CheckCircle
+            className="w-5 h-5 text-status-success-text flex-shrink-0"
+            weight="fill"
+          />
           <span className="text-xs font-semibold">{toastMessage}</span>
         </div>
       )}
@@ -341,12 +400,13 @@ export default function SubscriptionsPage() {
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-content-primary font-sans">
                 Memberships &amp; Payments
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20">
                 Payment Register
               </span>
             </div>
             <p className="text-xs sm:text-sm text-content-secondary">
-              Track active gym memberships, check upcoming renewal dates, and record fee payments at the desk.
+              Track active gym memberships, check upcoming renewal dates, and
+              record fee payments at the desk.
             </p>
           </div>
 
@@ -354,18 +414,27 @@ export default function SubscriptionsPage() {
             <button
               onClick={() => {
                 setSelectedSubForPayment(null);
+                setPayMemberCode("");
+                setMemberSearch("");
                 setPayAmount(5000);
                 setPayReference(`RCPT-${Date.now().toString().slice(-6)}`);
                 setIsRecordPaymentOpen(true);
               }}
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary transition-all btn-shadow"
             >
-              <Receipt className="w-4 h-4 text-emerald-600 dark:text-emerald-400" weight="duotone" />
+              <Receipt
+                className="w-4 h-4 text-status-success-text"
+                weight="duotone"
+              />
               <span>Record Payment</span>
             </button>
 
             <button
-              onClick={() => setIsNewSubOpen(true)}
+              onClick={() => {
+                setMemberSearch("");
+                setNewSubMemberCode("");
+                setIsNewSubOpen(true);
+              }}
               className="flex items-center gap-2 px-4 py-2 rounded-xl btn-shadow-primary text-xs font-bold transition-all"
             >
               <Plus className="w-4 h-4" weight="bold" />
@@ -374,16 +443,27 @@ export default function SubscriptionsPage() {
           </div>
         </div>
 
+        {loadError && (
+          <div role="alert" className="studio-alert" data-tone="danger">
+            {loadError}
+            <button className="studio-button" onClick={loadData}>
+              Refresh
+            </button>
+          </div>
+        )}
         {/* ============================================================
             2. KEY FINANCIAL & MEMBERSHIP METRICS
             ============================================================ */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow">
+          <div
+            data-tone="success"
+            className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
                 Active Memberships
               </span>
-              <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center">
                 <Users className="w-4 h-4" weight="duotone" />
               </div>
             </div>
@@ -395,16 +475,19 @@ export default function SubscriptionsPage() {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow">
+          <div
+            data-tone={metrics.expiringWithin7Days > 0 ? "warning" : "success"}
+            className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
                 Expiring Within 7 Days
               </span>
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-status-warning-bg text-status-warning-text flex items-center justify-center">
                 <Clock className="w-4 h-4" weight="duotone" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 tracking-tight font-sans mb-1">
+            <div className="text-2xl sm:text-3xl font-extrabold text-status-warning-text tracking-tight font-sans mb-1">
               {metrics.expiringWithin7Days} Renewals
             </div>
             <p className="text-[11px] text-content-tertiary">
@@ -412,16 +495,19 @@ export default function SubscriptionsPage() {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow">
+          <div
+            data-tone="success"
+            className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
                 Fees Collected (Month)
               </span>
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-status-success-bg text-status-success-text flex items-center justify-center">
                 <CurrencyDollar className="w-4 h-4" weight="duotone" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight font-sans mb-1">
+            <div className="text-2xl sm:text-3xl font-extrabold text-status-success-text tracking-tight font-sans mb-1">
               ₨{metrics.totalRevenueRecorded.toLocaleString()}
             </div>
             <p className="text-[11px] text-content-tertiary">
@@ -429,16 +515,19 @@ export default function SubscriptionsPage() {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow">
+          <div
+            data-tone={metrics.pendingPayments > 0 ? "danger" : "success"}
+            className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
                 Unpaid Dues
               </span>
-              <div className="w-8 h-8 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-status-danger-bg text-status-danger-text flex items-center justify-center">
                 <Warning className="w-4 h-4" weight="duotone" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-red-600 dark:text-red-400 tracking-tight font-sans mb-1">
+            <div className="text-2xl sm:text-3xl font-extrabold text-status-danger-text tracking-tight font-sans mb-1">
               {metrics.pendingPayments} Pending
             </div>
             <p className="text-[11px] text-content-tertiary">
@@ -452,44 +541,44 @@ export default function SubscriptionsPage() {
             ============================================================ */}
         <div className="flex items-center gap-2 border-b border-surface-border">
           <button
-            onClick={() => setActiveTab('SUBSCRIPTIONS')}
+            onClick={() => setActiveTab("SUBSCRIPTIONS")}
             className={`pb-3 px-4 text-xs font-bold transition-all relative ${
-              activeTab === 'SUBSCRIPTIONS'
-                ? 'text-purple-600 dark:text-cyan-400'
-                : 'text-content-tertiary hover:text-content-primary'
+              activeTab === "SUBSCRIPTIONS"
+                ? "text-brand-600 dark:text-brass-400"
+                : "text-content-tertiary hover:text-content-primary"
             }`}
           >
             <span>Active Memberships</span>
-            {activeTab === 'SUBSCRIPTIONS' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400 rounded-full" />
+            {activeTab === "SUBSCRIPTIONS" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brass-400 rounded-full" />
             )}
           </button>
 
           <button
-            onClick={() => setActiveTab('PAYMENTS')}
+            onClick={() => setActiveTab("PAYMENTS")}
             className={`pb-3 px-4 text-xs font-bold transition-all relative ${
-              activeTab === 'PAYMENTS'
-                ? 'text-purple-600 dark:text-cyan-400'
-                : 'text-content-tertiary hover:text-content-primary'
+              activeTab === "PAYMENTS"
+                ? "text-brand-600 dark:text-brass-400"
+                : "text-content-tertiary hover:text-content-primary"
             }`}
           >
             <span>Payment Records ({payments.length})</span>
-            {activeTab === 'PAYMENTS' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400 rounded-full" />
+            {activeTab === "PAYMENTS" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brass-400 rounded-full" />
             )}
           </button>
 
           <button
-            onClick={() => setActiveTab('PLANS')}
+            onClick={() => setActiveTab("PLANS")}
             className={`pb-3 px-4 text-xs font-bold transition-all relative ${
-              activeTab === 'PLANS'
-                ? 'text-purple-600 dark:text-cyan-400'
-                : 'text-content-tertiary hover:text-content-primary'
+              activeTab === "PLANS"
+                ? "text-brand-600 dark:text-brass-400"
+                : "text-content-tertiary hover:text-content-primary"
             }`}
           >
             <span>Membership Plans ({DEFAULT_PLANS.length})</span>
-            {activeTab === 'PLANS' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-cyan-400 rounded-full" />
+            {activeTab === "PLANS" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brass-400 rounded-full" />
             )}
           </button>
         </div>
@@ -497,7 +586,7 @@ export default function SubscriptionsPage() {
         {/* ============================================================
             4. TAB 1: MEMBER SUBSCRIPTIONS DIRECTORY
             ============================================================ */}
-        {activeTab === 'SUBSCRIPTIONS' && (
+        {activeTab === "SUBSCRIPTIONS" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             {/* Search & Filters */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -508,26 +597,26 @@ export default function SubscriptionsPage() {
                   placeholder="Search by member name, code (e.g. GR-1001), or plan..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-surface-border text-xs text-content-primary placeholder-content-tertiary outline-none focus:border-purple-600 dark:focus:border-cyan-400 transition-all btn-shadow"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-surface-border text-xs text-content-primary placeholder-content-tertiary outline-none focus:border-brand-600 dark:focus:border-brass-400 transition-all btn-shadow"
                 />
               </div>
 
               {/* Status Filter Buttons */}
               <div className="flex items-center gap-1 p-1 bg-surface-subtle border border-surface-border rounded-xl">
                 {[
-                  { id: 'ALL', label: 'All' },
-                  { id: 'ACTIVE', label: 'Active' },
-                  { id: 'PENDING_PAYMENT', label: 'Pending Payment' },
-                  { id: 'EXPIRED', label: 'Expired' },
-                  { id: 'CANCELLED', label: 'Cancelled' },
+                  { id: "ALL", label: "All" },
+                  { id: "ACTIVE", label: "Active" },
+                  { id: "PENDING_PAYMENT", label: "Pending Payment" },
+                  { id: "EXPIRED", label: "Expired" },
+                  { id: "CANCELLED", label: "Cancelled" },
                 ].map((st) => (
                   <button
                     key={st.id}
                     onClick={() => setStatusFilter(st.id as any)}
                     className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all btn-shadow ${
                       statusFilter === st.id
-                        ? 'bg-surface text-purple-600 dark:text-cyan-400 shadow-sm border border-surface-border'
-                        : 'text-content-tertiary hover:text-content-primary'
+                        ? "bg-surface text-brand-600 dark:text-brass-400 shadow-sm border border-surface-border"
+                        : "text-content-tertiary hover:text-content-primary"
                     }`}
                   >
                     {st.label}
@@ -551,14 +640,17 @@ export default function SubscriptionsPage() {
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-surface-border/50">
+                  <tbody className="divide-y divide-surface-border">
                     {filteredSubs.map((sub) => {
-                      const isExpired = sub.status === 'EXPIRED';
-                      const isPending = sub.status === 'PENDING_PAYMENT';
-                      const isCancelled = sub.status === 'CANCELLED';
+                      const isExpired = sub.status === "EXPIRED";
+                      const isPending = sub.status === "PENDING_PAYMENT";
+                      const isCancelled = sub.status === "CANCELLED";
 
                       return (
-                        <tr key={sub.id} className="hover:bg-surface-subtle/40 transition-colors">
+                        <tr
+                          key={sub.id}
+                          className="hover:bg-surface-subtle/40 transition-colors"
+                        >
                           <td className="py-3.5 px-4">
                             <div className="font-bold text-content-primary">
                               {sub.member?.firstName} {sub.member?.lastName}
@@ -569,8 +661,10 @@ export default function SubscriptionsPage() {
                           </td>
 
                           <td className="py-3.5 px-4">
-                            <div className="font-bold text-content-primary">{sub.planName}</div>
-                            <span className="inline-block mt-0.5 px-2 py-0.5 rounded-md text-[9px] font-bold font-mono bg-purple-500/10 text-purple-600 dark:text-cyan-400">
+                            <div className="font-bold text-content-primary">
+                              {sub.planName}
+                            </div>
+                            <span className="inline-block mt-0.5 px-2 py-0.5 rounded-md text-[9px] font-bold font-mono bg-brand-500/10 text-brand-600 dark:text-brass-400">
                               {sub.planType}
                             </span>
                           </td>
@@ -580,35 +674,37 @@ export default function SubscriptionsPage() {
                               ₨{sub.price.toLocaleString()}
                             </div>
                             <div className="text-[10px] text-content-tertiary">
-                              {sub.autoRenew ? 'Auto-renews' : 'Manual renewal'}
+                              {sub.autoRenew
+                                ? "Renewal preferred"
+                                : "Manual renewal"}
                             </div>
                           </td>
 
                           <td className="py-3.5 px-4">
                             <div className="font-semibold text-content-primary">
-                              {new Date(sub.startDate).toLocaleDateString()} →{' '}
+                              {new Date(sub.startDate).toLocaleDateString()} →{" "}
                               {new Date(sub.endDate).toLocaleDateString()}
                             </div>
                             <div className="text-[10px] text-content-tertiary">
-                              {isExpired ? 'Ended' : 'Active window'}
+                              {isExpired ? "Ended" : "Active window"}
                             </div>
                           </td>
 
                           <td className="py-3.5 px-4">
-                            {sub.status === 'ACTIVE' && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            {sub.status === "ACTIVE" && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-status-success-bg text-status-success-text border border-status-success-border">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 Active
                               </span>
                             )}
                             {isPending && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-status-warning-bg text-status-warning-text border border-status-warning-border">
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                 Pending Payment
                               </span>
                             )}
                             {isExpired && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-status-danger-bg text-status-danger-text border border-status-danger-border">
                                 <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                                 Expired
                               </span>
@@ -625,14 +721,21 @@ export default function SubscriptionsPage() {
                             {sub.latestPayment ? (
                               <div>
                                 <div className="font-bold text-content-primary">
-                                  ₨{sub.latestPayment.amount.toLocaleString()} ({sub.latestPayment.provider})
+                                  ₨{sub.latestPayment.amount.toLocaleString()} (
+                                  {sub.latestPayment.provider})
                                 </div>
                                 <div className="text-[10px] text-content-tertiary">
-                                  {sub.latestPayment.paidAt ? new Date(sub.latestPayment.paidAt).toLocaleDateString() : 'Recorded'}
+                                  {sub.latestPayment.paidAt
+                                    ? new Date(
+                                        sub.latestPayment.paidAt,
+                                      ).toLocaleDateString()
+                                    : "Recorded"}
                                 </div>
                               </div>
                             ) : (
-                              <span className="text-[11px] text-red-500 font-semibold">No record found</span>
+                              <span className="text-[11px] text-status-danger-text font-semibold">
+                                No record found
+                              </span>
                             )}
                           </td>
 
@@ -647,9 +750,15 @@ export default function SubscriptionsPage() {
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() => handleRenewSub(sub)}
+                                  onClick={() => {
+                                    setRenewalSub(sub);
+                                    setRenewalPaid(false);
+                                    setRenewalError("");
+                                    setPayProvider("CASH");
+                                  }}
+                                  disabled={saving || !!loadError}
                                   className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-subtle border border-surface-border text-content-primary transition-all btn-shadow"
-                                  title="Renew for 1 month"
+                                  title="Extend this plan; payment will remain pending until recorded"
                                 >
                                   Renew
                                 </button>
@@ -657,8 +766,14 @@ export default function SubscriptionsPage() {
 
                               {!isCancelled && (
                                 <button
-                                  onClick={() => handleCancelSub(sub.id, `${sub.member.firstName} ${sub.member.lastName}`)}
-                                  className="p-1 rounded-lg text-content-tertiary hover:text-red-500 hover:bg-surface-subtle transition-colors"
+                                  disabled={saving || !!loadError}
+                                  onClick={() =>
+                                    handleCancelSub(
+                                      sub.id,
+                                      `${sub.member.firstName} ${sub.member.lastName}`,
+                                    )
+                                  }
+                                  className="p-1 rounded-lg text-content-tertiary hover:text-status-danger-text hover:bg-surface-subtle transition-colors"
                                   title="Cancel subscription"
                                 >
                                   <X className="w-4 h-4" />
@@ -679,18 +794,25 @@ export default function SubscriptionsPage() {
         {/* ============================================================
             5. TAB 2: PAYMENT TRANSACTIONS AUDIT HISTORY
             ============================================================ */}
-        {activeTab === 'PAYMENTS' && (
+        {activeTab === "PAYMENTS" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-content-primary">Internal Payment Log</h3>
+                <h3 className="text-base font-bold text-content-primary">
+                  Internal Payment Log
+                </h3>
                 <p className="text-xs text-content-tertiary">
-                  Audited register of cash, bank slips, and mobile payments recorded at the front desk
+                  Audited register of cash, bank slips, and mobile payments
+                  recorded at the front desk
                 </p>
               </div>
 
               <span className="text-xs font-mono font-bold text-content-secondary px-3 py-1 rounded-xl bg-surface border border-surface-border btn-shadow">
-                Total: ₨{payments.reduce((acc, p) => acc + p.amount, 0).toLocaleString()}
+                Total: ₨
+                {payments
+                  .filter((p) => p.status === "COMPLETED")
+                  .reduce((acc, p) => acc + p.amount, 0)
+                  .toLocaleString()}
               </span>
             </div>
 
@@ -708,9 +830,12 @@ export default function SubscriptionsPage() {
                       <th className="py-3 px-4 text-right">Date Recorded</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-surface-border/50">
+                  <tbody className="divide-y divide-surface-border">
                     {payments.map((p) => (
-                      <tr key={p.id} className="hover:bg-surface-subtle/40 transition-colors">
+                      <tr
+                        key={p.id}
+                        className="hover:bg-surface-subtle/40 transition-colors"
+                      >
                         <td className="py-3.5 px-4 font-mono font-bold text-content-primary">
                           {p.providerReference || `RCPT-${p.id.slice(-6)}`}
                         </td>
@@ -724,10 +849,10 @@ export default function SubscriptionsPage() {
                         </td>
                         <td className="py-3.5 px-4">
                           <div className="font-semibold text-content-primary">
-                            {p.membership?.planName || 'Monthly Membership'}
+                            {p.membership?.planName || "Monthly Membership"}
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 font-extrabold text-emerald-600 dark:text-emerald-400 font-mono text-sm">
+                        <td className="py-3.5 px-4 font-extrabold text-status-success-text font-mono text-sm">
                           ₨{p.amount.toLocaleString()}
                         </td>
                         <td className="py-3.5 px-4">
@@ -736,7 +861,7 @@ export default function SubscriptionsPage() {
                           </span>
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-status-success-bg text-status-success-text border border-status-success-border">
                             Completed
                           </span>
                         </td>
@@ -755,12 +880,15 @@ export default function SubscriptionsPage() {
         {/* ============================================================
             6. TAB 3: SUBSCRIPTION PLANS & PRICING SETUP
             ============================================================ */}
-        {activeTab === 'PLANS' && (
+        {activeTab === "PLANS" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div>
-              <h3 className="text-base font-bold text-content-primary">Gym Membership Tiers</h3>
+              <h3 className="text-base font-bold text-content-primary">
+                Gym Membership Tiers
+              </h3>
               <p className="text-xs text-content-tertiary">
-                Configured recurring plans available for assignment to gym members
+                Configured recurring plans available for assignment to gym
+                members
               </p>
             </div>
 
@@ -772,7 +900,7 @@ export default function SubscriptionsPage() {
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-cyan-400">
+                      <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-md bg-brand-500/10 text-brand-600 dark:text-brass-400">
                         {plan.type}
                       </span>
                       <span className="text-xs font-semibold text-content-tertiary">
@@ -791,7 +919,7 @@ export default function SubscriptionsPage() {
                     <div className="space-y-2 pt-3 border-t border-surface-border text-xs text-content-secondary">
                       {plan.features.map((feat, fIdx) => (
                         <div key={fIdx} className="flex items-center gap-2">
-                          <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                          <Check className="w-3.5 h-3.5 text-status-success-text flex-shrink-0" />
                           <span>{feat}</span>
                         </div>
                       ))}
@@ -803,10 +931,16 @@ export default function SubscriptionsPage() {
                       setNewSubPlanName(plan.name);
                       setNewSubPlanType(plan.type as any);
                       setNewSubPrice(plan.price);
-                      setNewSubDurationMonths(plan.type === 'QUARTERLY' ? 3 : plan.type === 'ANNUAL' ? 12 : 1);
+                      setNewSubDurationMonths(
+                        plan.type === "QUARTERLY"
+                          ? 3
+                          : plan.type === "ANNUAL"
+                            ? 12
+                            : 1,
+                      );
                       setIsNewSubOpen(true);
                     }}
-                    className="w-full mt-5 py-2 text-center rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all btn-shadow"
+                    className="w-full mt-5 py-2 text-center rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all btn-shadow"
                   >
                     Assign to Member
                   </button>
@@ -825,7 +959,9 @@ export default function SubscriptionsPage() {
           <div className="bg-surface border border-surface-border rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
             <div className="flex items-center justify-between pb-3 border-b border-surface-border">
               <div>
-                <h3 className="text-lg font-extrabold text-content-primary">Record Member Payment</h3>
+                <h3 className="text-lg font-extrabold text-content-primary">
+                  Record Member Payment
+                </h3>
                 <p className="text-xs text-content-tertiary">
                   Record an internal cash or bank transfer payment at front desk
                 </p>
@@ -840,19 +976,49 @@ export default function SubscriptionsPage() {
 
             <form onSubmit={handleSubmitPayment} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold text-content-primary block mb-1">Member</label>
-                <input
-                  type="text"
+                <label className="font-bold text-content-primary block mb-1">
+                  Member
+                </label>
+                {!selectedSubForPayment && (
+                  <input
+                    aria-label="Find payment member"
+                    placeholder="Find by name, phone or member code"
+                    value={memberSearch}
+                    onChange={(event) => setMemberSearch(event.target.value)}
+                    className="studio-input mb-2"
+                  />
+                )}
+                <select
+                  aria-label="Payment member"
                   value={payMemberCode}
                   onChange={(e) => setPayMemberCode(e.target.value)}
                   className="w-full px-3.5 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary font-medium outline-none"
                   required
-                />
+                  disabled={!!selectedSubForPayment}
+                >
+                  <option value="">Select a member</option>
+                  {selectedSubForPayment ? (
+                    <option value={selectedSubForPayment.memberId}>
+                      {selectedSubForPayment.member.memberCode} ·{" "}
+                      {selectedSubForPayment.member.firstName}{" "}
+                      {selectedSubForPayment.member.lastName}
+                    </option>
+                  ) : (
+                    memberOptions.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.memberCode} · {member.firstName}{" "}
+                        {member.lastName}
+                      </option>
+                    ))
+                  )}
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-content-primary block mb-1">Amount (PKR)</label>
+                  <label className="font-bold text-content-primary block mb-1">
+                    Amount (PKR)
+                  </label>
                   <input
                     type="number"
                     value={payAmount}
@@ -864,7 +1030,9 @@ export default function SubscriptionsPage() {
                 </div>
 
                 <div>
-                  <label className="font-bold text-content-primary block mb-1">Payment Method</label>
+                  <label className="font-bold text-content-primary block mb-1">
+                    Payment Method
+                  </label>
                   <select
                     value={payProvider}
                     onChange={(e) => setPayProvider(e.target.value as any)}
@@ -892,7 +1060,9 @@ export default function SubscriptionsPage() {
               </div>
 
               <div>
-                <label className="font-bold text-content-primary block mb-1">Staff Notes</label>
+                <label className="font-bold text-content-primary block mb-1">
+                  Staff Notes
+                </label>
                 <textarea
                   value={payNotes}
                   onChange={(e) => setPayNotes(e.target.value)}
@@ -912,6 +1082,7 @@ export default function SubscriptionsPage() {
 
                 <button
                   type="submit"
+                  disabled={saving}
                   className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all btn-shadow"
                 >
                   Save &amp; Record Payment
@@ -930,7 +1101,9 @@ export default function SubscriptionsPage() {
           <div className="bg-surface border border-surface-border rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
             <div className="flex items-center justify-between pb-3 border-b border-surface-border">
               <div>
-                <h3 className="text-lg font-extrabold text-content-primary">Assign New Subscription</h3>
+                <h3 className="text-lg font-extrabold text-content-primary">
+                  Assign New Subscription
+                </h3>
                 <p className="text-xs text-content-tertiary">
                   Enroll a gym member into a recurring membership tier
                 </p>
@@ -945,18 +1118,36 @@ export default function SubscriptionsPage() {
 
             <form onSubmit={handleCreateSub} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold text-content-primary block mb-1">Select Member</label>
+                <label className="font-bold text-content-primary block mb-1">
+                  Select Member
+                </label>
                 <input
-                  type="text"
+                  aria-label="Find membership member"
+                  placeholder="Find by name, phone or member code"
+                  value={memberSearch}
+                  onChange={(event) => setMemberSearch(event.target.value)}
+                  className="studio-input mb-2"
+                />
+                <select
+                  aria-label="Membership member"
                   value={newSubMemberCode}
                   onChange={(e) => setNewSubMemberCode(e.target.value)}
                   className="w-full px-3.5 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary font-medium outline-none"
                   required
-                />
+                >
+                  <option value="">Select a member</option>
+                  {memberOptions.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.memberCode} · {member.firstName} {member.lastName}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
-                <label className="font-bold text-content-primary block mb-1">Plan Name</label>
+                <label className="font-bold text-content-primary block mb-1">
+                  Plan Name
+                </label>
                 <input
                   type="text"
                   value={newSubPlanName}
@@ -968,7 +1159,9 @@ export default function SubscriptionsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-content-primary block mb-1">Plan Tier</label>
+                  <label className="font-bold text-content-primary block mb-1">
+                    Plan Tier
+                  </label>
                   <select
                     value={newSubPlanType}
                     onChange={(e) => setNewSubPlanType(e.target.value as any)}
@@ -981,7 +1174,9 @@ export default function SubscriptionsPage() {
                 </div>
 
                 <div>
-                  <label className="font-bold text-content-primary block mb-1">Price (PKR)</label>
+                  <label className="font-bold text-content-primary block mb-1">
+                    Price (PKR)
+                  </label>
                   <input
                     type="number"
                     value={newSubPrice}
@@ -1001,9 +1196,13 @@ export default function SubscriptionsPage() {
                   <input
                     type="number"
                     value={newSubDurationMonths}
-                    onChange={(e) => setNewSubDurationMonths(Number(e.target.value))}
+                    onChange={(e) =>
+                      setNewSubDurationMonths(Number(e.target.value))
+                    }
                     className="w-full px-3.5 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary font-mono outline-none"
                     min={1}
+                    max={36}
+                    required
                   />
                 </div>
 
@@ -1013,10 +1212,13 @@ export default function SubscriptionsPage() {
                     id="autoRenew"
                     checked={newSubAutoRenew}
                     onChange={(e) => setNewSubAutoRenew(e.target.checked)}
-                    className="w-4 h-4 rounded text-purple-600 cursor-pointer"
+                    className="w-4 h-4 rounded text-brand-600 cursor-pointer"
                   />
-                  <label htmlFor="autoRenew" className="font-semibold text-content-primary cursor-pointer">
-                    Enable Auto-Renew
+                  <label
+                    htmlFor="autoRenew"
+                    className="font-semibold text-content-primary cursor-pointer"
+                  >
+                    Renewal preference (no automatic charge)
                   </label>
                 </div>
               </div>
@@ -1032,15 +1234,107 @@ export default function SubscriptionsPage() {
 
                 <button
                   type="submit"
+                  disabled={saving}
                   className="px-5 py-2 rounded-xl btn-shadow-primary text-xs font-bold transition-all"
                 >
-                  Activate Subscription
+                  Save membership
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+      <Modal
+        isOpen={!!renewalSub}
+        onClose={() => {
+          if (!saving) setRenewalSub(null);
+        }}
+        title="Renew membership"
+        description="Review the next term and record a fee only after you have received it."
+      >
+        {renewalSub && (
+          <form
+            className="space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleRenewSub(renewalSub);
+            }}
+          >
+            <div className="studio-alert" data-tone="success">
+              <span>
+                {renewalSub.member.firstName} {renewalSub.member.lastName} ·{" "}
+                {renewalSub.planName}
+                <br />
+                Extend by{" "}
+                {renewalSub.planType === "ANNUAL"
+                  ? 12
+                  : renewalSub.planType === "QUARTERLY"
+                    ? 3
+                    : 1}{" "}
+                month(s) · Rs {renewalSub.price.toLocaleString()}
+              </span>
+            </div>
+            <label className="flex items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={renewalPaid}
+                onChange={(event) => setRenewalPaid(event.target.checked)}
+              />
+              <span>
+                I have received the full renewal fee. Record this payment.
+              </span>
+            </label>
+            {renewalPaid && (
+              <label className="studio-field">
+                <span>Received through</span>
+                <select
+                  className="studio-input"
+                  value={payProvider}
+                  onChange={(event) =>
+                    setPayProvider(event.target.value as any)
+                  }
+                >
+                  <option value="CASH">Cash</option>
+                  <option value="BANK_TRANSFER">Bank transfer</option>
+                  <option value="JAZZCASH">JazzCash</option>
+                  <option value="EASYPAISA">EasyPaisa</option>
+                </select>
+              </label>
+            )}
+            <p className="studio-footnote">
+              A current paid term stays active. Unpaid renewals can be created
+              after expiry. This records an internal receipt; it does not charge
+              a bank account.
+            </p>
+            {renewalError && (
+              <p role="alert" className="studio-alert" data-tone="danger">
+                {renewalError}
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                className="studio-button"
+                disabled={saving}
+                onClick={() => setRenewalSub(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="studio-button studio-button-primary"
+                disabled={saving}
+              >
+                {saving
+                  ? "Saving…"
+                  : renewalPaid
+                    ? "Renew and record fee"
+                    : "Save pending renewal"}
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </AppLayout>
   );
 }

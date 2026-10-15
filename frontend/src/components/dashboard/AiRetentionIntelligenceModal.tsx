@@ -97,7 +97,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
         {/* Modal Header */}
         <div className="p-5 sm:p-6 border-b border-surface-border flex items-center justify-between bg-surface-subtle/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 dark:from-cyan-400 dark:to-blue-600 text-white dark:text-black flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-500 dark:from-brass-400 dark:to-blue-600 text-white dark:text-black flex items-center justify-center shadow-md">
               <BrainCircuit className="w-5 h-5" />
             </div>
             <div>
@@ -105,7 +105,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
                 <h2 className="text-base sm:text-lg font-extrabold text-content-primary">
                   AI Retention Intelligence &amp; Analytics
                 </h2>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-500/10 dark:bg-cyan-500/15 text-purple-700 dark:text-cyan-400 border border-purple-500/20 dark:border-cyan-500/30">
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-brand-500/10 dark:bg-brass-500/15 text-brand-700 dark:text-brass-400 border border-brand-500/20 dark:border-brass-500/30">
                   Groq LLM Powered
                 </span>
               </div>
@@ -126,9 +126,9 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
         {/* Modal Body */}
         <div className="p-5 sm:p-6 space-y-6 max-h-[75vh] overflow-y-auto">
           {/* Privacy Protection Banner */}
-          <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-            <div className="text-xs text-emerald-900 dark:text-emerald-300 leading-relaxed">
+          <div className="p-3.5 rounded-2xl bg-status-success-bg border border-status-success-border flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-status-success-text shrink-0 mt-0.5" />
+            <div className="text-xs text-emerald-900 text-status-success-text leading-relaxed">
               <span className="font-bold">Zero PII Privacy Guarantee:</span> Absolutely no personal data (no names, phone numbers, emails, or member codes) is ever transmitted to the AI layer. Only mathematical signals (missing days, active streak, frequency drop rate) are processed.
             </div>
           </div>
@@ -147,7 +147,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
               <div className="space-y-2.5">
                 <div>
                   <div className="flex justify-between text-[11px] font-semibold text-content-secondary mb-1">
-                    <span className="text-emerald-600 dark:text-emerald-400">1-3 Days Absent (Healthy Habit)</span>
+                    <span className="text-status-success-text">1-3 Days Absent (Healthy Habit)</span>
                     <span>84 members (59%)</span>
                   </div>
                   <div className="h-2 rounded-full bg-surface overflow-hidden">
@@ -157,17 +157,17 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
 
                 <div>
                   <div className="flex justify-between text-[11px] font-semibold text-content-secondary mb-1">
-                    <span className="text-blue-600 dark:text-cyan-400">4-7 Days Absent (Early Warning)</span>
+                    <span className="text-blue-600 dark:text-brass-400">4-7 Days Absent (Early Warning)</span>
                     <span>28 members (20%)</span>
                   </div>
                   <div className="h-2 rounded-full bg-surface overflow-hidden">
-                    <div className="h-full bg-blue-500 dark:bg-cyan-400 rounded-full" style={{ width: '20%' }} />
+                    <div className="h-full bg-blue-500 dark:bg-brass-400 rounded-full" style={{ width: '20%' }} />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between text-[11px] font-semibold text-content-secondary mb-1">
-                    <span className="text-amber-600 dark:text-amber-400">8-14 Days Absent (High Churn Window)</span>
+                    <span className="text-status-warning-text">8-14 Days Absent (High Churn Window)</span>
                     <span>18 members (13%)</span>
                   </div>
                   <div className="h-2 rounded-full bg-surface overflow-hidden">
@@ -177,7 +177,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
 
                 <div>
                   <div className="flex justify-between text-[11px] font-semibold text-content-secondary mb-1">
-                    <span className="text-red-600 dark:text-red-400">15+ Days Absent (Critical Silent Churn)</span>
+                    <span className="text-status-danger-text">15+ Days Absent (Critical Silent Churn)</span>
                     <span>12 members (8%)</span>
                   </div>
                   <div className="h-2 rounded-full bg-surface overflow-hidden">
@@ -200,22 +200,22 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
               <div className="grid grid-cols-4 gap-2 text-center py-2">
                 <div className="p-2 rounded-xl bg-surface border border-surface-border">
                   <div className="text-[10px] text-content-tertiary">1-3 Days</div>
-                  <div className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">4%</div>
+                  <div className="text-xs font-extrabold text-status-success-text mt-0.5">4%</div>
                   <div className="text-[9px] text-content-tertiary">Negligible</div>
                 </div>
                 <div className="p-2 rounded-xl bg-surface border border-surface-border">
                   <div className="text-[10px] text-content-tertiary">4-7 Days</div>
-                  <div className="text-xs font-extrabold text-blue-600 dark:text-cyan-400 mt-0.5">28%</div>
+                  <div className="text-xs font-extrabold text-blue-600 dark:text-brass-400 mt-0.5">28%</div>
                   <div className="text-[9px] text-content-tertiary">Noticeable</div>
                 </div>
                 <div className="p-2 rounded-xl bg-surface border border-surface-border ring-1 ring-amber-500/30">
                   <div className="text-[10px] text-content-tertiary">8-14 Days</div>
-                  <div className="text-xs font-extrabold text-amber-600 dark:text-amber-400 mt-0.5">68%</div>
+                  <div className="text-xs font-extrabold text-status-warning-text mt-0.5">68%</div>
                   <div className="text-[9px] text-content-tertiary">High Spike</div>
                 </div>
                 <div className="p-2 rounded-xl bg-surface border border-surface-border ring-1 ring-red-500/30">
                   <div className="text-[10px] text-content-tertiary">15+ Days</div>
-                  <div className="text-xs font-extrabold text-red-600 dark:text-red-400 mt-0.5">91%</div>
+                  <div className="text-xs font-extrabold text-status-danger-text mt-0.5">91%</div>
                   <div className="text-[9px] text-content-tertiary">Critical</div>
                 </div>
               </div>
@@ -230,7 +230,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
           <div className="p-4 sm:p-5 rounded-2xl bg-surface border border-surface-border space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                <Sliders className="w-4 h-4 text-brand-600 dark:text-brass-400" />
                 <span className="text-xs font-bold text-content-primary">
                   Anonymized Signal Inference Simulator
                 </span>
@@ -243,7 +243,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
               <div>
                 <div className="flex justify-between text-[11px] font-semibold mb-1">
                   <span className="text-content-secondary">Missing Days:</span>
-                  <span className="font-bold text-purple-600 dark:text-cyan-400">{missingDays}d</span>
+                  <span className="font-bold text-brand-600 dark:text-brass-400">{missingDays}d</span>
                 </div>
                 <input
                   type="range"
@@ -251,14 +251,14 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
                   max="30"
                   value={missingDays}
                   onChange={(e) => setMissingDays(Number(e.target.value))}
-                  className="w-full accent-purple-600 dark:accent-cyan-400 cursor-pointer"
+                  className="w-full accent-brand-600 dark:accent-brass-400 cursor-pointer"
                 />
               </div>
 
               <div>
                 <div className="flex justify-between text-[11px] font-semibold mb-1">
                   <span className="text-content-secondary">Active Streak:</span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{currentStreak}d</span>
+                  <span className="font-bold text-status-success-text">{currentStreak}d</span>
                 </div>
                 <input
                   type="range"
@@ -288,7 +288,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
               <div>
                 <div className="flex justify-between text-[11px] font-semibold mb-1">
                   <span className="text-content-secondary">Frequency Drop:</span>
-                  <span className="font-bold text-red-500">{frequencyDrop}%</span>
+                  <span className="font-bold text-status-danger-text">{frequencyDrop}%</span>
                 </div>
                 <input
                   type="range"
@@ -313,7 +313,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
               <button
                 onClick={() => runInference()}
                 disabled={aiLoading}
-                className="px-4 py-2 rounded-xl bg-purple-600 dark:bg-cyan-500 hover:bg-purple-500 dark:hover:bg-cyan-400 text-white dark:text-black text-xs font-bold transition-all shadow flex items-center gap-1.5 shrink-0 btn-shadow"
+                className="px-4 py-2 rounded-xl bg-brand-600 dark:bg-brass-500 hover:bg-brand-500 dark:hover:bg-brass-400 text-white dark:text-black text-xs font-bold transition-all shadow flex items-center gap-1.5 shrink-0 btn-shadow"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>{aiLoading ? 'Thinking...' : 'Run AI Analysis'}</span>
@@ -322,15 +322,15 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
 
             {/* AI Results Box */}
             {aiResult && (
-              <div className="mt-4 p-4 rounded-2xl bg-purple-500/10 dark:bg-cyan-500/10 border border-purple-500/20 dark:border-cyan-500/20 space-y-3 animate-in fade-in duration-200">
+              <div className="mt-4 p-4 rounded-2xl bg-brand-500/10 dark:bg-brass-500/10 border border-brand-500/20 dark:border-brass-500/20 space-y-3 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Bot className="w-4 h-4 text-purple-700 dark:text-cyan-400" />
+                    <Bot className="w-4 h-4 text-brand-700 dark:text-brass-400" />
                     <span className="text-xs font-bold text-content-primary">
                       Retention Recommendation ({aiResult.modelUsed})
                     </span>
                   </div>
-                  <span className="text-xs font-extrabold px-2 py-0.5 rounded-full bg-red-500/15 text-red-600 dark:text-red-400 font-mono">
+                  <span className="text-xs font-extrabold px-2 py-0.5 rounded-full bg-status-danger-bg text-status-danger-text font-mono">
                     Predicted Churn: {aiResult.churnProbability}%
                   </span>
                 </div>
@@ -342,7 +342,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
                 {aiResult.recommendedWhatsAppNudge && (
                   <div className="p-3 rounded-xl bg-surface border border-surface-border">
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <span className="text-[10px] font-bold text-status-success-text flex items-center gap-1">
                         <MessageCircle className="w-3 h-3" />
                         Empathetic WhatsApp Re-Engagement Template:
                       </span>
@@ -352,8 +352,8 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
                       >
                         {copied ? (
                           <>
-                            <Check className="w-3 h-3 text-emerald-500" />
-                            <span className="text-emerald-500">Copied</span>
+                            <Check className="w-3 h-3 text-status-success-text" />
+                            <span className="text-status-success-text">Copied</span>
                           </>
                         ) : (
                           <>

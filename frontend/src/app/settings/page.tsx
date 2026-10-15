@@ -61,8 +61,8 @@ export default function SettingsAndBillingPage() {
       setInvitations(invites);
       if (capStatus?.capacity) setCapacity(capStatus.capacity);
       if (capStatus?.capacityPolicy) setPolicy(capStatus.capacityPolicy);
-    } catch {
-      // Fallback
+    } catch (error: any) {
+      showToast(error?.message || 'Could not load settings. Check the connection and refresh.');
     } finally {
       setLoading(false);
     }
@@ -72,33 +72,13 @@ export default function SettingsAndBillingPage() {
     loadAll();
   }, []);
 
-  // Sandbox simulation actions
-  const handleSimulatePayment = async (plan: 'STARTER' | 'PRO' | 'ENTERPRISE') => {
+  // Plan review never changes entitlements or claims that a payment succeeded.
+  const handleReviewPlan = async (plan: 'STARTER' | 'PRO' | 'ENTERPRISE') => {
     setSimulating(true);
     try {
-      await api.simulateSaasPayment({
-        eventType: 'payment_succeeded',
-        plan,
-      });
-      showToast(`Sandbox payment verified for ${plan} plan! Entitlements active.`);
-      await loadAll();
+      showToast(`${plan} selected. Online checkout is not connected yet. No payment has been taken and your plan has not changed.`);
     } catch (err: any) {
       showToast(err?.message || 'Payment simulation failed');
-    } finally {
-      setSimulating(false);
-    }
-  };
-
-  const handleSimulatePaymentFailed = async () => {
-    setSimulating(true);
-    try {
-      await api.simulateSaasPayment({
-        eventType: 'payment_failed',
-      });
-      showToast('Simulated payment failed: Subscription marked PAST_DUE.');
-      await loadAll();
-    } catch (err: any) {
-      showToast(err?.message || 'Failure simulation failed');
     } finally {
       setSimulating(false);
     }
@@ -182,7 +162,7 @@ export default function SettingsAndBillingPage() {
       {/* Toast Alert */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-surface border border-surface-border text-content-primary shadow-2xl animate-in slide-in-from-bottom-5 duration-200">
-          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+          <CheckCircle2 className="w-5 h-5 text-status-success-text shrink-0" />
           <span className="text-xs font-semibold">{toastMessage}</span>
         </div>
       )}
@@ -192,7 +172,7 @@ export default function SettingsAndBillingPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-surface-border">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
+              <ShieldCheck className="w-5 h-5 text-brand-600 dark:text-brass-400" />
               Gym SaaS &amp; Administration
             </h1>
             <p className="text-xs text-content-secondary mt-1">
@@ -206,7 +186,7 @@ export default function SettingsAndBillingPage() {
               onClick={() => setActiveTab('BILLING')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all btn-shadow ${
                 activeTab === 'BILLING'
-                  ? 'bg-surface text-purple-600 dark:text-cyan-400 shadow-sm border border-surface-border'
+                  ? 'bg-surface text-brand-600 dark:text-brass-400 shadow-sm border border-surface-border'
                   : 'text-content-tertiary hover:text-content-primary'
               }`}
             >
@@ -216,7 +196,7 @@ export default function SettingsAndBillingPage() {
               onClick={() => setActiveTab('TEAM')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all btn-shadow ${
                 activeTab === 'TEAM'
-                  ? 'bg-surface text-purple-600 dark:text-cyan-400 shadow-sm border border-surface-border'
+                  ? 'bg-surface text-brand-600 dark:text-brass-400 shadow-sm border border-surface-border'
                   : 'text-content-tertiary hover:text-content-primary'
               }`}
             >
@@ -226,7 +206,7 @@ export default function SettingsAndBillingPage() {
               onClick={() => setActiveTab('CAPACITY')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all btn-shadow ${
                 activeTab === 'CAPACITY'
-                  ? 'bg-surface text-purple-600 dark:text-cyan-400 shadow-sm border border-surface-border'
+                  ? 'bg-surface text-brand-600 dark:text-brass-400 shadow-sm border border-surface-border'
                   : 'text-content-tertiary hover:text-content-primary'
               }`}
             >
@@ -239,10 +219,10 @@ export default function SettingsAndBillingPage() {
         {activeTab === 'BILLING' && (
           <div className="space-y-6">
             {/* Current Plan Overview Card */}
-            <div className="p-6 rounded-2xl bg-surface border border-surface-border shadow-sm btn-shadow">
+            <div data-tone={billingStatus?.status === 'ACTIVE' ? 'success' : billingStatus?.status === 'PAST_DUE' ? 'danger' : 'warning'} className="status-surface p-6 rounded-2xl bg-surface border border-surface-border shadow-sm btn-shadow">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-surface-border">
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-cyan-400">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600 dark:text-brass-400">
                     Active GymRetain Software Plan
                   </span>
                   <div className="flex items-center gap-3 mt-1">
@@ -252,12 +232,12 @@ export default function SettingsAndBillingPage() {
                     <span
                       className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
                         billingStatus?.status === 'ACTIVE'
-                          ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                          ? 'bg-status-success-bg text-status-success-text border border-status-success-border'
                           : billingStatus?.status === 'TRIAL'
-                          ? 'bg-blue-500/15 text-blue-600 dark:text-cyan-400 border border-blue-500/30'
+                          ? 'bg-blue-500/15 text-blue-600 dark:text-brass-400 border border-blue-500/30'
                           : billingStatus?.status === 'PAST_DUE'
-                          ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
-                          : 'bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30'
+                          ? 'bg-status-warning-bg text-status-warning-text border border-status-warning-border'
+                          : 'bg-status-danger-bg text-status-danger-text border border-status-danger-border'
                       }`}
                     >
                       {billingStatus?.status || 'TRIAL'}
@@ -275,7 +255,7 @@ export default function SettingsAndBillingPage() {
                   <button
                     onClick={handleCancelSub}
                     disabled={simulating}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-all btn-shadow self-start md:self-auto"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-status-danger-text hover:bg-status-danger-bg border border-status-danger-border transition-all btn-shadow self-start md:self-auto"
                   >
                     Cancel Subscription
                   </button>
@@ -294,7 +274,7 @@ export default function SettingsAndBillingPage() {
                   </div>
                   <div className="w-full bg-surface rounded-full h-2 overflow-hidden border border-surface-border">
                     <div
-                      className="bg-purple-600 dark:bg-cyan-500 h-full rounded-full transition-all"
+                      className="bg-brand-600 dark:bg-brass-500 h-full rounded-full transition-all"
                       style={{
                         width: `${Math.min(
                           100,
@@ -361,39 +341,39 @@ export default function SettingsAndBillingPage() {
                   </p>
                   <ul className="text-xs text-content-secondary space-y-2 mb-6">
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>150 Active Members</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>3 Staff / Trainer Seats</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>QR Attendance &amp; Floor Capacity</span>
                     </li>
                   </ul>
                 </div>
                 <button
-                  onClick={() => handleSimulatePayment('STARTER')}
+                  onClick={() => handleReviewPlan('STARTER')}
                   disabled={simulating}
                   className="w-full py-2.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary transition-all btn-shadow"
                 >
-                  Switch to Starter
+                  Review Starter
                 </button>
               </div>
 
               {/* Pro */}
-              <div className="p-5 rounded-2xl bg-surface border-2 border-purple-500/50 flex flex-col justify-between relative shadow-xl btn-shadow">
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
+              <div className="p-5 rounded-2xl bg-surface border-2 border-brand-500/50 flex flex-col justify-between relative shadow-xl btn-shadow">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-brand-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
                   Recommended
                 </span>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs font-bold text-purple-600 dark:text-cyan-400 uppercase">
+                    <span className="text-xs font-bold text-brand-600 dark:text-brass-400 uppercase">
                       Pro Retention
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-cyan-400">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brass-400">
                       Up to 500 Members
                     </span>
                   </div>
@@ -405,29 +385,29 @@ export default function SettingsAndBillingPage() {
                   </p>
                   <ul className="text-xs text-content-secondary space-y-2 mb-6">
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>500 Active Members</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>10 Staff / Trainer Seats</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>AI Retention Radar &amp; WhatsApp Nudges</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>Missed check-out audit reconciliation</span>
                     </li>
                   </ul>
                 </div>
                 <button
-                  onClick={() => handleSimulatePayment('PRO')}
+                  onClick={() => handleReviewPlan('PRO')}
                   disabled={simulating}
-                  className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black shadow-md btn-shadow transition-all"
+                  className="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black shadow-md btn-shadow transition-all"
                 >
-                  Upgrade to Pro
+                  Review Pro
                 </button>
               </div>
 
@@ -448,56 +428,33 @@ export default function SettingsAndBillingPage() {
                   </p>
                   <ul className="text-xs text-content-secondary space-y-2 mb-6">
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>Unlimited Members &amp; Staff</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>Multi-Branch Isolation &amp; Sync</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <Check className="w-4 h-4 text-status-success-text shrink-0" />
                       <span>Dedicated Account Manager &amp; Custom SLA</span>
                     </li>
                   </ul>
                 </div>
                 <button
-                  onClick={() => handleSimulatePayment('ENTERPRISE')}
+                  onClick={() => handleReviewPlan('ENTERPRISE')}
                   disabled={simulating}
                   className="w-full py-2.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary transition-all btn-shadow"
                 >
-                  Switch to Enterprise
+                  Review Enterprise
                 </button>
               </div>
             </div>
 
-            {/* Sandbox Billing Simulator Box */}
-            <div className="p-5 rounded-2xl bg-purple-500/5 border border-purple-500/20 text-xs space-y-3">
-              <div className="flex items-center gap-2 text-purple-700 dark:text-cyan-400 font-bold">
-                <Sparkles className="w-4 h-4" />
-                <span>🧪 Sandbox Billing Simulator (Audit Test Environment)</span>
-              </div>
-              <p className="text-content-secondary leading-relaxed">
-                As required by SaaS safety standards, production payment credentials are not fabricated. Use these verified server-side simulation endpoints to test webhook verification, idempotent payment events, and entitlement updates.
-              </p>
-              <div className="flex flex-wrap gap-2.5 pt-1">
-                <button
-                  onClick={() => handleSimulatePayment('PRO')}
-                  disabled={simulating}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all btn-shadow"
-                >
-                  Simulate Payment Succeeded (Pro)
-                </button>
-                <button
-                  onClick={handleSimulatePaymentFailed}
-                  disabled={simulating}
-                  className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold transition-all btn-shadow"
-                >
-                  Simulate Payment Failed (Past Due)
-                </button>
-              </div>
+            <div className="p-5 rounded-2xl bg-status-warning-bg border border-status-warning-border text-sm text-content-secondary">
+              <h3 className="font-semibold text-content-primary mb-1">Online checkout is being prepared</h3>
+              <p>Review the plans before choosing. Payments are not collected here yet; choosing a plan here does not change your subscription.</p>
             </div>
-
             {/* SaaS Invoices Table */}
             <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow">
               <h3 className="text-xs font-bold text-content-secondary uppercase tracking-wider mb-3">
@@ -528,7 +485,7 @@ export default function SettingsAndBillingPage() {
                           <td className="py-2.5">{inv.plan}</td>
                           <td className="py-2.5 font-mono">₨{(inv.amount / 100).toLocaleString()}</td>
                           <td className="py-2.5">
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-status-success-bg text-status-success-text">
                               {inv.status}
                             </span>
                           </td>
@@ -562,12 +519,12 @@ export default function SettingsAndBillingPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="coach@yourgym.com"
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-xs text-content-primary focus:border-purple-500 outline-none"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-xs text-content-primary focus:border-brand-500 outline-none"
                 />
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value as any)}
-                  className="px-4 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-xs text-content-primary focus:border-purple-500 outline-none"
+                  className="px-4 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-xs text-content-primary focus:border-brand-500 outline-none"
                 >
                   <option value="STAFF">Front-Desk Staff</option>
                   <option value="TRAINER">Trainer / Coach</option>
@@ -575,7 +532,7 @@ export default function SettingsAndBillingPage() {
                 <button
                   type="submit"
                   disabled={inviting}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black transition-all btn-shadow disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black transition-all btn-shadow disabled:opacity-50"
                 >
                   {inviting ? 'Sending...' : 'Send Invitation'}
                 </button>
@@ -602,7 +559,7 @@ export default function SettingsAndBillingPage() {
                       </div>
                       <button
                         onClick={() => handleRevokeInvite(inv.id)}
-                        className="px-3 py-1 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-500/10 border border-red-500/20 text-[11px] font-semibold btn-shadow"
+                        className="px-3 py-1 rounded-lg text-status-danger-text hover:bg-status-danger-bg border border-status-danger-border text-[11px] font-semibold btn-shadow"
                       >
                         Revoke
                       </button>
@@ -633,7 +590,7 @@ export default function SettingsAndBillingPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20">
                         {st.role}
                       </span>
                       {st.role !== 'OWNER' && (
@@ -674,7 +631,7 @@ export default function SettingsAndBillingPage() {
                     max="10000"
                     value={capacity}
                     onChange={(e) => setCapacity(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-sm font-mono font-bold text-content-primary focus:border-purple-500 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-sm font-mono font-bold text-content-primary focus:border-brand-500 outline-none"
                   />
                   <p className="text-[10px] text-content-tertiary mt-1">
                     Note: Operational guide, not a certified fire safety or municipal code.
@@ -688,7 +645,7 @@ export default function SettingsAndBillingPage() {
                   <select
                     value={policy}
                     onChange={(e) => setPolicy(e.target.value as any)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-xs font-semibold text-content-primary focus:border-purple-500 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-xs font-semibold text-content-primary focus:border-brand-500 outline-none"
                   >
                     <option value="WARNING_ONLY">Warning-Only Policy (Permit entry with staff alert)</option>
                     <option value="BLOCK_AT_CAPACITY">Admission-Blocking Policy (Reject until checkout)</option>
@@ -699,8 +656,8 @@ export default function SettingsAndBillingPage() {
               <div className="pt-3 border-t border-surface-border flex justify-end">
                 <button
                   onClick={handleSaveCapacity}
-                  disabled={savingCapacity}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black shadow-md btn-shadow transition-all disabled:opacity-50"
+                  disabled={savingCapacity || !Number.isInteger(capacity) || capacity < 1 || capacity > 10000}
+                  className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black shadow-md btn-shadow transition-all disabled:opacity-50"
                 >
                   {savingCapacity ? 'Saving...' : 'Save Capacity Settings'}
                 </button>
@@ -712,7 +669,7 @@ export default function SettingsAndBillingPage() {
                 IANA Timezone &amp; Daily Boundaries
               </h3>
               <p className="text-xs text-content-secondary">
-                Daily streak boundaries, reset times, and attendance statistics are calculated using your gym’s configured IANA timezone (<code className="font-mono text-purple-600 dark:text-cyan-400">Asia/Karachi</code>).
+                Daily streak boundaries, reset times, and attendance statistics are calculated using your gym’s configured IANA timezone (<code className="font-mono text-brand-600 dark:text-brass-400">Asia/Karachi</code>).
               </p>
               <div className="p-3.5 rounded-xl bg-surface-subtle border border-surface-border text-xs text-content-tertiary space-y-1">
                 <div>• All database timestamps are stored uniformly in UTC.</div>

@@ -21,7 +21,7 @@ export const StreakLeaderboard: React.FC<StreakLeaderboardProps> = ({ leaders })
         <div className="flex items-center justify-between pb-3.5 border-b border-surface-border">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-surface-subtle text-content-primary flex items-center justify-center border border-surface-border">
-              <Flame className="w-4 h-4 text-amber-500" />
+              <Flame className="w-4 h-4 text-status-warning-text" />
             </div>
             <div>
               <h2 className="text-sm font-semibold text-content-primary tracking-tight">Active Streak Leaders</h2>
@@ -48,7 +48,7 @@ export const StreakLeaderboard: React.FC<StreakLeaderboardProps> = ({ leaders })
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
                       index === 0
-                        ? 'bg-purple-600 dark:bg-white text-white dark:text-black shadow-xs'
+                        ? 'bg-brand-600 dark:bg-white text-white dark:text-black shadow-xs'
                         : index === 1
                         ? 'bg-surface-subtle text-content-primary border border-surface-border'
                         : index === 2
@@ -74,7 +74,7 @@ export const StreakLeaderboard: React.FC<StreakLeaderboardProps> = ({ leaders })
                 </div>
 
                 <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-subtle border border-surface-border text-content-primary">
-                  <Flame className="w-3.5 h-3.5 text-amber-500" />
+                  <Flame className="w-3.5 h-3.5 text-status-warning-text" />
                   <span className="text-xs font-semibold text-content-primary font-mono">
                     {leader.currentStreak}
                   </span>
@@ -89,9 +89,9 @@ export const StreakLeaderboard: React.FC<StreakLeaderboardProps> = ({ leaders })
       <div className="pt-3 border-t border-surface-border mt-4 flex items-center justify-between text-xs font-medium">
         <Link
           href="/rewards/winners"
-          className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400 hover:opacity-80 transition-colors py-1 px-2 rounded-lg hover:bg-surface-subtle btn-shadow"
+          className="inline-flex items-center gap-1.5 text-status-warning-text hover:opacity-80 transition-colors py-1 px-2 rounded-lg hover:bg-surface-subtle btn-shadow"
         >
-          <Trophy className="w-3.5 h-3.5 text-amber-500" />
+          <Trophy className="w-3.5 h-3.5 text-status-warning-text" />
           <span>Streak Winners</span>
           <ArrowRight className="w-3 h-3" />
         </Link>

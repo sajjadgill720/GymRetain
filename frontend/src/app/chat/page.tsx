@@ -266,7 +266,7 @@ export default function AiChatPage() {
         {/* Top Header */}
         <div className="px-4 py-3 sm:px-6 border-b border-surface-border bg-surface flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center border border-purple-500/20">
+            <div className="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center border border-brand-500/20">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -274,7 +274,7 @@ export default function AiChatPage() {
                 <h1 className="text-base sm:text-lg font-bold text-content-primary">
                   AI Operations &amp; Retention Insights
                 </h1>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-status-success-bg text-status-success-text border border-status-success-border">
                   llama-3.3-70b-versatile
                 </span>
               </div>
@@ -298,7 +298,7 @@ export default function AiChatPage() {
               onClick={startNewChat}
               className="px-3.5 py-1.5 rounded-xl bg-surface-subtle hover:bg-surface border border-surface-border text-content-primary text-xs font-semibold flex items-center gap-1.5 transition-all btn-shadow"
             >
-              <Plus className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+              <Plus className="w-4 h-4 text-brand-600 dark:text-brass-400" />
               <span>New Chat</span>
             </button>
           </div>
@@ -316,7 +316,7 @@ export default function AiChatPage() {
           >
             <div className="p-3 border-b border-surface-border flex items-center justify-between text-xs font-semibold text-content-secondary">
               <span className="flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400" />
+                <MessageSquare className="w-3.5 h-3.5 text-brand-600 dark:text-brass-400" />
                 Recent Threads
               </span>
               <span className="text-[10px] font-mono text-content-tertiary">
@@ -336,14 +336,14 @@ export default function AiChatPage() {
                     onClick={() => selectConversation(c.id)}
                     className={`group flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-all ${
                       activeConversationId === c.id
-                        ? 'bg-purple-500/15 dark:bg-cyan-500/15 text-purple-700 dark:text-cyan-400 font-semibold'
+                        ? 'bg-brand-500/15 dark:bg-brass-500/15 text-brand-700 dark:text-brass-400 font-semibold'
                         : 'text-content-secondary hover:text-content-primary hover:bg-surface'
                     }`}
                   >
                     <span className="truncate flex-1 pr-2">{c.title}</span>
                     <button
                       onClick={(e) => handleDeleteConversation(e, c.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-content-tertiary hover:text-red-500 transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-content-tertiary hover:text-status-danger-text transition-opacity"
                       title="Delete thread"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -354,7 +354,7 @@ export default function AiChatPage() {
             </div>
 
             <div className="p-3 border-t border-surface-border bg-surface/40 text-[11px] text-content-tertiary flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <ShieldCheck className="w-3.5 h-3.5 text-status-success-text shrink-0" />
               <span>PII scrubbed; tenant-isolated</span>
             </div>
           </div>
@@ -366,7 +366,7 @@ export default function AiChatPage() {
                 // Empty State with Starter Prompts
                 <div className="max-w-2xl mx-auto py-8 sm:py-12 space-y-8 animate-in fade-in duration-300">
                   <div className="text-center space-y-2">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 dark:from-cyan-400 dark:to-blue-600 text-white flex items-center justify-center mx-auto shadow-md">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-500 dark:from-brass-400 dark:to-blue-600 text-white flex items-center justify-center mx-auto shadow-md">
                       <Sparkles className="w-7 h-7" />
                     </div>
                     <h2 className="text-xl sm:text-2xl font-extrabold text-content-primary tracking-tight">
@@ -383,10 +383,10 @@ export default function AiChatPage() {
                       <button
                         key={starter.title}
                         onClick={() => handleSendMessage(starter.prompt)}
-                        className="p-4 rounded-2xl bg-surface hover:bg-surface-subtle border border-surface-border hover:border-purple-500/40 dark:hover:border-cyan-400/40 text-left transition-all group flex flex-col gap-1.5 btn-shadow"
+                        className="p-4 rounded-2xl bg-surface hover:bg-surface-subtle border border-surface-border hover:border-brand-500/40 dark:hover:border-brass-400/40 text-left transition-all group flex flex-col gap-1.5 btn-shadow"
                       >
                         <div className="flex items-center gap-2">
-                          <starter.icon className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                          <starter.icon className="w-4 h-4 text-brand-600 dark:text-brass-400" />
                           <span className="text-xs font-bold text-content-primary">
                             {starter.title}
                           </span>
@@ -399,7 +399,7 @@ export default function AiChatPage() {
                   </div>
 
                   <div className="flex items-center justify-center gap-2 text-[11px] text-content-tertiary">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                    <ShieldCheck className="w-4 h-4 text-status-success-text" />
                     <span>Personal member details (names, phones, emails) are scrubbed before reaching the LLM.</span>
                   </div>
                 </div>
@@ -416,8 +416,8 @@ export default function AiChatPage() {
                     <div
                       className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold shadow-sm ${
                         msg.role === 'user'
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gradient-to-tr from-purple-600 to-indigo-500 dark:from-cyan-400 dark:to-blue-600 text-white'
+                          ? 'bg-brand-600 text-white'
+                          : 'bg-gradient-to-tr from-brand-600 to-brand-500 dark:from-brass-400 dark:to-blue-600 text-white'
                       }`}
                     >
                       {msg.role === 'user' ? (
@@ -431,13 +431,13 @@ export default function AiChatPage() {
                     <div
                       className={`rounded-2xl px-4 py-3 text-xs leading-relaxed ${
                         msg.role === 'user'
-                          ? 'bg-purple-600 text-white font-medium shadow-sm'
+                          ? 'bg-brand-600 text-white font-medium shadow-sm'
                           : 'bg-surface border border-surface-border text-content-primary shadow-sm'
                       }`}
                     >
                       {msg.isThinking && !msg.content ? (
                         <div className="flex items-center gap-2 text-content-tertiary py-1">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-600 dark:text-cyan-400" />
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-600 dark:text-brass-400" />
                           <span className="italic">Analyzing real-time gym data...</span>
                         </div>
                       ) : (
@@ -458,7 +458,7 @@ export default function AiChatPage() {
                     e.preventDefault();
                     handleSendMessage();
                   }}
-                  className="flex items-center gap-2 p-1.5 bg-surface-subtle border border-surface-border focus-within:border-purple-500 dark:focus-within:border-cyan-400 rounded-2xl shadow-inner transition-all"
+                  className="flex items-center gap-2 p-1.5 bg-surface-subtle border border-surface-border focus-within:border-brand-500 dark:focus-within:border-brass-400 rounded-2xl shadow-inner transition-all"
                 >
                   <input
                     type="text"
@@ -482,7 +482,7 @@ export default function AiChatPage() {
                     <button
                       type="submit"
                       disabled={!inputMessage.trim()}
-                      className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1.5 transition-all btn-shadow"
+                      className="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1.5 transition-all btn-shadow"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Send</span>

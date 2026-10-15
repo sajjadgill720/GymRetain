@@ -144,16 +144,16 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
       <div className="lg:col-span-3 flex flex-col gap-4">
         {/* Active Revenue Violet Card */}
         <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#6D28D9] to-[#5B21B6] dark:from-[#131722] dark:to-[#171E2D] dark:border dark:border-surface-border text-white shadow-md flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-purple-200 dark:text-cyan-400 font-medium mb-1">
+          <div className="flex items-center justify-between text-xs text-brand-200 dark:text-brass-400 font-medium mb-1">
             <span>Membership Revenue</span>
-            <span className="bg-emerald-400/20 text-emerald-300 dark:text-emerald-400 px-2 py-0.5 rounded-full text-[10px] font-bold">
+            <span className="bg-status-success-bg text-status-success-text px-2 py-0.5 rounded-full text-[10px] font-bold">
               +18.4% MoM
             </span>
           </div>
           <div className="text-2xl sm:text-3xl font-extrabold tracking-tight font-sans my-1 font-mono">
             ₨{monthlyRevenue.toLocaleString()}
           </div>
-          <div className="text-[11px] text-purple-200/80 dark:text-content-tertiary">
+          <div className="text-[11px] text-brand-200/80 dark:text-content-tertiary">
             From {activeMembers} active member retainers
           </div>
         </div>
@@ -168,7 +168,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
           </div>
           <Link
             href="/check-in"
-            className="w-9 h-9 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black flex items-center justify-center transition-all btn-shadow"
+            className="w-9 h-9 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black flex items-center justify-center transition-all btn-shadow"
             title="Open Kiosk Check-In"
           >
             <ArrowRight className="w-4 h-4" />
@@ -178,7 +178,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
         {/* Top Active Streak Card */}
         <div className="p-4 rounded-2xl bg-surface border border-surface-border app-card flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-xl bg-status-warning-bg text-status-warning-text flex items-center justify-center font-bold">
               <Flame className="w-4 h-4" />
             </div>
             <div>
@@ -190,7 +190,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
           </div>
           <Link
             href="/rewards/winners"
-            className="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-0.5 rounded-full transition-colors"
+            className="text-xs font-bold text-status-warning-text bg-status-warning-bg hover:bg-status-warning-bg px-2.5 py-0.5 rounded-full transition-colors"
           >
             🔥 Top
           </Link>
@@ -204,7 +204,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-content-primary">Gym Workout Trends</span>
-              <span className="text-[10px] bg-purple-600/10 dark:bg-cyan-500/15 text-purple-700 dark:text-cyan-400 font-bold px-2 py-0.5 rounded-full">
+              <span className="text-[10px] bg-brand-600/10 dark:bg-brass-500/15 text-brand-700 dark:text-brass-400 font-bold px-2 py-0.5 rounded-full">
                 LIVE
               </span>
             </div>
@@ -220,7 +220,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
                   }}
                   className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all btn-shadow ${
                     activeTab === tab
-                      ? 'bg-purple-600 text-white dark:bg-white dark:text-black shadow-sm'
+                      ? 'bg-brand-600 text-white dark:bg-white dark:text-black shadow-sm'
                       : 'text-content-secondary hover:text-content-primary'
                   }`}
                 >
@@ -282,7 +282,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
                   cx={c.x}
                   cy={c.y}
                   r={hoveredPoint?.label === c.label ? 6 : idx === coords.length - 1 ? 5 : 3}
-                  className="cursor-pointer fill-purple-600 dark:fill-cyan-400 stroke-white dark:stroke-surface stroke-2 transition-all duration-150"
+                  className="cursor-pointer fill-brand-600 dark:fill-brass-400 stroke-white dark:stroke-surface stroke-2 transition-all duration-150"
                   onMouseEnter={() => setHoveredPoint({ label: c.label, val: c.val })}
                   onMouseLeave={() => setHoveredPoint(null)}
                 />
@@ -293,7 +293,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
             {hoveredPoint && (
               <div className="absolute top-2 right-4 bg-surface border border-surface-border px-3 py-1.5 rounded-xl shadow-lg text-xs font-mono animate-in fade-in duration-100">
                 <span className="text-content-tertiary mr-1.5">{hoveredPoint.label}:</span>
-                <span className="font-bold text-purple-600 dark:text-cyan-400">{hoveredPoint.val} Visits</span>
+                <span className="font-bold text-brand-600 dark:text-brass-400">{hoveredPoint.val} Visits</span>
               </div>
             )}
           </div>
@@ -315,7 +315,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
           </div>
           <div>
             <div className="text-[10px] text-content-tertiary">Floor Load</div>
-            <div className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+            <div className="text-xs font-extrabold text-status-success-text font-mono">
               {capacityPct}% Peak
             </div>
           </div>
@@ -338,7 +338,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
             </div>
             <div>
               <span className="text-[10px] text-content-tertiary block">Current Retention</span>
-              <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+              <span className="text-base font-extrabold text-status-success-text font-mono">
                 91.4%
               </span>
             </div>
@@ -352,11 +352,11 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
             </div>
             <div className="relative h-2 rounded-full bg-surface-subtle overflow-hidden">
               <div
-                className="absolute left-0 top-0 bottom-0 bg-purple-500 dark:bg-cyan-400 rounded-full transition-all duration-300"
+                className="absolute left-0 top-0 bottom-0 bg-brand-500 dark:bg-brass-400 rounded-full transition-all duration-300"
                 style={{ width: `${Math.min(100, Math.max(15, (todayCheckIns / 50) * 100))}%` }}
               />
             </div>
-            <div className="text-center text-xs font-extrabold text-purple-700 dark:text-cyan-400 pt-0.5 font-mono">
+            <div className="text-center text-xs font-extrabold text-brand-700 dark:text-brass-400 pt-0.5 font-mono">
               Current: {todayCheckIns} Visits Today
             </div>
           </div>
@@ -373,7 +373,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
                 style={{ width: '82%' }}
               />
             </div>
-            <div className="text-center text-xs font-extrabold text-emerald-700 dark:text-emerald-400 pt-0.5 font-mono">
+            <div className="text-center text-xs font-extrabold text-status-success-text pt-0.5 font-mono">
               Daily Avg: {(monthlyTotalVisits / 30).toFixed(1)} Visits / Day
             </div>
           </div>

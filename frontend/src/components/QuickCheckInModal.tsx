@@ -72,7 +72,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
           <div>
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-8 h-8 rounded-xl bg-surface-subtle text-content-primary flex items-center justify-center border border-surface-border">
-                <UserCheck className="w-4 h-4 text-purple-600 dark:text-neon-cyan" />
+                <UserCheck className="w-4 h-4 text-brand-600 dark:text-neon-cyan" />
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-content-primary">Front-Desk Member Check-In</h3>
@@ -81,7 +81,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
             </div>
 
             {error && (
-              <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-center gap-2 mb-3">
+              <div className="p-3.5 rounded-xl bg-status-danger-bg border border-status-danger-border text-status-danger-text text-xs flex items-center gap-2 mb-3">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -102,7 +102,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
                     }}
                     onKeyDown={(e) => e.key === 'Enter' && handleCheckIn()}
                     placeholder="Enter Code (GR-1001) or Phone (+92...)"
-                    className="w-full bg-surface-subtle border border-surface-border focus:border-purple-500/50 rounded-xl px-3.5 py-2.5 text-xs text-content-primary placeholder-content-tertiary focus:outline-none font-mono transition-colors"
+                    className="w-full bg-surface-subtle border border-surface-border focus:border-brand-500/50 rounded-xl px-3.5 py-2.5 text-xs text-content-primary placeholder-content-tertiary focus:outline-none font-mono transition-colors"
                     autoFocus
                   />
                   <Search className="w-4 h-4 text-content-tertiary absolute right-3.5 top-3" />
@@ -136,7 +136,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
                 <button
                   onClick={() => handleCheckIn()}
                   disabled={loading}
-                  className="w-full py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 disabled:opacity-50 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow transition-all flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 disabled:opacity-50 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow transition-all flex items-center justify-center gap-1.5"
                 >
                   <UserCheck className="w-3.5 h-3.5" />
                   <span>{loading ? 'Verifying & Recording...' : 'Confirm Check-In'}</span>
@@ -147,7 +147,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
         ) : (
           /* Check-In Success / Streak Celebration View */
           <div className="text-center py-2 animate-in fade-in zoom-in-95 duration-100">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 border border-emerald-500/20">
+            <div className="w-12 h-12 rounded-full bg-status-success-bg text-status-success-text flex items-center justify-center mx-auto mb-3 border border-status-success-border">
               <CheckCircle2 className="w-6 h-6" />
             </div>
 
@@ -159,7 +159,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
             {/* Streak Counter Card */}
             <div className="my-4 p-4 rounded-xl bg-surface-subtle border border-surface-border flex items-center justify-center gap-3 shadow-sm">
               <div className="w-10 h-10 rounded-xl bg-surface text-content-primary flex items-center justify-center border border-surface-border">
-                <Flame className="w-5 h-5 text-amber-500" />
+                <Flame className="w-5 h-5 text-status-warning-text" />
               </div>
               <div className="text-left">
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-content-tertiary">
@@ -177,10 +177,10 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
             {/* Reward Unlocked Alert (if milestone reached) */}
             {successResult.unlockedRewards && successResult.unlockedRewards.length > 0 && (
               <div className="p-3.5 rounded-xl bg-surface-subtle border border-surface-border text-content-primary text-xs mb-3 text-left flex items-start gap-2">
-                <Award className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <Award className="w-4 h-4 text-status-warning-text shrink-0 mt-0.5" />
                 <div>
                   <div className="font-medium text-content-primary flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <Sparkles className="w-3.5 h-3.5 text-status-warning-text" />
                     New Reward Milestone Unlocked!
                   </div>
                   <div className="text-content-secondary font-medium mt-0.5">
@@ -202,7 +202,7 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
               </button>
               <button
                 onClick={onClose}
-                className="flex-1 py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-semibold text-white dark:text-black shadow-sm btn-shadow transition-all"
+                className="flex-1 py-2 px-3 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-semibold text-white dark:text-black shadow-sm btn-shadow transition-all"
               >
                 Done
               </button>

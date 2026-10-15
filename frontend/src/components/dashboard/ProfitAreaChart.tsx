@@ -63,7 +63,7 @@ export const ProfitAreaChart: React.FC = () => {
           <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-content-primary font-sans">
             $446.7K
           </span>
-          <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+          <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-status-success-bg text-status-success-text">
             <TrendingUp className="w-3.5 h-3.5" />
             +24.4%
           </span>
@@ -189,20 +189,20 @@ export const ProfitAreaChart: React.FC = () => {
           </div>
 
           {/* Segment 2: Distributors / VIP */}
-          <div className="p-3 rounded-2xl bg-surface-subtle/70 border border-surface-border relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
+          <div className="p-3 rounded-2xl bg-surface-subtle/70 border border-surface-border relative overflow-hidden group hover:border-status-success-border transition-colors">
             <div className="absolute top-0 inset-x-0 h-1 bg-emerald-500 rounded-t-full" />
             <div className="flex items-center gap-1.5 text-xs text-content-secondary mb-1">
-              <Users className="w-3.5 h-3.5 text-emerald-500" />
+              <Users className="w-3.5 h-3.5 text-status-success-text" />
               <span className="font-extrabold text-content-primary text-sm">1.432</span>
             </div>
             <span className="text-[11px] text-content-tertiary font-medium">VIP Annual</span>
           </div>
 
           {/* Segment 3: Wholesalers / Quarterly */}
-          <div className="p-3 rounded-2xl bg-surface-subtle/70 border border-surface-border relative overflow-hidden group hover:border-amber-500/30 transition-colors">
+          <div className="p-3 rounded-2xl bg-surface-subtle/70 border border-surface-border relative overflow-hidden group hover:border-status-warning-border transition-colors">
             <div className="absolute top-0 inset-x-0 h-1 bg-amber-500 rounded-t-full" />
             <div className="flex items-center gap-1.5 text-xs text-content-secondary mb-1">
-              <Building className="w-3.5 h-3.5 text-amber-500" />
+              <Building className="w-3.5 h-3.5 text-status-warning-text" />
               <span className="font-extrabold text-content-primary text-sm">562</span>
             </div>
             <span className="text-[11px] text-content-tertiary font-medium">Quarterly Flex</span>

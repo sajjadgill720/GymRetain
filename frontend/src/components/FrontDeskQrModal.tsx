@@ -74,7 +74,7 @@ export const FrontDeskQrModal: React.FC<FrontDeskQrModalProps> = ({ isOpen, onCl
 
         <div className="text-center mb-5">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-subtle border border-surface-border text-content-secondary text-xs font-medium mb-2 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400" />
+            <Sparkles className="w-3.5 h-3.5 text-brand-600 dark:text-brass-400" />
             <span>Front-Desk Attendance Placard</span>
           </div>
           <h2 className="text-lg font-bold text-content-primary tracking-tight">{currentGym.name}</h2>
@@ -117,7 +117,7 @@ export const FrontDeskQrModal: React.FC<FrontDeskQrModalProps> = ({ isOpen, onCl
         </div>
 
         {rotatedMessage && (
-          <div className="mt-3 p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-cyan-400 text-xs font-semibold flex items-center justify-center gap-1.5 animate-in fade-in">
+          <div className="mt-3 p-2.5 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-700 dark:text-brass-400 text-xs font-semibold flex items-center justify-center gap-1.5 animate-in fade-in">
             <CheckCircle2 className="w-4 h-4" />
             <span>{rotatedMessage}</span>
           </div>
@@ -144,7 +144,7 @@ export const FrontDeskQrModal: React.FC<FrontDeskQrModalProps> = ({ isOpen, onCl
             </button>
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-semibold text-white dark:text-black shadow-sm btn-shadow transition-all"
+              className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-semibold text-white dark:text-black shadow-sm btn-shadow transition-all"
             >
               Close
             </button>

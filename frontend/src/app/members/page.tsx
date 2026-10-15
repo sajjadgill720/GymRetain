@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AppLayout } from '../../components/AppLayout';
 import { api } from '../../lib/api';
 import { Member } from '../../types';
@@ -27,8 +28,11 @@ import {
   ShieldAlert,
 } from '@/components/icons';
 
-export default function MembersPage() {
+function MembersDirectory() {
+  const searchParams = useSearchParams();
   const [members, setMembers] = useState<Member[]>([]);
+  const [loadError, setLoadError] = useState('');
+  const requestId = useRef(0);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [trainerFilter, setTrainerFilter] = useState('');
@@ -102,31 +106,47 @@ export default function MembersPage() {
   const [formSubmitting, setFormSubmitting] = useState(false);
 
   const fetchMembers = async () => {
+    const currentRequest = ++requestId.current;
     setLoading(true);
+    setLoadError('');
     try {
-      const [membersRes, trainersRes, templatesRes] = await Promise.all([
-        api.getMembers({
-          search,
-          status: statusFilter || undefined,
-          trainerId: trainerFilter && trainerFilter !== 'unassigned' ? trainerFilter : undefined,
-          unassigned: trainerFilter === 'unassigned',
-        }),
-        api.getTrainers(),
-        api.getDietTemplates(),
-      ]);
-      setMembers(membersRes?.members || []);
-      setTrainers(trainersRes || []);
-      setTemplates(templatesRes || []);
-      if (trainersRes && trainersRes.length > 0 && !targetTrainerId) {
-        setTargetTrainerId(trainersRes[0].id);
+      const result = await api.getMembers({
+        search,
+        status: statusFilter || undefined,
+        trainerId: trainerFilter && trainerFilter !== 'unassigned' ? trainerFilter : undefined,
+        unassigned: trainerFilter === 'unassigned',
+      });
+      if (currentRequest === requestId.current) setMembers(result?.members || []);
+    } catch (error) {
+      if (currentRequest === requestId.current) {
+        setMembers([]);
+        setLoadError(error instanceof TypeError ? 'Could not connect. Please try again in a moment.' : error instanceof Error ? error.message : 'Could not load members. Please try again.');
       }
     } finally {
-      setLoading(false);
+      if (currentRequest === requestId.current) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMembers();
+    let cancelled = false;
+    api.getTrainers().then(result => {
+      if (!cancelled) {
+        setTrainers(result || []);
+        if (result?.length) setTargetTrainerId(result[0].id);
+      }
+    }).catch(() => {});
+    api.getDietTemplates().then(result => { if (!cancelled) setTemplates(result || []); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    setSearch(searchParams.get('search') || '');
+    if (searchParams.get('new') === '1') setIsAddModalOpen(true);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const timer = setTimeout(fetchMembers, 200);
+    return () => { clearTimeout(timer); requestId.current++; };
   }, [search, statusFilter, trainerFilter]);
 
   const handleOpenMemberStory = async (member: Member) => {
@@ -225,11 +245,12 @@ export default function MembersPage() {
   return (
     <AppLayout onRefreshData={fetchMembers}>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
+        {loadError && <div role="alert" className="flex items-center justify-between gap-3 rounded-xl border border-status-danger-border bg-status-danger-bg p-4 text-sm"><span>{loadError}</span><button onClick={fetchMembers} className="shrink-0 px-3 py-2 rounded-lg border border-surface-border text-xs font-semibold">Try again</button></div>}
         {/* Toast Alert */}
         {toastMessage && (
-          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between animate-in fade-in duration-200">
+          <div className="bg-status-success-bg border border-status-success-border text-status-success-text px-4 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between animate-in fade-in duration-200">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <CheckCircle2 className="w-4 h-4 text-status-success-text" />
               <span>{toastMessage}</span>
             </div>
             <button onClick={() => setToastMessage(null)} className="text-zinc-400 hover:text-zinc-200">
@@ -243,7 +264,7 @@ export default function MembersPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
-                <Users className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
+                <Users className="w-5 h-5 text-brand-600 dark:text-brass-400" />
                 Member Directory
               </h1>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-subtle text-content-secondary border border-surface-border">
@@ -256,7 +277,7 @@ export default function MembersPage() {
           </div>
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow transition-all shrink-0 self-start sm:self-auto cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow transition-all shrink-0 self-start sm:self-auto cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Member</span>
@@ -272,7 +293,7 @@ export default function MembersPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, member code (e.g. GR-1001), or phone..."
-              className="w-full bg-surface-subtle border border-surface-border rounded-xl pl-9 pr-3 py-2 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400 transition-colors"
+              className="w-full bg-surface-subtle border border-surface-border rounded-xl pl-9 pr-3 py-2 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-brand-500 dark:focus:border-brass-400 transition-colors"
             />
           </div>
 
@@ -281,7 +302,7 @@ export default function MembersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-purple-500"
+              className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-brand-500"
             >
               <option value="">All Statuses</option>
               <option value="ACTIVE">Active</option>
@@ -292,7 +313,7 @@ export default function MembersPage() {
             <select
               value={trainerFilter}
               onChange={(e) => setTrainerFilter(e.target.value)}
-              className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-purple-500"
+              className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-brand-500"
             >
               <option value="">All Coaches</option>
               <option value="unassigned">Unassigned Members</option>
@@ -341,7 +362,7 @@ export default function MembersPage() {
                             {member.lastName?.[0]}
                           </div>
                           <div>
-                            <div className="font-medium text-content-primary group-hover:text-purple-600 dark:group-hover:text-cyan-400 transition-colors">
+                            <div className="font-medium text-content-primary group-hover:text-brand-600 dark:group-hover:text-brass-400 transition-colors">
                               {member.firstName} {member.lastName}
                             </div>
                             <div className="text-[11px] text-content-tertiary font-mono">
@@ -367,8 +388,8 @@ export default function MembersPage() {
 
                       {/* Streak Badge */}
                       <td className="py-3.5 px-4">
-                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 font-mono text-xs">
-                          <Flame className="w-3.5 h-3.5 text-amber-500" />
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-status-warning-bg border border-status-warning-border text-status-warning-text font-mono text-xs">
+                          <Flame className="w-3.5 h-3.5 text-status-warning-text" />
                           <span className="font-semibold">{currentStreak}</span>
                           <span className="text-[10px] opacity-80">days</span>
                         </div>
@@ -377,8 +398,8 @@ export default function MembersPage() {
                       {/* Assigned Trainer Column */}
                       <td className="py-3.5 px-4">
                         {assignedTrainer ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-700 dark:text-cyan-400 border border-purple-500/20 text-xs font-medium">
-                            <Dumbbell className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-brand-500/10 text-brand-700 dark:text-brass-400 border border-brand-500/20 text-xs font-medium">
+                            <Dumbbell className="w-3.5 h-3.5 text-brand-600 dark:text-brass-400" />
                             <span>Coach {assignedTrainer.name}</span>
                           </span>
                         ) : (
@@ -407,9 +428,9 @@ export default function MembersPage() {
                         <span
                           className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-0.5 rounded-full font-semibold ${
                             member.status === 'ACTIVE'
-                              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20'
+                              ? 'bg-status-success-bg text-status-success-text border border-status-success-border'
                               : member.status === 'FROZEN'
-                              ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20'
+                              ? 'bg-status-warning-bg text-status-warning-text border border-status-warning-border'
                               : 'bg-surface-subtle text-content-tertiary border border-surface-border'
                           }`}
                         >
@@ -486,7 +507,7 @@ export default function MembersPage() {
               <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border btn-shadow">
                 <div className="text-[11px] text-content-tertiary font-medium">Current Streak</div>
                 <div className="mt-1 flex items-baseline gap-1.5">
-                  <Flame className="w-4 h-4 text-amber-500 shrink-0" />
+                  <Flame className="w-4 h-4 text-status-warning-text shrink-0" />
                   <span className="text-xl font-bold font-mono text-content-primary">
                     {selectedMember.streak?.currentStreak || 0}
                   </span>
@@ -518,7 +539,7 @@ export default function MembersPage() {
                 <div className="p-4 rounded-2xl bg-surface-subtle border border-surface-border space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
-                      <Dumbbell className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                      <Dumbbell className="w-4 h-4 text-brand-600 dark:text-brass-400" />
                       <span>Coaching &amp; Personal Training</span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -564,14 +585,14 @@ export default function MembersPage() {
             <div className="p-4 rounded-2xl bg-surface-subtle border border-surface-border space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
-                  <QrCode className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                  <QrCode className="w-4 h-4 text-brand-600 dark:text-brass-400" />
                   <span>Member QR Attendance Credential</span>
                 </div>
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                     memberQrData?.status === 'ACTIVE'
-                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-red-500/15 text-red-600 dark:text-red-400'
+                      ? 'bg-status-success-bg text-status-success-text'
+                      : 'bg-status-danger-bg text-status-danger-text'
                   }`}
                 >
                   {memberQrData?.status === 'ACTIVE' ? 'Active Credential' : 'Revoked'}
@@ -610,7 +631,7 @@ export default function MembersPage() {
                       type="button"
                       onClick={handleRotateMemberQr}
                       disabled={qrLoading}
-                      className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-[11px] transition-all btn-shadow disabled:opacity-50"
+                      className="px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-[11px] transition-all btn-shadow disabled:opacity-50"
                     >
                       {qrLoading ? 'Processing...' : 'Rotate Credential'}
                     </button>
@@ -619,7 +640,7 @@ export default function MembersPage() {
                         type="button"
                         onClick={handleRevokeMemberQr}
                         disabled={qrLoading}
-                        className="px-3 py-1.5 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-500/10 border border-red-500/20 font-semibold text-[11px] transition-all btn-shadow disabled:opacity-50"
+                        className="px-3 py-1.5 rounded-xl text-status-danger-text hover:bg-status-danger-bg border border-status-danger-border font-semibold text-[11px] transition-all btn-shadow disabled:opacity-50"
                       >
                         Revoke Credential
                       </button>
@@ -633,7 +654,7 @@ export default function MembersPage() {
             <div className="p-4 rounded-2xl bg-surface-subtle border border-surface-border space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold text-content-primary flex items-center gap-1.5">
-                  <Utensils className="w-4 h-4 text-emerald-500" />
+                  <Utensils className="w-4 h-4 text-status-success-text" />
                   <span>Diet &amp; Meal Plan</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -659,7 +680,7 @@ export default function MembersPage() {
                         Prepared by {memberDietPlans[0].createdBy?.name || 'Assigned Coach'}
                       </p>
                     </div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-status-success-bg text-status-success-text border border-status-success-border text-[10px] font-semibold">
                       {memberDietPlans[0].goal.replace('_', ' ')}
                     </span>
                   </div>
@@ -719,7 +740,7 @@ export default function MembersPage() {
             <select
               value={targetTrainerId}
               onChange={(e) => setTargetTrainerId(e.target.value)}
-              className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary mb-4 focus:outline-none focus:border-purple-500"
+              className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary mb-4 focus:outline-none focus:border-brand-500"
             >
               {trainers
                 .filter((t) => t.isActive && !t.isArchived)
@@ -742,7 +763,7 @@ export default function MembersPage() {
                 type="button"
                 disabled={reassigning}
                 onClick={handleConfirmReassign}
-                className="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs btn-shadow disabled:opacity-50"
+                className="px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs btn-shadow disabled:opacity-50"
               >
                 {reassigning ? 'Saving...' : 'Confirm Assignment'}
               </button>
@@ -763,7 +784,7 @@ export default function MembersPage() {
             </button>
 
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center">
                 <Plus className="w-4 h-4" />
               </div>
               <div>
@@ -784,7 +805,7 @@ export default function MembersPage() {
                     value={formFirstName}
                     onChange={(e) => setFormFirstName(e.target.value)}
                     placeholder="e.g. Usman"
-                    className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+                    className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-brand-500 dark:focus:border-brass-400"
                   />
                 </div>
                 <div>
@@ -796,7 +817,7 @@ export default function MembersPage() {
                     value={formLastName}
                     onChange={(e) => setFormLastName(e.target.value)}
                     placeholder="e.g. Khan"
-                    className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+                    className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-brand-500 dark:focus:border-brass-400"
                   />
                 </div>
               </div>
@@ -812,7 +833,7 @@ export default function MembersPage() {
                     value={formPhone}
                     onChange={(e) => setFormPhone(e.target.value)}
                     placeholder="+923001234567"
-                    className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary placeholder-content-tertiary font-mono focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+                    className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary placeholder-content-tertiary font-mono focus:outline-none focus:border-brand-500 dark:focus:border-brass-400"
                   />
                 </div>
                 <div>
@@ -824,7 +845,7 @@ export default function MembersPage() {
                     value={formEmail}
                     onChange={(e) => setFormEmail(e.target.value)}
                     placeholder="member@email.com"
-                    className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+                    className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-brand-500 dark:focus:border-brass-400"
                   />
                 </div>
               </div>
@@ -842,14 +863,14 @@ export default function MembersPage() {
                       if (e.target.value === 'Monthly Gold') setFormPricePaisa(650000);
                       if (e.target.value === 'Quarterly VIP') setFormPricePaisa(1600000);
                     }}
-                    className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+                    className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary focus:outline-none focus:border-brand-500 dark:focus:border-brass-400"
                   >
                     <option value="Monthly Standard">Monthly Standard (5,000 PKR)</option>
                     <option value="Monthly Gold">Monthly Gold (6,500 PKR)</option>
                     <option value="Quarterly VIP">Quarterly VIP (16,000 PKR)</option>
                   </select>
 
-                  <div className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-mono flex items-center">
+                  <div className="bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-status-success-text font-mono flex items-center">
                     PKR {(formPricePaisa / 100).toLocaleString()}
                   </div>
                 </div>
@@ -866,7 +887,7 @@ export default function MembersPage() {
                 <button
                   type="submit"
                   disabled={formSubmitting}
-                  className="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow disabled:opacity-50 transition-all"
+                  className="px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow disabled:opacity-50 transition-all"
                 >
                   {formSubmitting ? 'Registering...' : 'Register Member'}
                 </button>
@@ -877,4 +898,8 @@ export default function MembersPage() {
       )}
     </AppLayout>
   );
+}
+
+export default function MembersPage() {
+  return <Suspense fallback={<div className="p-8 text-content-secondary">Loading members…</div>}><MembersDirectory /></Suspense>;
 }

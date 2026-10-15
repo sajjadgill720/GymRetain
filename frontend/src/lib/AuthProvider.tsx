@@ -1,7 +1,13 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { api } from '../lib/api';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { api } from "../lib/api";
 
 export interface GymInfo {
   id: string;
@@ -30,7 +36,15 @@ interface AuthContextValue {
   /** Switch the active gym (only meaningful if user is linked to multiple gyms). */
   switchGym: (gymId: string) => void;
   /** Hydrate auth state from login response or /auth/me. */
-  setAuthFromLogin: (data: { user: UserInfo; gymId: string; gymName: string; gymSlug: string }) => void;
+  setAuthFromLogin: (data: {
+    user: UserInfo;
+    gymId: string;
+    gymName: string;
+    gymSlug: string;
+    token?: string;
+    gyms?: GymInfo[];
+    activeGym?: GymInfo;
+  }) => void;
   logout: () => void;
 }
 
@@ -47,9 +61,9 @@ const AuthContext = createContext<AuthContextValue>({
 
 export const useAuth = () => useContext(AuthContext);
 
-const STORAGE_KEY_USER = 'gymretain_user';
-const STORAGE_KEY_GYMS = 'gymretain_gyms';
-const STORAGE_KEY_ACTIVE_GYM = 'gymretain_active_gym';
+const STORAGE_KEY_USER = "gymretain_user";
+const STORAGE_KEY_GYMS = "gymretain_gyms";
+const STORAGE_KEY_ACTIVE_GYM = "gymretain_active_gym";
 
 /**
  * AuthProvider hydrates user + gym context from:
@@ -59,7 +73,9 @@ const STORAGE_KEY_ACTIVE_GYM = 'gymretain_active_gym';
  * For demo mode (no backend running), falls back to the first
  * gym returned from the login response stored in localStorage.
  */
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [gyms, setGyms] = useState<GymInfo[]>([]);
   const [activeGym, setActiveGym] = useState<GymInfo | null>(null);
@@ -72,6 +88,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const storedGyms = localStorage.getItem(STORAGE_KEY_GYMS);
       const storedActiveGym = localStorage.getItem(STORAGE_KEY_ACTIVE_GYM);
 
+      if (!localStorage.getItem("gymretain_token")) {
+        setIsLoading(false);
+        return;
+      }
       if (storedUser) setUser(JSON.parse(storedUser));
       if (storedGyms) {
         const parsed = JSON.parse(storedGyms);
@@ -93,19 +113,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshFromServer = async () => {
     try {
-      const token = localStorage.getItem('gymretain_token');
+      const token = localStorage.getItem("gymretain_token");
       if (!token) return;
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/auth/me`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"}/auth/me`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         },
       );
 
+      if (res.status === 401) {
+        setUser(null);
+        setGyms([]);
+        setActiveGym(null);
+        api.clearToken();
+        [STORAGE_KEY_USER, STORAGE_KEY_GYMS, STORAGE_KEY_ACTIVE_GYM].forEach(
+          (key) => localStorage.removeItem(key),
+        );
+        window.location.assign("/login");
+        return;
+      }
       if (!res.ok) return;
 
       const data = await res.json();
@@ -123,7 +154,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (meData.activeGym) {
         setActiveGym(meData.activeGym);
-        localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(meData.activeGym));
+        localStorage.setItem(
+          STORAGE_KEY_ACTIVE_GYM,
+          JSON.stringify(meData.activeGym),
+        );
         api.setGym(meData.activeGym);
       } else if (meData.gyms && meData.gyms.length > 0) {
         const currentActive = localStorage.getItem(STORAGE_KEY_ACTIVE_GYM);
@@ -152,15 +186,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const switchGym = useCallback(
     async (gymId: string) => {
       try {
-        const token = localStorage.getItem('gymretain_token');
+        const token = localStorage.getItem("gymretain_token");
         if (token) {
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/auth/switch-gym`,
+            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"}/auth/switch-gym`,
             {
-              method: 'POST',
+              method: "POST",
               headers: {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({ gymId }),
             },
@@ -172,27 +206,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (payload.token) {
               api.setToken(payload.token);
-              localStorage.setItem('gymretain_token', payload.token);
+              localStorage.setItem("gymretain_token", payload.token);
             }
             if (payload.activeGym) {
               setActiveGym(payload.activeGym);
-              localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(payload.activeGym));
+              localStorage.setItem(
+                STORAGE_KEY_ACTIVE_GYM,
+                JSON.stringify(payload.activeGym),
+              );
               api.setGym(payload.activeGym);
             }
             if (payload.user) {
               setUser(payload.user);
-              localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(payload.user));
+              localStorage.setItem(
+                STORAGE_KEY_USER,
+                JSON.stringify(payload.user),
+              );
             }
 
             // Immediately reload view so no stale tenant data from previous gym is retained
-            if (typeof window !== 'undefined') {
+            if (typeof window !== "undefined") {
               window.location.reload();
             }
             return;
           }
+          throw new Error("Could not switch gyms. Please sign in again.");
         }
       } catch (err) {
-        console.error('Server switchGym failed, falling back:', err);
+        window.alert(
+          err instanceof Error ? err.message : "Could not switch gyms.",
+        );
+        return;
       }
 
       // Offline / demo fallback
@@ -201,7 +245,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setActiveGym(target);
         localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(target));
         api.setGym(target);
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           window.location.reload();
         }
       }
@@ -217,10 +261,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       gymSlug: string;
       token?: string;
       gyms?: GymInfo[];
+      activeGym?: GymInfo;
     }) => {
       if (data.token) {
         api.setToken(data.token);
-        localStorage.setItem('gymretain_token', data.token);
+        localStorage.setItem("gymretain_token", data.token);
       }
 
       setUser(data.user);
@@ -230,24 +275,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data.gyms && data.gyms.length > 0
           ? data.gyms
           : data.gymId
-          ? [
-              {
-                id: data.gymId,
-                name: data.gymName,
-                slug: data.gymSlug,
-                city: '',
-                currency: 'PKR',
-              },
-            ]
-          : [];
+            ? [
+                {
+                  id: data.gymId,
+                  name: data.gymName,
+                  slug: data.gymSlug,
+                  city: "",
+                  currency: "PKR",
+                },
+              ]
+            : [];
 
       setGyms(gymList);
       localStorage.setItem(STORAGE_KEY_GYMS, JSON.stringify(gymList));
 
       if (gymList.length > 0) {
-        setActiveGym(gymList[0]);
-        localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(gymList[0]));
-        api.setGym(gymList[0]);
+        const selected =
+          gymList.find(
+            (gym) => gym.id === (data.activeGym?.id || data.gymId),
+          ) || gymList[0];
+        setActiveGym(selected);
+        localStorage.setItem(STORAGE_KEY_ACTIVE_GYM, JSON.stringify(selected));
+        api.setGym(selected);
       } else {
         setActiveGym(null);
         localStorage.removeItem(STORAGE_KEY_ACTIVE_GYM);
@@ -264,7 +313,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem(STORAGE_KEY_USER);
     localStorage.removeItem(STORAGE_KEY_GYMS);
     localStorage.removeItem(STORAGE_KEY_ACTIVE_GYM);
-    localStorage.removeItem('gymretain_token');
+    localStorage.removeItem("gymretain_token");
   }, []);
 
   return (

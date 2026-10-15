@@ -22,7 +22,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 
   return (
     <div
-      className={`animate-pulse bg-[#24201C] ${variantStyles[variant]} ${className}`}
+      className={`animate-pulse bg-surface-subtle ${variantStyles[variant]} ${className}`}
       style={{
         width,
         height,
@@ -38,7 +38,7 @@ export const TableSkeleton: React.FC<{ rows?: number }> = ({ rows = 4 }) => (
     {Array.from({ length: rows }).map((_, i) => (
       <div
         key={i}
-        className="p-4 rounded-xl bg-[#1A1816] border border-[#292522] flex items-center justify-between gap-4"
+        className="p-4 rounded-xl bg-surface border border-surface-border flex items-center justify-between gap-4"
       >
         <div className="flex items-center gap-3 flex-1">
           <Skeleton variant="circular" className="w-9 h-9 shrink-0" />

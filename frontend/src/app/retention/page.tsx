@@ -1,99 +1,64 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { AppLayout } from '../../components/AppLayout';
 import { AtRiskMembersTable } from '../../components/AtRiskMembersTable';
 import { api } from '../../lib/api';
 import { MemberRiskDetails } from '../../types';
-import {
-  AlertTriangle,
-  TrendingDown,
-  Clock,
-  DollarSign,
-  TrendingUp,
-} from '@/components/icons';
+import { ArrowRight, ArrowsClockwise, ShieldCheck, AlertTriangle, Clock, CheckCircle2 } from '@/components/icons';
 
 export default function RetentionPage() {
-  const [atRiskList, setAtRiskList] = useState<MemberRiskDetails[]>([]);
+  const [members, setMembers] = useState<MemberRiskDetails[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const fetchRisk = async () => {
-    try {
-      const list = await api.getAtRiskMembers();
-      setAtRiskList(list);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRisk();
+  const [error, setError] = useState('');
+  const fetchRisk = useCallback(async () => {
+    setLoading(true); setError('');
+    try { setMembers(await api.getAtRiskMembers()); }
+    catch { setError('We couldn’t load the follow-up queue. Please try again.'); }
+    finally { setLoading(false); }
   }, []);
+  useEffect(() => { fetchRisk(); }, [fetchRisk]);
+  const urgent = members.filter(member => member.riskLevel === 'HIGH').length;
+  const slipping = members.filter(member => member.riskLevel === 'MEDIUM').length;
+  const overdue = members.filter(member => member.factors.isPaymentOverdue).length;
 
-  const highRisk = atRiskList.filter((m) => m.riskLevel === 'HIGH');
-  const mediumRisk = atRiskList.filter((m) => m.riskLevel === 'MEDIUM');
-
-  return (
-    <AppLayout onRefreshData={fetchRisk}>
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
-        {/* Page Context Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-surface-border">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
-                Members who may stop attending
-              </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                {highRisk.length} need urgent contact
-              </span>
-            </div>
-            <p className="text-xs text-content-tertiary mt-1">
-              See which members have stopped visiting or fallen behind on their schedule, and send a friendly message before they quit.
-            </p>
-          </div>
+  return <AppLayout onRefreshData={fetchRisk}>
+    <div className="max-w-[1480px] w-full mx-auto p-5 sm:p-8 lg:p-10 space-y-8 lg:space-y-10">
+      <div className="flex flex-wrap items-end justify-between gap-5">
+        <div>
+          <p className="premium-eyebrow mb-4">Member experience / Retention</p>
+          <h1 className="premium-title">A little attention goes a long way.</h1>
+          <p className="text-sm text-content-secondary mt-4 max-w-xl leading-relaxed">Notice the change in a routine. Reach out at the right moment.<br className="hidden sm:block" /> Help your members find their momentum again.</p>
         </div>
-
-        {/* 3 Clean Summary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-          <div className="p-4 rounded-2xl bg-surface border border-surface-border btn-shadow">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-red-600 dark:text-red-400 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
-              Needs urgent contact
-            </span>
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400 font-mono mt-1">
-              {highRisk.length} <span className="text-xs font-normal text-content-tertiary">members</span>
-            </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Absent for 14+ days or has overdue fees</p>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-surface border border-surface-border btn-shadow">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              Attendance slipping
-            </span>
-            <div className="text-2xl font-bold text-amber-600 dark:text-amber-400 font-mono mt-1">
-              {mediumRisk.length} <span className="text-xs font-normal text-content-tertiary">members</span>
-            </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Visits dropped by half or more recently</p>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-surface border border-surface-border btn-shadow">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              Monthly dues at risk
-            </span>
-            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-1">
-              PKR 35,000<span className="text-xs font-normal text-content-tertiary">/mo</span>
-            </div>
-            <p className="text-[11px] text-content-tertiary mt-1">Can be protected with a quick friendly check-in</p>
-          </div>
-        </div>
-
-        {/* At Risk Table Component */}
-        <AtRiskMembersTable members={atRiskList} showFilters={true} />
+        <button onClick={fetchRisk} disabled={loading} className="flex items-center gap-2.5 rounded-lg px-4 py-2.5 border border-surface-border bg-surface text-xs font-medium"><ArrowsClockwise className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />{loading ? 'Refreshing' : 'Refresh queue'}</button>
       </div>
-    </AppLayout>
-  );
+
+      <div className="premium-panel overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 px-6 sm:px-8 py-6 bg-[var(--accent-brand-light)] border-b border-surface-border">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 shrink-0 rounded-full border border-[var(--border-hover)] flex items-center justify-center text-[var(--accent-brand)]"><ShieldCheck className="w-5 h-5" /></div>
+            <div><p className="text-sm font-medium text-content-primary">{loading ? 'Finding the members who need you.' : urgent ? `${urgent} member${urgent === 1 ? '' : 's'} could use a personal check-in.` : 'A good routine starts with staying connected.'}</p><p className="text-xs text-content-secondary mt-1">A thoughtful conversation can make all the difference.</p></div>
+          </div>
+          <a href="#follow-up-queue" className="flex items-center gap-3 text-xs font-semibold text-[var(--accent-brand)] whitespace-nowrap">Review follow-ups <ArrowRight className="w-4 h-4" /></a>
+        </div>
+        <div className="retention-metrics grid grid-cols-3">
+          {[
+            { label: 'Priority follow-ups', value: urgent, detail: 'Members with a high retention risk', tone: 'danger', icon: AlertTriangle },
+            { label: 'Changing routines', value: slipping, detail: 'Members whose attendance is slipping', tone: 'warning', icon: Clock },
+            { label: 'Payments up to date', value: members.length - overdue, detail: 'Members in this queue without overdue fees', tone: 'success', icon: CheckCircle2 },
+          ].map(metric => <div key={metric.label} data-tone={metric.tone} className="status-metric px-4 sm:px-8 py-6 sm:py-8">
+            <div className="flex items-center justify-between"><p className="metric-label text-xs font-medium">{metric.label}</p><metric.icon aria-hidden="true" className="hidden sm:block w-4 h-4 shrink-0 status-text" /></div>
+            <p className="metric-value text-4xl sm:text-[42px] font-medium tracking-[-0.05em] leading-none mt-5 tabular-nums">{loading ? '—' : String(metric.value).padStart(2, '0')}</p>
+            <p className="metric-detail hidden sm:block text-xs mt-4">{metric.detail}</p>
+          </div>)}
+        </div>
+      </div>
+
+      {error && <p role="alert" className="text-sm text-status-danger-text">{error}</p>}
+      <section id="follow-up-queue" className="scroll-mt-24">
+        <AtRiskMembersTable members={members} showFilters loading={loading} />
+      </section>
+      <p className="text-[11px] text-content-tertiary flex items-center gap-2 pb-3"><ShieldCheck className="w-3.5 h-3.5" />Built around better relationships. Risk signals are a guide for your team’s judgment.</p>
+    </div>
+  </AppLayout>;
 }

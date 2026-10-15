@@ -67,7 +67,7 @@ export const RetentionRateGauge: React.FC = () => {
           <span className="text-3xl font-extrabold text-content-primary tracking-tight font-sans">
             {percentage}%
           </span>
-          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+          <span className="text-[11px] text-status-success-text font-medium">
             Exceeding 85% industry benchmark
           </span>
         </div>

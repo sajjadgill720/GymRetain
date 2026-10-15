@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -19,13 +19,15 @@ import {
   Dumbbell,
   Utensils,
   CreditCard,
+  Calendar,
+  ArrowRight,
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
   ShieldCheck,
 } from '@/components/icons';
 import { useAuth, GymInfo } from '../lib/AuthProvider';
-import { ThemeToggle } from './ThemeToggle';
+
 import { GymLogo } from './GymLogo';
 
 interface SidebarProps {
@@ -59,7 +61,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [showGymDropdown, setShowGymDropdown] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
-  const userName = user?.name || 'Bilal C.';
+  useEffect(() => { if (isOpenMobile) setCollapsed(false); }, [isOpenMobile]);
+
+  const userName = user?.name || 'Gym owner';
   const userRole = user?.role || 'OWNER';
   const userInitials =
     userName
@@ -67,56 +71,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
       .map((w) => w[0])
       .join('')
       .toUpperCase()
-      .slice(0, 2) || 'BC';
+      .slice(0, 2) || 'GO';
 
   const navItems = [
+    { name: 'Overview', href: '/', icon: LayoutDashboard },
+    { name: 'Operations', href: '/operations', icon: Calendar },
     {
-      name: 'Dashboard',
-      href: '/',
-      icon: LayoutDashboard,
-    },
-    {
-      name: 'Gym Insights',
+      name: 'Insights',
       href: '/insights',
       icon: Sparkles,
-      badge: 'AI',
-      badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-cyan-400 font-mono',
+      badge: undefined,
+      badgeColor: 'bg-brand-500/10 text-brand-600 dark:text-brass-400 font-mono',
     },
     {
       name: 'Diet Plans',
       href: '/diet-plans',
       icon: Utensils,
-      badge: 'Meals',
-      badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono',
+      badge: undefined,
+      badgeColor: 'bg-status-success-bg text-status-success-text font-mono',
     },
     {
-      name: 'Memberships & Fees',
+      name: 'Memberships',
       href: '/subscriptions',
       icon: CreditCard,
-      badge: 'Billing',
-      badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono',
+      badge: undefined,
+      badgeColor: 'bg-status-success-bg text-status-success-text font-mono',
     },
     {
       name: 'Members',
       href: '/members',
       icon: Users,
-      badge: '142',
-      badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono',
+      badge: undefined,
+      badgeColor: 'bg-status-success-bg text-status-success-text font-mono',
     },
     {
-      name: 'Needs Attention',
+      name: 'Retention',
       href: '/retention',
       icon: AlertTriangle,
-      badge: '6 urgent',
-      badgeColor: 'bg-red-500/10 text-red-600 dark:text-red-400 font-mono',
+      badge: undefined,
+      badgeColor: 'bg-status-danger-bg text-status-danger-text font-mono',
     },
     {
-      name: 'Front Desk Check-In',
+      name: 'Check-in',
       href: '/check-in',
       icon: UserCheck,
     },
     {
-      name: 'Trainers & Coaches',
+      name: 'Trainers',
       href: '/trainers',
       icon: Dumbbell,
     },
@@ -124,32 +125,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
       name: 'Streak Winners',
       href: '/rewards/winners',
       icon: Trophy,
-      badge: '6 Won',
-      badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-mono',
+      badge: undefined,
+      badgeColor: 'bg-status-warning-bg text-status-warning-text font-mono',
     },
     {
-      name: 'Rewards & Perks',
+      name: 'Rewards',
       href: '/rewards',
       icon: Award,
     },
     {
-      name: 'Gym SaaS & Settings',
+      name: 'Settings',
       href: '/settings',
       icon: ShieldCheck,
-      badge: 'SaaS',
-      badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-cyan-400 font-mono',
+      badge: undefined,
+      badgeColor: 'bg-brand-500/10 text-brand-600 dark:text-brass-400 font-mono',
     },
   ];
+
+  const navOrder = ['/', '/operations', '/members', '/subscriptions', '/check-in', '/retention', '/trainers', '/diet-plans', '/rewards', '/rewards/winners', '/insights', '/settings'];
+  navItems.sort((a,b) => navOrder.indexOf(a.href)-navOrder.indexOf(b.href));
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-surface-sidebar border-r border-surface-border select-none transition-colors duration-200">
       {/* Brand Logo & Collapse Toggle */}
-      <div className="p-4 sm:p-5 flex items-center justify-between border-b border-surface-border">
+      <div className={`flex items-center border-b border-surface-border ${collapsed ? 'flex-col gap-3 p-3' : 'p-4 sm:p-5 justify-between'}`}>
         <Link href="/" className="flex items-center gap-3 group">
           <GymLogo size={32} />
           {!collapsed && (
             <div className="flex items-center gap-1.5">
-              <span className="text-lg font-extrabold tracking-tight text-content-primary font-sans">
+              <span className="text-lg font-semibold tracking-tight text-content-primary font-sans">
                 GymRetain
               </span>
             </div>
@@ -169,6 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onCloseMobile && (
           <button
             onClick={onCloseMobile}
+            aria-label="Close navigation"
             className="lg:hidden p-1.5 rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-subtle"
           >
             <X className="w-4 h-4" />
@@ -178,7 +183,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Gym Branch Location Badge */}
       {!collapsed && (
-        <div className="px-4 py-3 border-b border-surface-border/60">
+        <div className="px-4 py-3 border-b border-surface-border">
           {hasMultipleGyms ? (
             <div className="relative">
               <button
@@ -186,7 +191,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-surface-subtle hover:bg-surface-elevated border border-surface-border text-xs font-medium text-content-primary transition-colors btn-shadow text-left"
               >
                 <div className="flex items-center gap-2 truncate">
-                  <Building2 className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400 shrink-0" />
+                  <Building2 className="w-3.5 h-3.5 text-blue-600 dark:text-brass-400 shrink-0" />
                   <span className="truncate">{currentGym.name}</span>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-content-tertiary shrink-0 ml-1" />
@@ -206,7 +211,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       }}
                       className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col ${
                         currentGym.id === gym.id
-                          ? 'bg-purple-500/15 dark:bg-cyan-500/15 text-purple-700 dark:text-cyan-400 font-semibold'
+                          ? 'bg-brand-500/15 dark:bg-brass-500/15 text-brand-700 dark:text-brass-400 font-semibold'
                           : 'text-content-secondary hover:text-content-primary hover:bg-surface-subtle'
                       }`}
                     >
@@ -223,7 +228,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ) : (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-subtle/80 border border-surface-border text-xs font-medium text-content-secondary">
-              <Building2 className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400 shrink-0" />
+              <Building2 className="w-3.5 h-3.5 text-brand-600 dark:text-brass-400 shrink-0" />
               <span className="truncate text-content-primary font-medium">{currentGym.name}</span>
             </div>
           )}
@@ -231,10 +236,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Navigation Items (Light: Foxstocks Lavender Pill | Dark: Vision High-Contrast White Pill) */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1.5">
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {!collapsed && (
           <div className="px-3 py-1 text-[10px] font-semibold text-content-tertiary uppercase tracking-wider">
-            User Panel
+            Workspace
           </div>
         )}
 
@@ -242,16 +247,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           const isActive =
             item.href === '/'
               ? pathname === '/'
-              : pathname.startsWith(item.href);
+              : (pathname === item.href || pathname.startsWith(item.href + '/')) && !(item.href === '/rewards' && pathname.startsWith('/rewards/winners'));
 
           return (
             <Link
               key={item.name}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
+              title={collapsed ? item.name : undefined}
               onClick={onCloseMobile}
-              className={`group flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-150 ${
+              className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                 isActive
-                  ? 'bg-[#EDE9FE] text-[#6D28D9] dark:bg-white dark:text-black shadow-sm'
+                  ? 'premium-nav-active'
                   : 'text-content-secondary hover:text-content-primary hover:bg-surface-subtle'
               }`}
             >
@@ -259,7 +266,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <item.icon
                   className={`w-4 h-4 transition-colors ${
                     isActive
-                      ? 'text-[#6D28D9] dark:text-black'
+                      ? 'text-inherit'
                       : 'text-content-tertiary group-hover:text-content-primary'
                   }`}
                 />
@@ -279,7 +286,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Quick Tools */}
         {!collapsed && (
-          <div className="pt-4 mt-2 border-t border-surface-border/60 space-y-1">
+          <div className="pt-4 mt-2 border-t border-surface-border space-y-1">
             <div className="px-3 py-1 text-[10px] font-semibold text-content-tertiary uppercase tracking-wider">
               Front Desk
             </div>
@@ -287,14 +294,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={onOpenCheckInModal}
               className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-content-secondary hover:text-content-primary hover:bg-surface-subtle transition-colors"
             >
-              <UserCheck className="w-4 h-4 text-emerald-500" />
+              <UserCheck className="w-4 h-4 text-status-success-text" />
               <span>+ Quick Check-In</span>
             </button>
             <button
               onClick={onOpenQrModal}
               className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-content-secondary hover:text-content-primary hover:bg-surface-subtle transition-colors"
             >
-              <QrCode className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+              <QrCode className="w-4 h-4 text-brand-600 dark:text-brass-400" />
               <span>Front-Desk QR</span>
             </button>
           </div>
@@ -302,9 +309,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Footer User Profile & Theme Toggle */}
-      <div className="p-3 border-t border-surface-border flex items-center justify-between gap-2">
+      <div className={`p-3 border-t border-surface-border flex items-center justify-between gap-2 ${collapsed ? 'flex-col' : ''}`}>
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-full bg-purple-600/10 dark:bg-cyan-500/10 text-purple-700 dark:text-cyan-400 font-bold text-xs flex items-center justify-center shrink-0 border border-purple-500/20 dark:border-cyan-500/20">
+          <div className="w-8 h-8 rounded-full bg-brand-600/10 dark:bg-brass-500/10 text-brand-700 dark:text-brass-400 font-bold text-xs flex items-center justify-center shrink-0 border border-brand-500/20 dark:border-brass-500/20">
             {userInitials}
           </div>
           {!collapsed && (
@@ -316,7 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
         </div>
-        <ThemeToggle />
+        {user ? <button title="Sign out" aria-label="Sign out" onClick={() => { logout(); window.location.assign('/login'); }} className="p-2 rounded-lg text-content-secondary hover:bg-surface-subtle"><LogOut className="w-4 h-4" /></button> : <Link href="/login" title="Sign in" aria-label="Sign in" className="p-2 rounded-lg text-content-secondary hover:bg-surface-subtle btn-shadow"><ArrowRight className="w-4 h-4" /></Link>}
       </div>
     </div>
   );
@@ -325,7 +332,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <>
       <aside
         className={`hidden lg:block shrink-0 h-screen sticky top-0 transition-all duration-200 z-30 ${
-          collapsed ? 'w-20' : 'w-64'
+          collapsed ? 'w-20' : 'w-60'
         }`}
       >
         {sidebarContent}

@@ -156,7 +156,7 @@ export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ 
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-xs font-bold text-content-primary">Retention &amp; Check-In Analytics</h3>
-                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[10px] bg-status-success-bg text-status-success-text font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                   <TrendingUp className="w-3 h-3" /> Real-Time Series
                 </span>
               </div>
@@ -174,7 +174,7 @@ export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ 
                   }}
                   className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all btn-shadow ${
                     activeFilter === tab
-                      ? 'bg-purple-600 text-white dark:bg-white dark:text-black shadow-sm'
+                      ? 'bg-brand-600 text-white dark:bg-white dark:text-black shadow-sm'
                       : 'text-content-secondary hover:text-content-primary'
                   }`}
                 >
@@ -245,7 +245,7 @@ export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ 
                     cx={activePoint.px}
                     cy={activePoint.py}
                     r="5.5"
-                    className="fill-purple-600 dark:fill-cyan-400 stroke-white dark:stroke-surface stroke-2 shadow-md"
+                    className="fill-brand-600 dark:fill-brass-400 stroke-white dark:stroke-surface stroke-2 shadow-md"
                   />
                 </g>
               )}
@@ -266,7 +266,7 @@ export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ 
             {/* Pinned Tooltip Overlay */}
             {activePoint && (
               <div
-                className="absolute bg-purple-700 text-white dark:bg-white dark:text-black rounded-xl px-3 py-1.5 shadow-xl text-center pointer-events-none transform -translate-x-1/2 -translate-y-5 transition-all duration-150 animate-in fade-in"
+                className="absolute bg-brand-700 text-white dark:bg-white dark:text-black rounded-xl px-3 py-1.5 shadow-xl text-center pointer-events-none transform -translate-x-1/2 -translate-y-5 transition-all duration-150 animate-in fade-in"
                 style={{
                   left: `${(activePoint.px / svgW) * 100}%`,
                   top: `${Math.max(18, (activePoint.py / svgH) * 100 - 10)}%`,
@@ -299,13 +299,13 @@ export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ 
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <h3 className="text-xs font-bold text-content-primary">At-Risk Priority Queue</h3>
-              <span className="text-[10px] bg-red-500/10 text-red-600 dark:text-red-400 font-bold px-2 py-0.5 rounded-full">
+              <span className="text-[10px] bg-status-danger-bg text-status-danger-text font-bold px-2 py-0.5 rounded-full">
                 {displayAtRisk.filter((m) => m.riskLevel === 'HIGH').length || 6} High Risk
               </span>
             </div>
             <Link
               href="/retention"
-              className="w-7 h-7 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black flex items-center justify-center btn-shadow transition-colors"
+              className="w-7 h-7 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black flex items-center justify-center btn-shadow transition-colors"
               title="Add follow-up intervention"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -313,7 +313,7 @@ export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ 
           </div>
 
           {/* List items loaded from real GymRetain at-risk engine */}
-          <div className="divide-y divide-surface-border/60">
+          <div className="divide-y divide-surface-border">
             {displayAtRisk.map((m) => {
               const nameParts = (m.fullName || 'Member').split(' ');
               const initials = `${nameParts[0]?.[0] || 'M'}${nameParts[1]?.[0] || ''}`;
@@ -328,7 +328,7 @@ export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ 
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                        isHigh ? 'bg-red-500/15 text-red-600 dark:text-red-400' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                        isHigh ? 'bg-status-danger-bg text-status-danger-text' : 'bg-status-warning-bg text-status-warning-text'
                       }`}
                     >
                       {initials}
@@ -350,7 +350,7 @@ export const FoxstocksBottomSection: React.FC<FoxstocksBottomSectionProps> = ({ 
                       </div>
                       <div
                         className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full inline-block mt-0.5 ${
-                          isHigh ? 'text-red-600 dark:text-red-400 bg-red-500/10' : 'text-amber-600 dark:text-amber-400 bg-amber-500/10'
+                          isHigh ? 'text-status-danger-text bg-status-danger-bg' : 'text-status-warning-text bg-status-warning-bg'
                         }`}
                       >
                         {absentDays}d absent

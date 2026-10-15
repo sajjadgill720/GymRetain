@@ -293,7 +293,7 @@ export default function InsightsPage() {
         {/* Top Insights Navigation Bar */}
         <div className="px-4 py-3 sm:px-6 border-b border-surface-border bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center border border-purple-500/20">
+            <div className="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center border border-brand-500/20">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -301,7 +301,7 @@ export default function InsightsPage() {
                 <h1 className="text-base sm:text-lg font-bold text-content-primary">
                   Gym Insights &amp; AI Assistant
                 </h1>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20">
                   AI Assistant
                 </span>
               </div>
@@ -317,7 +317,7 @@ export default function InsightsPage() {
                 onClick={() => setActiveTab('COPILOT')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
                   activeTab === 'COPILOT'
-                    ? 'bg-purple-600 text-white shadow-sm'
+                    ? 'bg-brand-600 text-white shadow-sm'
                     : 'text-content-secondary hover:text-content-primary'
                 }`}
               >
@@ -329,7 +329,7 @@ export default function InsightsPage() {
                 onClick={() => setActiveTab('PREDICTIVE')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
                   activeTab === 'PREDICTIVE'
-                    ? 'bg-purple-600 text-white shadow-sm'
+                    ? 'bg-brand-600 text-white shadow-sm'
                     : 'text-content-secondary hover:text-content-primary'
                 }`}
               >
@@ -341,7 +341,7 @@ export default function InsightsPage() {
                 onClick={() => setActiveTab('ATTENDANCE')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
                   activeTab === 'ATTENDANCE'
-                    ? 'bg-purple-600 text-white shadow-sm'
+                    ? 'bg-brand-600 text-white shadow-sm'
                     : 'text-content-secondary hover:text-content-primary'
                 }`}
               >
@@ -365,12 +365,12 @@ export default function InsightsPage() {
             >
               <div className="p-3 border-b border-surface-border flex items-center justify-between text-xs font-semibold text-content-secondary">
                 <span className="flex items-center gap-1.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400" />
+                  <MessageSquare className="w-3.5 h-3.5 text-brand-600 dark:text-brass-400" />
                   Recent Threads
                 </span>
                 <button
                   onClick={startNewChat}
-                  className="p-1 rounded-lg text-purple-600 dark:text-cyan-400 hover:bg-surface-subtle"
+                  className="p-1 rounded-lg text-brand-600 dark:text-brass-400 hover:bg-surface-subtle"
                   title="New Thread"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -389,14 +389,14 @@ export default function InsightsPage() {
                       onClick={() => selectConversation(c.id)}
                       className={`group flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-all ${
                         activeConversationId === c.id
-                          ? 'bg-purple-500/15 dark:bg-cyan-500/15 text-purple-700 dark:text-cyan-400 font-semibold'
+                          ? 'bg-brand-500/15 dark:bg-brass-500/15 text-brand-700 dark:text-brass-400 font-semibold'
                           : 'text-content-secondary hover:text-content-primary hover:bg-surface'
                       }`}
                     >
                       <span className="truncate flex-1 pr-2">{c.title}</span>
                       <button
                         onClick={(e) => handleDeleteConversation(e, c.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-content-tertiary hover:text-red-500 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-content-tertiary hover:text-status-danger-text transition-opacity"
                         title="Delete thread"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -407,7 +407,7 @@ export default function InsightsPage() {
               </div>
 
               <div className="p-3 border-t border-surface-border bg-surface/40 text-[11px] text-content-tertiary flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <ShieldCheck className="w-3.5 h-3.5 text-status-success-text shrink-0" />
                 <span>Zero PII sent; tenant-isolated</span>
               </div>
             </div>
@@ -418,7 +418,7 @@ export default function InsightsPage() {
                 {messages.length === 0 ? (
                   <div className="max-w-2xl mx-auto py-8 sm:py-12 space-y-8 animate-in fade-in duration-300">
                     <div className="text-center space-y-2">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 dark:from-cyan-400 dark:to-blue-600 text-white flex items-center justify-center mx-auto shadow-md">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-500 dark:from-brass-400 dark:to-blue-600 text-white flex items-center justify-center mx-auto shadow-md">
                         <Sparkles className="w-7 h-7" />
                       </div>
                       <h2 className="text-xl sm:text-2xl font-extrabold text-content-primary tracking-tight">
@@ -435,10 +435,10 @@ export default function InsightsPage() {
                         <button
                           key={starter.title}
                           onClick={() => handleSendMessage(starter.prompt)}
-                          className="p-4 rounded-2xl bg-surface hover:bg-surface-subtle border border-surface-border hover:border-purple-500/40 dark:hover:border-cyan-400/40 text-left transition-all group flex flex-col gap-1.5 btn-shadow"
+                          className="p-4 rounded-2xl bg-surface hover:bg-surface-subtle border border-surface-border hover:border-brand-500/40 dark:hover:border-brass-400/40 text-left transition-all group flex flex-col gap-1.5 btn-shadow"
                         >
                           <div className="flex items-center gap-2">
-                            <starter.icon className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                            <starter.icon className="w-4 h-4 text-brand-600 dark:text-brass-400" />
                             <span className="text-xs font-bold text-content-primary">
                               {starter.title}
                             </span>
@@ -451,7 +451,7 @@ export default function InsightsPage() {
                     </div>
 
                     <div className="flex items-center justify-center gap-2 text-[11px] text-content-tertiary">
-                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                      <ShieldCheck className="w-4 h-4 text-status-success-text" />
                       <span>Member PII (names, phones, emails) is strictly scrubbed before reaching the LLM.</span>
                     </div>
                   </div>
@@ -466,8 +466,8 @@ export default function InsightsPage() {
                       <div
                         className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold shadow-sm ${
                           msg.role === 'user'
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gradient-to-tr from-purple-600 to-indigo-500 dark:from-cyan-400 dark:to-blue-600 text-white'
+                            ? 'bg-brand-600 text-white'
+                            : 'bg-gradient-to-tr from-brand-600 to-brand-500 dark:from-brass-400 dark:to-blue-600 text-white'
                         }`}
                       >
                         {msg.role === 'user' ? (
@@ -480,13 +480,13 @@ export default function InsightsPage() {
                       <div
                         className={`rounded-2xl px-4 py-3 text-xs leading-relaxed ${
                           msg.role === 'user'
-                            ? 'bg-purple-600 text-white font-medium shadow-sm'
+                            ? 'bg-brand-600 text-white font-medium shadow-sm'
                             : 'bg-surface border border-surface-border text-content-primary shadow-sm'
                         }`}
                       >
                         {msg.isThinking && !msg.content ? (
                           <div className="flex items-center gap-2 text-content-tertiary py-1">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-600 dark:text-cyan-400" />
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-600 dark:text-brass-400" />
                             <span className="italic">Analyzing real-time gym data...</span>
                           </div>
                         ) : (
@@ -507,7 +507,7 @@ export default function InsightsPage() {
                       e.preventDefault();
                       handleSendMessage();
                     }}
-                    className="flex items-center gap-2 p-1.5 bg-surface-subtle border border-surface-border focus-within:border-purple-500 dark:focus-within:border-cyan-400 rounded-2xl shadow-inner transition-all"
+                    className="flex items-center gap-2 p-1.5 bg-surface-subtle border border-surface-border focus-within:border-brand-500 dark:focus-within:border-brass-400 rounded-2xl shadow-inner transition-all"
                   >
                     <input
                       type="text"
@@ -531,7 +531,7 @@ export default function InsightsPage() {
                       <button
                         type="submit"
                         disabled={!inputMessage.trim()}
-                        className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1.5 transition-all btn-shadow"
+                        className="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1.5 transition-all btn-shadow"
                       >
                         <Send className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Send</span>
@@ -553,10 +553,10 @@ export default function InsightsPage() {
         {activeTab === 'PREDICTIVE' && (
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
+              <div data-tone="success" className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
                 <span className="text-xs font-semibold text-content-secondary">Monthly Attendance Retention</span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                  <span className="text-3xl font-black text-status-success-text font-mono">
                     {retentionData?.retentionRate || 91.4}%
                   </span>
                   <span className="text-xs text-content-tertiary">vs 85% goal</span>
@@ -564,16 +564,16 @@ export default function InsightsPage() {
                 <div className="w-full bg-surface-subtle h-2 rounded-full overflow-hidden">
                   <div className="bg-emerald-500 h-full rounded-full" style={{ width: '91.4%' }} />
                 </div>
-                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 pt-1 font-medium">
+                <div className="text-[11px] text-status-success-text flex items-center gap-1 pt-1 font-medium">
                   <ArrowUpRight className="w-3.5 h-3.5" />
                   <span>+6.4% higher than regional gym average</span>
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
+              <div data-tone="danger" className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
                 <span className="text-xs font-semibold text-content-secondary">Members Needing Attention</span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-black text-red-600 dark:text-red-400 font-mono">
+                  <span className="text-3xl font-black text-status-danger-text font-mono">
                     {summaryData?.kpis?.atRiskMembersTotal || 19}
                   </span>
                   <span className="text-xs text-content-tertiary">members need check-in</span>
@@ -581,16 +581,16 @@ export default function InsightsPage() {
                 <div className="text-[11px] text-content-tertiary">
                   {summaryData?.kpis?.highRiskCount || 6} absent 12+ days • {summaryData?.kpis?.mediumRiskCount || 13} visits dropped
                 </div>
-                <div className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1 pt-1 font-medium">
+                <div className="text-[11px] text-status-warning-text flex items-center gap-1 pt-1 font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   <span>Friendly WhatsApp message recommended</span>
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
+              <div data-tone="success" className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-2">
                 <span className="text-xs font-semibold text-content-secondary">Regular Gym Attendees</span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-black text-purple-600 dark:text-cyan-400 font-mono">
+                  <span className="text-3xl font-black text-brand-600 dark:text-brass-400 font-mono">
                     110
                   </span>
                   <span className="text-xs text-content-tertiary">members on active streaks</span>
@@ -598,7 +598,7 @@ export default function InsightsPage() {
                 <div className="text-[11px] text-content-tertiary">
                   77% of active members maintain regular weekly visits
                 </div>
-                <div className="text-[11px] text-purple-600 dark:text-cyan-400 flex items-center gap-1 pt-1 font-medium">
+                <div className="text-[11px] text-brand-600 dark:text-brass-400 flex items-center gap-1 pt-1 font-medium">
                   <Flame className="w-3.5 h-3.5" />
                   <span>Consistent members make up 62% of all check-ins</span>
                 </div>
@@ -617,10 +617,10 @@ export default function InsightsPage() {
 
                 <div className="space-y-3">
                   {[
-                    { label: 'Attending Regularly (1–3 Days)', count: 84, pct: 59, color: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
-                    { label: 'Warning (4–7 Days Absent)', count: 28, pct: 20, color: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+                    { label: 'Attending Regularly (1–3 Days)', count: 84, pct: 59, color: 'bg-emerald-500', text: 'text-status-success-text' },
+                    { label: 'Warning (4–7 Days Absent)', count: 28, pct: 20, color: 'bg-amber-500', text: 'text-status-warning-text' },
                     { label: 'Needs Follow-Up (8–14 Days Absent)', count: 18, pct: 13, color: 'bg-orange-500', text: 'text-orange-600 dark:text-orange-400' },
-                    { label: 'Urgent Contact (15+ Days Absent)', count: 12, pct: 8, color: 'bg-red-500', text: 'text-red-600 dark:text-red-400' },
+                    { label: 'Urgent Contact (15+ Days Absent)', count: 12, pct: 8, color: 'bg-red-500', text: 'text-status-danger-text' },
                   ].map((item) => (
                     <div key={item.label} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
@@ -645,10 +645,10 @@ export default function InsightsPage() {
 
                 <div className="space-y-2.5">
                   {[
-                    { window: '1–3 Days Absent', prob: '4%', badge: 'Low Risk', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
-                    { window: '4–7 Days Absent', prob: '28%', badge: 'Early Warning', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
+                    { window: '1–3 Days Absent', prob: '4%', badge: 'Low Risk', color: 'bg-status-success-bg text-status-success-text border-status-success-border' },
+                    { window: '4–7 Days Absent', prob: '28%', badge: 'Early Warning', color: 'bg-status-warning-bg text-status-warning-text border-status-warning-border' },
                     { window: '8–14 Days Absent', prob: '68%', badge: 'Needs Follow-Up', color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' },
-                    { window: '15+ Days Absent', prob: '91%', badge: 'Urgent Contact', color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' },
+                    { window: '15+ Days Absent', prob: '91%', badge: 'Urgent Contact', color: 'bg-status-danger-bg text-status-danger-text border-status-danger-border' },
                   ].map((row) => (
                     <div
                       key={row.window}
@@ -678,7 +678,7 @@ export default function InsightsPage() {
             <div className="p-6 rounded-2xl bg-surface border border-surface-border btn-shadow space-y-4">
               <div>
                 <h3 className="text-base font-bold text-content-primary flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
+                  <Clock className="w-5 h-5 text-brand-600 dark:text-brass-400" />
                   Peak Hours &amp; Gym Floor Traffic
                 </h3>
                 <p className="text-xs text-content-tertiary mt-0.5">
@@ -691,8 +691,8 @@ export default function InsightsPage() {
                   { hour: '6:00 AM – 9:00 AM', label: 'Morning Workout Rush', checkIns: '22% of daily visits', level: 'High', width: '65%', color: 'bg-blue-500' },
                   { hour: '9:00 AM – 1:00 PM', label: 'Mid-Morning General Fitness', checkIns: '14% of daily visits', level: 'Moderate', width: '38%', color: 'bg-emerald-500' },
                   { hour: '1:00 PM – 4:30 PM', label: 'Afternoon Training Sessions', checkIns: '8% of daily visits', level: 'Quiet', width: '22%', color: 'bg-amber-500' },
-                  { hour: '4:30 PM – 8:30 PM', label: 'Prime Evening Rush', checkIns: '44% of daily visits', level: 'Busiest Time', width: '92%', color: 'bg-purple-600 dark:bg-cyan-400' },
-                  { hour: '8:30 PM – 11:00 PM', label: 'Late Night Workout Shift', checkIns: '12% of daily visits', level: 'Moderate', width: '30%', color: 'bg-indigo-500' },
+                  { hour: '4:30 PM – 8:30 PM', label: 'Prime Evening Rush', checkIns: '44% of daily visits', level: 'Busiest Time', width: '92%', color: 'bg-brand-600 dark:bg-brass-400' },
+                  { hour: '8:30 PM – 11:00 PM', label: 'Late Night Workout Shift', checkIns: '12% of daily visits', level: 'Moderate', width: '30%', color: 'bg-brand-500' },
                 ].map((slot) => (
                   <div key={slot.hour} className="p-4 rounded-xl bg-surface-subtle border border-surface-border space-y-2">
                     <div className="flex items-center justify-between text-xs">
@@ -711,8 +711,8 @@ export default function InsightsPage() {
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-start gap-3 btn-shadow">
-              <Sparkles className="w-5 h-5 text-purple-600 dark:text-cyan-400 shrink-0 mt-0.5" />
+            <div className="p-5 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-start gap-3 btn-shadow">
+              <Sparkles className="w-5 h-5 text-brand-600 dark:text-brass-400 shrink-0 mt-0.5" />
               <div className="text-xs space-y-1">
                 <span className="font-bold text-content-primary block">
                   Staffing &amp; Equipment Tip:

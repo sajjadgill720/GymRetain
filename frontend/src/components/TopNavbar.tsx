@@ -1,256 +1,133 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import {
-  Search,
-  Bell,
-  Menu,
-  MessageCircle,
-  X,
-  Send,
-  QrCode,
-  UserCheck,
-  Building2,
-  Sparkles,
-} from '@/components/icons';
-import { useAuth, GymInfo } from '../lib/AuthProvider';
+import { usePathname } from 'next/navigation';
+import { Search, Bell, Menu, MessageCircle, Send, QrCode, ArrowRight } from '@/components/icons';
+import { useAuth } from '../lib/AuthProvider';
+import { api } from '../lib/api';
+import { Member, MemberRiskDetails } from '../types';
 import { ThemeToggle } from './ThemeToggle';
-import { GymLogo } from './GymLogo';
+import { Modal } from './ui/Modal';
 
 interface TopNavbarProps {
   onOpenQrModal?: () => void;
   onOpenCheckInModal?: () => void;
   onToggleMobileMenu?: () => void;
 }
+const pages = [
+  { name: 'Overview', href: '/' }, { name: 'Operations', href: '/operations' }, { name: 'Lead pipeline', href: '/operations?view=leads' }, { name: 'Schedule', href: '/operations?view=sessions' }, { name: 'Expenses', href: '/operations?view=expenses' }, { name: 'Members', href: '/members' },
+  { name: 'Check-in', href: '/check-in' }, { name: 'Retention', href: '/retention' },
+  { name: 'Insights', href: '/insights' }, { name: 'Trainers', href: '/trainers' },
+  { name: 'Diet Plans', href: '/diet-plans' }, { name: 'Memberships', href: '/subscriptions' },
+  { name: 'Rewards', href: '/rewards' }, { name: 'Streak Winners', href: '/rewards/winners' },
+  { name: 'Settings', href: '/settings' }, { name: 'Conversations', href: '/chat' },
+];
 
-const DEMO_FALLBACK_GYM: GymInfo = {
-  id: '11111111-1111-1111-1111-111111111111',
-  name: 'Iron House Gym & Fitness',
-  slug: 'iron-house-lahore',
-  city: 'Lahore, Pakistan',
-  currency: 'PKR',
-};
-
-export const TopNavbar: React.FC<TopNavbarProps> = ({
-  onOpenQrModal,
-  onOpenCheckInModal,
-  onToggleMobileMenu,
-}) => {
+export const TopNavbar: React.FC<TopNavbarProps> = ({ onOpenQrModal, onToggleMobileMenu }) => {
   const { user, activeGym } = useAuth();
-  const currentGym = activeGym || DEMO_FALLBACK_GYM;
+  const pathname = usePathname();
+  const [query, setQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  const [alerts, setAlerts] = useState<MemberRiskDetails[]>([]);
+  const [alertsLoading, setAlertsLoading] = useState(false);
+  const [alertsError, setAlertsError] = useState(false);
+  const [simOpen, setSimOpen] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [keyword, setKeyword] = useState('STREAK');
+  const [reply, setReply] = useState('');
+  const [simError, setSimError] = useState('');
+  const [sending, setSending] = useState(false);
+  const name = user?.name || 'Gym owner';
+  const initials = name.split(' ').map(word => word[0]).join('').slice(0, 2);
+  const matchingPages = pages.filter(page => page.name.toLowerCase().includes(query.toLowerCase().trim()));
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
-  const [simPhone, setSimPhone] = useState('+923009876543');
-  const [simText, setSimText] = useState('STREAK');
-  const [simResponse, setSimResponse] = useState<string | null>(null);
-  const [simLoading, setSimLoading] = useState(false);
+  useEffect(() => {
+    if (!query.trim()) { setMembers([]); setSearching(false); setSearchError(false); return; }
+    let cancelled = false;
+    setSearching(true);
+    setMembers([]);
+    setSearchError(false);
+    const timer = setTimeout(() => {
+      api.getMembers({ search: query.trim() }).then(result => {
+        if (!cancelled) setMembers(result.members.slice(0, 5));
+      }).catch(() => { if (!cancelled) setSearchError(true); })
+        .finally(() => { if (!cancelled) setSearching(false); });
+    }, 250);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [query]);
 
-  const userName = user?.name || 'Bilal C.';
-  const firstName = userName.split(' ')[0] || 'Bilal';
-  const userInitials =
-    userName
-      .split(' ')
-      .map((w) => w[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2) || 'BC';
+  useEffect(() => {
+    const dismiss = (event: PointerEvent) => {
+      if (!searchRef.current?.contains(event.target as Node)) setSearchOpen(false);
+    };
+    document.addEventListener('pointerdown', dismiss);
+    return () => document.removeEventListener('pointerdown', dismiss);
+  }, []);
 
-  const handleSimulate = async () => {
-    setSimLoading(true);
-    try {
-      const res = await fetch('http://localhost:4000/api/v1/messaging/whatsapp/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: simPhone, message: simText, gymId: currentGym.id }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSimResponse(data.reply);
-      } else {
-        throw new Error();
-      }
-    } catch {
-      if (simText.toUpperCase().includes('STREAK')) {
-        setSimResponse(
-          `🔥 *${currentGym.name} Member Status*\nSalam Hamza! Here is your attendance summary:\n\n• *Current Streak:* 12 consecutive days 🔥\n• *Personal Best:* 12 days\n• *Active Plan:* Monthly Gold\n• *Next Reward:* 3 more days until the 15-Day Milestone (Free Whey Protein Shake)! 🎁\n\nDrop by today to keep your streak alive! 💪`,
-        );
-      } else {
-        setSimResponse(
-          `Salam! Welcome to *${currentGym.name}* on WhatsApp.\n\nReply with:\n• *STREAK* — View your active workout streak & badge progress\n• *STATUS* — Check membership expiration date\n• *HELP* — Speak with front-desk reception`,
-        );
-      }
-    } finally {
-      setSimLoading(false);
-    }
+  const openAlerts = () => {
+    setAlertsOpen(true); setAlertsLoading(true); setAlertsError(false);
+    api.getAtRiskMembers().then(setAlerts).catch(() => setAlertsError(true)).finally(() => setAlertsLoading(false));
   };
 
-  return (
-    <>
-      <header className="sticky top-0 z-20 w-full bg-surface/90 backdrop-blur-md border-b border-surface-border select-none transition-colors duration-200">
-        <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
-          {/* Left: Greeting matching Foxstocks "Hello Matt," */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <button
-              onClick={onToggleMobileMenu}
-              className="lg:hidden p-2 rounded-xl text-content-secondary hover:text-content-primary hover:bg-surface-subtle border border-surface-border btn-shadow"
-              aria-label="Toggle navigation menu"
-            >
-              <Menu className="w-4 h-4" />
-            </button>
+  const simulate = async (event: React.FormEvent) => {
+    event.preventDefault(); setSending(true); setSimError(''); setReply('');
+    try {
+      const result = await api.previewWhatsAppReply({ phone: phone.trim(), message: keyword, ...(activeGym ? { gymId: activeGym.id } : {}) });
+      setReply(result.reply || result.message || 'No response was returned. Check that this phone belongs to a member.');
+    } catch (error) { setSimError(error instanceof Error ? error.message : 'Could not load the preview. Please try again.'); }
+    finally { setSending(false); }
+  };
 
-            <Link href="/" className="flex items-center gap-2 lg:hidden">
-              <GymLogo size={26} />
-              <span className="font-bold text-sm text-content-primary">GymRetain</span>
-            </Link>
-
-            <div className="hidden sm:block">
-              <h1 className="text-base sm:text-lg font-extrabold text-content-primary tracking-tight font-sans">
-                Hello {firstName},
-              </h1>
-            </div>
-          </div>
-
-          {/* Center: Search pill matching Foxstocks Image 1 */}
-          <div className="flex-1 max-w-md hidden md:block">
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-content-tertiary">
-                <Search className="w-4 h-4" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for members, check-ins, streaks..."
-                className="w-full pl-9 pr-4 py-2 rounded-2xl bg-surface-subtle hover:bg-surface focus:bg-surface border border-surface-border focus:border-purple-500 dark:focus:border-cyan-400 focus:ring-2 focus:ring-purple-500/20 text-xs text-content-primary placeholder-content-tertiary outline-none transition-all shadow-inner"
-              />
-            </div>
-          </div>
-
-          {/* Right: Actions, Theme Toggle, Bell, Profile */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Front Desk QR trigger */}
-            {onOpenQrModal && (
-              <button
-                onClick={onOpenQrModal}
-                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-content-secondary hover:text-content-primary transition-all btn-shadow"
-                title="Printable QR kiosk placard"
-              >
-                <QrCode className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400" />
-                <span>Front-Desk QR</span>
-              </button>
-            )}
-
-            {/* Test WhatsApp Experience Button */}
-            <button
-              onClick={() => {
-                setIsSimulatorOpen(true);
-                setSimResponse(null);
-              }}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-content-secondary hover:text-content-primary transition-all btn-shadow"
-              title="Test WhatsApp member response"
-            >
-              <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="hidden lg:inline">Test WhatsApp</span>
-            </button>
-
-            {/* Theme Toggle (Sun / Moon) */}
-            <ThemeToggle />
-
-            {/* Notification Bell matching Image 1 */}
-            <button
-              className="relative p-2 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-content-secondary hover:text-content-primary transition-colors btn-shadow"
-              title="Notifications"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-surface" />
-            </button>
-
-            {/* User Profile Avatar matching Image 1 */}
-            <div className="flex items-center gap-2 pl-0.5">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 dark:from-cyan-400 dark:to-blue-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm">
-                {userInitials}
-              </div>
-            </div>
-          </div>
+  return <>
+    <header className="sticky top-0 z-20 border-b border-surface-border bg-surface transition-colors">
+      <div className="flex min-h-[76px] items-center gap-3 px-4 sm:px-8">
+        <button onClick={onToggleMobileMenu} aria-label="Open navigation" className="lg:hidden p-2.5 rounded-xl border border-surface-border text-content-secondary"><Menu className="w-5 h-5" /></button>
+        <div className="hidden xl:block min-w-[170px]">
+          <p className="text-sm font-semibold">{pages.find(page => page.href === pathname)?.name || 'Workspace'}</p>
+          <p className="text-xs text-content-secondary mt-1">{activeGym?.name || 'Your gym workspace'}</p>
         </div>
-      </header>
-
-      {/* WhatsApp Simulation Modal */}
-      {isSimulatorOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface max-w-sm w-full rounded-2xl p-5 border border-surface-border shadow-2xl relative animate-in fade-in zoom-in-95 duration-100">
-            <button
-              onClick={() => setIsSimulatorOpen(false)}
-              className="absolute right-3.5 top-3.5 p-1 rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-subtle btn-shadow"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-                <MessageCircle className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-content-primary">Test WhatsApp Messages</h3>
-                <p className="text-[11px] text-content-tertiary">See how members receive automatic check-ins and streak updates</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <label className="text-[11px] font-medium text-content-secondary block mb-1">
-                  Member Phone:
-                </label>
-                <input
-                  type="text"
-                  value={simPhone}
-                  onChange={(e) => setSimPhone(e.target.value)}
-                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-1.5 text-xs text-content-primary font-mono outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-medium text-content-secondary block mb-1">
-                  Keyword Trigger:
-                </label>
-                <div className="flex gap-1.5">
-                  {['STREAK', 'STATUS', 'HELP'].map((kw) => (
-                    <button
-                      key={kw}
-                      type="button"
-                      onClick={() => setSimText(kw)}
-                      className={`px-3 py-1 rounded-lg text-[11px] font-mono font-medium transition-all ${
-                        simText === kw
-                          ? 'bg-emerald-600 text-white font-semibold shadow'
-                          : 'bg-surface-subtle text-content-secondary hover:text-content-primary border border-surface-border'
-                      }`}
-                    >
-                      {kw}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={handleSimulate}
-                disabled={simLoading}
-                className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs shadow transition-all flex items-center justify-center gap-1.5 btn-shadow"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>{simLoading ? 'Sending...' : `Send "${simText}" via WhatsApp`}</span>
-              </button>
-
-              {simResponse && (
-                <div className="mt-3 p-3 rounded-xl bg-surface-subtle border border-surface-border text-xs text-content-primary whitespace-pre-line leading-relaxed shadow-inner">
-                  {simResponse}
-                </div>
-              )}
-            </div>
-          </div>
+        <div ref={searchRef} className="relative flex-1 max-w-lg mx-auto">
+          <Search className="absolute left-3.5 top-3 w-4 h-4 text-content-tertiary pointer-events-none" />
+          <input aria-label="Search members and pages" aria-expanded={searchOpen} aria-controls="workspace-search" type="search" autoComplete="off" value={query}
+            onFocus={() => setSearchOpen(true)} onChange={event => { setQuery(event.target.value); setSearchOpen(true); }} onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); setSearchOpen(false); } }}
+            placeholder="Search members or pages…" className="w-full h-10 pl-10 pr-3 rounded-xl border border-surface-border bg-canvas text-sm outline-none focus:border-brand-500 dark:focus:border-brass-400" />
+          {searchOpen && <div id="workspace-search" className="absolute top-full mt-2 w-full max-h-[65vh] overflow-y-auto rounded-2xl border border-surface-border bg-surface p-2 shadow-xl">
+            <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-content-tertiary">{query ? 'Pages' : 'Go to'}</p>
+            {matchingPages.map(page => <Link key={page.href} href={page.href} onClick={() => setSearchOpen(false)} className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm hover:bg-surface-subtle">{page.name}<ArrowRight className="w-3.5 h-3.5 text-content-tertiary" /></Link>)}
+            {query.trim() && <><p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-content-tertiary">Members</p>
+              {searching ? <p role="status" className="px-3 py-3 text-sm text-content-secondary">Searching…</p> : members.map(member => <Link key={member.id} href={`/members?search=${encodeURIComponent(member.memberCode)}`} onClick={() => { setSearchOpen(false); setQuery(''); }} className="block rounded-lg px-3 py-2.5 hover:bg-surface-subtle"><span className="text-sm font-medium">{member.firstName} {member.lastName}</span><span className="block text-xs text-content-secondary mt-1">{member.memberCode}</span></Link>)}
+              {!searching && !members.length && <p role="status" className="px-3 py-3 text-sm text-content-secondary">{searchError ? 'Search unavailable. Please try again.' : 'No matching members.'}</p>}
+            </>}
+          </div>}
         </div>
-      )}
-    </>
-  );
+        <div className="flex items-center gap-2">
+          {onOpenQrModal && <button onClick={onOpenQrModal} aria-label="Front-desk QR code" title="Front-desk QR code" className="hidden sm:flex p-2.5 rounded-xl text-content-secondary hover:bg-surface-subtle"><QrCode className="w-4 h-4" /></button>}
+          <button onClick={() => { setSimOpen(true); setReply(''); setSimError(''); }} aria-label="Preview WhatsApp replies" title="Preview WhatsApp replies" className="hidden sm:flex p-2.5 rounded-xl text-content-secondary hover:bg-surface-subtle"><MessageCircle className="w-4 h-4" /></button>
+          <ThemeToggle />
+          <button onClick={openAlerts} aria-label="View member alerts" title="Member alerts" className="p-2.5 rounded-xl text-content-secondary hover:bg-surface-subtle"><Bell className="w-4 h-4" /></button>
+          <Link href="/settings" aria-label="Account settings" title={name} className="hidden sm:flex w-9 h-9 ml-2 items-center justify-center rounded-full bg-brand-500/10 dark:bg-brass-400/10 text-brand-700 dark:text-brass-400 text-xs font-semibold border border-brand-500/15">{initials}</Link>
+        </div>
+      </div>
+    </header>
+    <Modal isOpen={alertsOpen} onClose={() => setAlertsOpen(false)} title="Member alerts" description="Members who may need a friendly follow-up.">
+      <div className="space-y-2">
+        {alertsLoading ? <p role="status" className="py-8 text-center text-sm text-content-secondary">Loading alerts…</p> : alertsError ? <p role="alert" className="py-6 text-sm text-status-danger-text">Could not load alerts. Close and try again.</p> : alerts.length ? alerts.map(member => <Link key={member.memberId} href="/retention" className="flex items-center justify-between gap-4 p-4 rounded-xl bg-canvas hover:bg-surface-subtle"><div><p className="text-sm font-medium">{member.fullName}</p><p className="text-xs text-content-secondary mt-1">{member.factors.daysSinceLastCheckIn} days since last visit</p></div><ArrowRight className="w-4 h-4 shrink-0" /></Link>) : <p className="py-8 text-center text-sm text-content-secondary">You’re all caught up. No members need a follow-up.</p>}
+      </div>
+    </Modal>
+    <Modal isOpen={simOpen} onClose={() => setSimOpen(false)} title="WhatsApp preview" description="Test the reply a member receives for a keyword.">
+      <form onSubmit={simulate} className="space-y-5">
+        <div><label htmlFor="preview-phone" className="block text-sm font-medium mb-2">Member phone</label><input id="preview-phone" type="tel" required pattern="\+?[0-9 ()-]{7,20}" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+92 300 1234567" className="w-full rounded-xl border border-surface-border bg-canvas px-4 py-3 text-sm" /></div>
+        <fieldset><legend className="text-sm font-medium mb-2">Keyword</legend><div className="flex gap-2">{['STREAK', 'STATUS', 'HELP'].map(word => <button key={word} type="button" aria-pressed={keyword === word} onClick={() => setKeyword(word)} className={`flex-1 rounded-xl py-2.5 text-xs font-semibold border ${keyword === word ? 'border-brand-500 dark:border-brass-400 bg-brand-500/10 dark:bg-brass-400/10' : 'border-surface-border'}`}>{word}</button>)}</div></fieldset>
+        <button disabled={sending} className="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm btn-shadow-primary"><Send className="w-4 h-4" />{sending ? 'Loading preview…' : 'Preview reply'}</button>
+        {simError && <p role="alert" className="text-sm text-status-danger-text">{simError}</p>}
+        {reply && <p role="status" className="p-4 rounded-xl bg-canvas border border-surface-border text-sm leading-relaxed whitespace-pre-line">{reply}</p>}
+      </form>
+    </Modal>
+  </>;
 };

@@ -1,3 +1,4 @@
+import { OperationsState, OperationCommand, demoOperations, applyDemoOperation } from './operations';
 import {
   DashboardSummary,
   AttendanceTrendPoint,
@@ -512,6 +513,7 @@ const MOCK_MEMBERS: Member[] = [
 ];
 
 class ApiClient {
+  dashboardUsesDemoData = false;
   private token: string | null = null;
   private currentGym = {
     id: '11111111-1111-1111-1111-111111111111',
@@ -536,6 +538,7 @@ class ApiClient {
 
   clearToken() {
     this.token = null;
+    this.currentGym = {id:'11111111-1111-1111-1111-111111111111',name:'Iron House Gym & Fitness',slug:'iron-house-lahore',city:'Lahore, Pakistan',currency:'PKR'};
     if (typeof window !== 'undefined') {
       localStorage.removeItem('gymretain_token');
     }
@@ -583,11 +586,43 @@ class ApiClient {
     }
   }
 
+  hasSession() { return !!this.token; }
+
+  async authenticate(mode: 'login'|'signup', payload: Record<string,string>): Promise<any> {
+    return this.request(mode === 'login' ? '/auth/login' : '/auth/signup-owner', {method:'POST',body:JSON.stringify(payload)});
+  }
+
+  async getOperations(): Promise<OperationsState> {
+    if (this.token) return this.request('/operations');
+    if (typeof window === 'undefined') return demoOperations();
+    const key = `gymretain_operations_demo_${this.currentGym.id}`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const state = JSON.parse(stored);
+      if (!Number.isInteger(state.version) || !['leads','sessions','expenses','tasks'].every(field => Array.isArray(state[field]))) throw new Error('Demo workspace data is damaged. Clear this site’s storage to reset it.');
+      return state;
+    }
+    const state = demoOperations();
+    localStorage.setItem(key, JSON.stringify(state));
+    return state;
+  }
+
+  async mutateOperations(command: OperationCommand): Promise<OperationsState> {
+    if (this.token) return this.request('/operations', {method:'POST',body:JSON.stringify(command)});
+    const state = applyDemoOperation(await this.getOperations(), command);
+    localStorage.setItem(`gymretain_operations_demo_${this.currentGym.id}`, JSON.stringify(state));
+    return state;
+  }
+
   // Dashboard Summary KPIs
   async getDashboardSummary(): Promise<DashboardSummary> {
     try {
-      return await this.request<DashboardSummary>('/analytics/dashboard');
-    } catch {
+      const summary = await this.request<DashboardSummary>('/analytics/dashboard');
+      this.dashboardUsesDemoData = false;
+      return summary;
+    } catch (error) {
+      if (this.token) throw error;
+      this.dashboardUsesDemoData = true;
       return MOCK_SUMMARY;
     }
   }
@@ -596,7 +631,8 @@ class ApiClient {
   async getAttendanceTrends(days = 30): Promise<AttendanceTrendPoint[]> {
     try {
       return await this.request<AttendanceTrendPoint[]>(`/analytics/attendance-trends?days=${days}`);
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return generateMockTrends(days);
     }
   }
@@ -605,7 +641,8 @@ class ApiClient {
   async getRetentionAnalytics(): Promise<any> {
     try {
       return await this.request('/analytics/retention-deep');
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return {
         totalActiveMembers: 142,
         retentionRate: 91.4,
@@ -649,7 +686,8 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify(dto),
       });
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       const missing = dto.anonymizedData?.missingDays ?? 8;
       const streak = dto.anonymizedData?.currentStreak ?? 0;
       const churnProb = Math.min(98, Math.max(5, Math.round(1 / (1 + Math.exp(-0.25 * (missing - 7))) * 100)));
@@ -669,7 +707,8 @@ class ApiClient {
     try {
       const url = level ? `/retention/at-risk-members?level=${level}` : '/retention/at-risk-members';
       return await this.request<MemberRiskDetails[]>(url);
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       if (level) {
         return MOCK_SUMMARY.recentAtRiskPreview.filter((m) => m.riskLevel === level);
       }
@@ -707,8 +746,14 @@ class ApiClient {
     if (take !== undefined) params.append('take', take.toString());
 
     const query = params.toString() ? `?${params.toString()}` : '';
-    const res = await this.request<any>(`/members${query}`);
-    return res.data || res;
+    try {
+      const res = await this.request<any>(`/members${query}`);
+      return res.data || res;
+    } catch (error) {
+      if (this.token) throw error;
+      const filtered = MOCK_MEMBERS.filter(member => (!search || `${member.firstName} ${member.lastName} ${member.memberCode} ${member.phone}`.toLowerCase().includes(search.toLowerCase())) && (!status || member.status === status) && (!trainerId || member.trainerAssignments?.some(assignment=>assignment.trainerId===trainerId)) && (!unassigned || !member.trainerAssignments?.length));
+      return {members:filtered.slice(skip||0,(skip||0)+(take||100)),meta:{total:filtered.length}};
+    }
   }
 
   // Create Member
@@ -718,7 +763,8 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify(data),
       });
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       const newMember: Member = {
         id: `mem-${Date.now()}`,
         gymId: this.currentGym.id,
@@ -745,7 +791,8 @@ class ApiClient {
   async getRewards(): Promise<Reward[]> {
     try {
       return await this.request<Reward[]>('/rewards');
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return MOCK_REWARDS;
     }
   }
@@ -757,7 +804,8 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify(data),
       });
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       const newReward: Reward = {
         id: `rew-${Date.now()}`,
         gymId: this.currentGym.id,
@@ -781,7 +829,8 @@ class ApiClient {
     try {
       const res = await this.request<RewardRedemption[]>('/rewards/winners');
       return res && res.length > 0 ? res : MOCK_WINNERS;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return MOCK_WINNERS;
     }
   }
@@ -793,7 +842,8 @@ class ApiClient {
         method: 'PATCH',
         body: JSON.stringify({ notes }),
       });
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       const item = MOCK_WINNERS.find((w) => w.id === redemptionId);
       if (item) {
         item.status = 'REDEEMED';
@@ -814,8 +864,17 @@ class ApiClient {
   }> {
     try {
       const res = await this.request<any>('/gyms/capacity');
-      return res.data || res;
-    } catch {
+      const data = res.data || res;
+      const occupancy = data.currentlyCheckedIn ?? data.currentOccupancy ?? 0;
+      return {
+        ...data,
+        currentlyCheckedIn: occupancy,
+        capacityPolicy: data.capacityPolicy === 'BLOCK_ADMISSION' ? 'BLOCK_AT_CAPACITY' : data.capacityPolicy,
+        capacityUsagePercent: data.capacityUsagePercent ?? data.utilizationPercent ?? 0,
+        remainingCapacity: Math.max(0, data.capacity - occupancy),
+      };
+    } catch (error) {
+      if (this.token) throw error;
       return {
         capacity: 100,
         capacityPolicy: 'WARNING_ONLY',
@@ -831,9 +890,9 @@ class ApiClient {
     capacity: number;
     capacityPolicy?: 'WARNING_ONLY' | 'BLOCK_AT_CAPACITY';
   }): Promise<any> {
-    const res = await this.request<any>('/gyms/capacity', {
+    const res = await this.request<any>('/gyms/my-gym', {
       method: 'PATCH',
-      body: JSON.stringify(dto),
+      body: JSON.stringify({ ...dto, capacityPolicy: dto.capacityPolicy === 'BLOCK_AT_CAPACITY' ? 'BLOCK_ADMISSION' : dto.capacityPolicy }),
     });
     return res.data || res;
   }
@@ -895,7 +954,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/check-ins/open-sessions');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [];
     }
   }
@@ -918,7 +978,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/gyms/qr-code');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return {
         qrPayload: JSON.stringify({
           gymId: this.currentGym.id,
@@ -977,7 +1038,8 @@ class ApiClient {
     try {
       const res = await this.request<any>(`/retention/members/${memberId}/interventions`);
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [];
     }
   }
@@ -987,7 +1049,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/saas-billing/status');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return {
         gymId: this.currentGym.id,
         plan: 'STARTER',
@@ -1040,7 +1103,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/saas-billing/invoices');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [];
     }
   }
@@ -1050,7 +1114,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/auth/team/staff');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [];
     }
   }
@@ -1059,7 +1124,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/auth/team/invitations');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [];
     }
   }
@@ -1209,7 +1275,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/diet-plans/templates/all');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [
         {
           id: 'tpl-1',
@@ -1351,7 +1418,8 @@ class ApiClient {
     try {
       const res = await this.request<any>(`/diet-plans/member/${memberId}`);
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [
         {
           id: 'dp-mock-1',
@@ -1417,7 +1485,8 @@ class ApiClient {
         body: JSON.stringify(payload),
       });
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return {
         id: `dp-${Date.now()}`,
         ...payload,
@@ -1435,7 +1504,8 @@ class ApiClient {
         body: JSON.stringify(payload),
       });
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return {
         id: `dp-cloned-${Date.now()}`,
         memberId: payload.memberId,
@@ -1459,7 +1529,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/chat/conversations');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [];
     }
   }
@@ -1468,7 +1539,8 @@ class ApiClient {
     try {
       const res = await this.request<any>(`/chat/conversations/${conversationId}/messages`);
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [];
     }
   }
@@ -1478,7 +1550,8 @@ class ApiClient {
       return await this.request(`/chat/conversations/${conversationId}`, {
         method: 'DELETE',
       });
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return { success: true };
     }
   }
@@ -1489,9 +1562,14 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify(payload),
       });
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return { success: true, simulated: true, payload };
     }
+  }
+
+  async previewWhatsAppReply(payload: { phone: string; message: string; gymId?: string }): Promise<{ reply?: string; message?: string }> {
+    return this.request('/messaging/whatsapp/simulate', { method: 'POST', body: JSON.stringify(payload) });
   }
 
   // --- SUBSCRIPTION & PAYMENT MANAGEMENT ---
@@ -1501,7 +1579,8 @@ class ApiClient {
       const query = status && status !== 'ALL' ? `?status=${status}` : '';
       const res = await this.request<any>(`/payments/subscriptions${query}`);
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [
         {
           id: 'sub-1',
@@ -1598,7 +1677,8 @@ class ApiClient {
         body: JSON.stringify(payload),
       });
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return { id: `sub-${Date.now()}`, ...payload, status: 'ACTIVE' };
     }
   }
@@ -1610,7 +1690,8 @@ class ApiClient {
         body: JSON.stringify(payload),
       });
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return { id, success: true };
     }
   }
@@ -1620,7 +1701,8 @@ class ApiClient {
       return await this.request(`/payments/subscriptions/${id}/cancel`, {
         method: 'PATCH',
       });
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return { id, status: 'CANCELLED' };
     }
   }
@@ -1629,7 +1711,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/payments/records');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return [
         {
           id: 'pay-201',
@@ -1694,7 +1777,8 @@ class ApiClient {
         body: JSON.stringify(payload),
       });
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return { id: `pay-${Date.now()}`, ...payload, status: 'COMPLETED', createdAt: new Date().toISOString() };
     }
   }
@@ -1703,7 +1787,8 @@ class ApiClient {
     try {
       const res = await this.request<any>('/payments/metrics');
       return res.data || res;
-    } catch {
+    } catch (error) {
+      if (this.token) throw error;
       return {
         activeSubscriptions: 138,
         pendingPayments: 6,

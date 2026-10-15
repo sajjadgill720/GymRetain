@@ -41,7 +41,7 @@ export const VisionDarkHero: React.FC<VisionDarkHeroProps> = ({ summary }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 relative z-10">
             {/* Metric 1: Total Revenue */}
             <div className="p-4 rounded-2xl bg-[#161B26] border border-[#232B3E] flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-xl bg-brass-500/10 text-brass-400 flex items-center justify-center font-bold">
                 <DollarSign className="w-5 h-5" />
               </div>
               <div>
@@ -49,13 +49,13 @@ export const VisionDarkHero: React.FC<VisionDarkHeroProps> = ({ summary }) => {
                   Total Revenue
                 </span>
                 <div className="text-xl font-extrabold text-white font-sans">₨446,500</div>
-                <span className="text-[10px] text-emerald-400 font-bold">+18.4% MoM</span>
+                <span className="text-[10px] text-status-success-text font-bold">+18.4% MoM</span>
               </div>
             </div>
 
             {/* Metric 2: Total Check-Ins */}
             <div className="p-4 rounded-2xl bg-[#161B26] border border-[#232B3E] flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center font-bold">
                 <UserCheck className="w-5 h-5" />
               </div>
               <div>
@@ -63,7 +63,7 @@ export const VisionDarkHero: React.FC<VisionDarkHeroProps> = ({ summary }) => {
                   Total Check-Ins
                 </span>
                 <div className="text-xl font-extrabold text-white font-sans">2,840 Visits</div>
-                <span className="text-[10px] text-cyan-400 font-bold">94.6 Day Avg</span>
+                <span className="text-[10px] text-brass-400 font-bold">94.6 Day Avg</span>
               </div>
             </div>
           </div>
@@ -73,7 +73,7 @@ export const VisionDarkHero: React.FC<VisionDarkHeroProps> = ({ summary }) => {
         <div className="lg:col-span-4 p-6 rounded-3xl bg-[#11141C] border border-[#1E2433] flex flex-col justify-between items-center text-center shadow-2xl">
           <div className="w-full flex items-center justify-between">
             <span className="text-xs font-bold text-zinc-300">Retention Goal</span>
-            <span className="text-[10px] text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full font-bold">
+            <span className="text-[10px] text-brass-400 bg-brass-500/10 px-2 py-0.5 rounded-full font-bold">
               TARGET 85%
             </span>
           </div>
@@ -103,7 +103,7 @@ export const VisionDarkHero: React.FC<VisionDarkHeroProps> = ({ summary }) => {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-3xl font-extrabold text-white tracking-tight">91%</span>
-              <span className="text-[10px] text-emerald-400 font-bold">+6% over target</span>
+              <span className="text-[10px] text-status-success-text font-bold">+6% over target</span>
             </div>
           </div>
 

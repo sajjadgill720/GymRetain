@@ -1,1017 +1,722 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { AppLayout } from '../components/AppLayout';
-import { api } from '../lib/api';
-import { DashboardSummary, AttendanceTrendPoint, MemberRiskDetails } from '../types';
-import { Retention3DRadar, RadarSegment } from '../components/dashboard/Retention3DRadar';
+"use client";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { AppLayout } from "@/components/AppLayout";
+import { api } from "@/lib/api";
+import { useAuth } from "@/lib/AuthProvider";
+import {
+  DashboardSummary,
+  AttendanceTrendPoint,
+  MemberRiskDetails,
+} from "@/types";
+import {
+  OperationsState,
+  localDate,
+  money,
+  downloadCsv,
+} from "@/lib/operations";
 import {
   Users,
   UserCheck,
-  Warning,
-  Medal,
-  Fire,
-  Sparkle,
-  TrendUp,
-  TrendDown,
-  CalendarBlank,
-  Clock,
-  ChatCircleDots,
   ArrowRight,
-  ShieldCheck,
+  Plus,
+  ArrowUpRight,
+  CreditCard,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  Warning,
+  Download,
+  Fire,
+  RefreshCw,
   QrCode,
-  CheckCircle,
-  Activity,
-  DotsThree,
-} from '@/components/icons';
+} from "@/components/icons";
 
 export default function DashboardPage() {
+  const { user, activeGym, isLoading: authLoading } = useAuth();
+  const canManage =
+    !user || ["GYM_OWNER", "GYM_MANAGER", "SUPER_ADMIN"].includes(user.role);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [trendData, setTrendData] = useState<AttendanceTrendPoint[]>([]);
-  const [timeframe, setTimeframe] = useState<'7D' | '14D' | '30D' | '90D'>('30D');
-  const [hoveredPoint, setHoveredPoint] = useState<{ label: string; date: string; val: number; x: number; y: number } | null>(null);
+  const [operations, setOperations] = useState<OperationsState | null>(null);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [risk, setRisk] = useState<MemberRiskDetails[]>([]);
+  const [trend, setTrend] = useState<AttendanceTrendPoint[]>([]);
+  const [period, setPeriod] = useState(14);
   const [loading, setLoading] = useState(true);
-  const [nudgedMembers, setNudgedMembers] = useState<Set<string>>(new Set());
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Radar interactive segment filter
-  const [radarSegment, setRadarSegment] = useState<RadarSegment>('ALL');
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
-  };
-
-  const loadData = async () => {
-    try {
-      const sum = await api.getDashboardSummary();
-      setSummary(sum);
-    } catch {
-      // Fallback
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const [failed, setFailed] = useState<string[]>([]);
+  const [busyTask, setBusyTask] = useState("");
+  const [taskError, setTaskError] = useState("");
+  const request = useRef(0);
+  const timezone = activeGym?.timezone || "Asia/Karachi";
+  const today = localDate(new Date(), timezone);
+  const load = useCallback(async () => {
+    const id = ++request.current;
+    setLoading(true);
+    setFailed([]);
+    const results = await Promise.allSettled([
+      api.getDashboardSummary(),
+      canManage ? api.getOperations() : Promise.resolve(null),
+      canManage ? api.getPaymentRecords() : Promise.resolve([]),
+      api.getAtRiskMembers(),
+      canManage ? api.getSubscriptions() : Promise.resolve([]),
+    ]);
+    if (id !== request.current) return;
+    const labels = [
+      "Overview",
+      "Operations",
+      "Collections",
+      "Retention",
+      "Memberships",
+    ];
+    const errors: string[] = [];
+    results.forEach((result, index) => {
+      if (result.status === "rejected") errors.push(labels[index]);
+      else {
+        if (index === 0) setSummary(result.value as DashboardSummary);
+        if (index === 1) setOperations(result.value as OperationsState | null);
+        if (index === 2) setPayments(result.value as any[]);
+        if (index === 3) setRisk(result.value as MemberRiskDetails[]);
+        if (index === 4) setSubscriptions(result.value as any[]);
+      }
+    });
+    setFailed(errors);
+    setLoading(false);
+  }, [canManage]);
   useEffect(() => {
-    loadData();
-  }, []);
-
+    if (!authLoading) load();
+    return () => {
+      request.current++;
+    };
+  }, [load, authLoading, activeGym?.id]);
   useEffect(() => {
-    const days = timeframe === '7D' ? 7 : timeframe === '14D' ? 14 : timeframe === '30D' ? 30 : 90;
+    if (authLoading) return;
+    let alive = true;
     api
-      .getAttendanceTrends(days)
-      .then((data) => {
-        if (data && data.length > 0) {
-          setTrendData(data);
-        }
+      .getAttendanceTrends(period)
+      .then((rows) => {
+        if (alive) setTrend(rows);
       })
-      .catch(() => {});
-  }, [timeframe]);
-
-  // Real Backend KPIs
+      .catch(() => {
+        if (alive) setTrend([]);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [period, activeGym?.id, authLoading]);
   const kpis = summary?.kpis;
-  const activeMembers = kpis?.activeMembers ?? 142;
-  const membersCheckedInToday = kpis?.membersCheckedInToday ?? kpis?.todayCheckIns ?? 0;
-  const visitsToday = kpis?.visitsToday ?? membersCheckedInToday;
-  const currentlyCheckedIn = kpis?.currentlyCheckedIn ?? 0;
-  const gymCapacity = kpis?.capacity ?? 100;
-  const capacityUsagePercent = kpis?.capacityUsagePercent ?? Math.round((currentlyCheckedIn / (gymCapacity || 1)) * 100);
-  const rawPolicy = kpis?.capacityPolicy;
-  const capacityPolicy: 'WARNING_ONLY' | 'BLOCK_AT_CAPACITY' =
-    rawPolicy === 'BLOCK_AT_CAPACITY' || rawPolicy === 'BLOCK_ADMISSION'
-      ? 'BLOCK_AT_CAPACITY'
-      : 'WARNING_ONLY';
-  const averageVisitDurationMinutes = kpis?.averageVisitDurationMinutes;
-  const busiestArrivalHours = kpis?.busiestArrivalHours ?? [];
-  const accuracyNotice = kpis?.accuracyNotice ?? 'Live count reflects open attendance sessions. Missed check-outs or delayed check-outs can affect real-time accuracy.';
-  const highRiskCount = kpis?.highRiskCount ?? 6;
-  const topStreakLeader = summary?.streakLeaders?.[0] || {
-    memberName: 'Hamza Sheikh',
-    currentStreak: 12,
-    memberCode: 'GR-1001',
-  };
-
-  // Capacity Modal State
-  const [isCapacityModalOpen, setIsCapacityModalOpen] = useState(false);
-  const [capacityInput, setCapacityInput] = useState<number>(gymCapacity);
-  const [policyInput, setPolicyInput] = useState<'WARNING_ONLY' | 'BLOCK_AT_CAPACITY'>(capacityPolicy);
-  const [savingCapacity, setSavingCapacity] = useState(false);
-
-  useEffect(() => {
-    if (kpis?.capacity) setCapacityInput(kpis.capacity);
-    if (kpis?.capacityPolicy) {
-      setPolicyInput(kpis.capacityPolicy === 'BLOCK_ADMISSION' ? 'BLOCK_AT_CAPACITY' : kpis.capacityPolicy);
-    }
-  }, [kpis?.capacity, kpis?.capacityPolicy]);
-
-  const handleSaveCapacity = async () => {
-    setSavingCapacity(true);
-    try {
-      await api.updateCapacity({
-        capacity: Number(capacityInput),
-        capacityPolicy: policyInput,
-      });
-      showToast('Gym capacity settings updated successfully.');
-      setIsCapacityModalOpen(false);
-      loadData();
-    } catch (err: any) {
-      showToast(err?.message || 'Failed to update capacity');
-    } finally {
-      setSavingCapacity(false);
-    }
-  };
-
-  // Recent at-risk preview fallback
-  const baseAtRiskMembers: MemberRiskDetails[] =
-    summary?.recentAtRiskPreview && summary.recentAtRiskPreview.length > 0
-      ? summary.recentAtRiskPreview.slice(0, 6)
-      : [
-          {
-            memberId: 'mem-2',
-            memberCode: 'GR-1002',
-            fullName: 'Ayesha Malik',
-            phone: '+923331122334',
-            riskScore: 88,
-            riskLevel: 'HIGH',
-            factors: { daysSinceLastCheckIn: 16 } as any,
-          },
-          {
-            memberId: 'mem-7',
-            memberCode: 'GR-1007',
-            fullName: 'Omer Farooq',
-            phone: '+923005544332',
-            riskScore: 78,
-            riskLevel: 'HIGH',
-            factors: { daysSinceLastCheckIn: 12 } as any,
-          },
-          {
-            memberId: 'mem-8',
-            memberCode: 'GR-1008',
-            fullName: 'Sana Tariq',
-            phone: '+923219988776',
-            riskScore: 68,
-            riskLevel: 'HIGH',
-            factors: { daysSinceLastCheckIn: 10 } as any,
-          },
-          {
-            memberId: 'mem-9',
-            memberCode: 'GR-1009',
-            fullName: 'Hamza Tariq',
-            phone: '+923341122998',
-            riskScore: 62,
-            riskLevel: 'HIGH',
-            factors: { daysSinceLastCheckIn: 9 } as any,
-          },
-          {
-            memberId: 'mem-3',
-            memberCode: 'GR-1003',
-            fullName: 'Zaid Siddiqui',
-            phone: '+923451122334',
-            riskScore: 48,
-            riskLevel: 'MEDIUM',
-            factors: { daysSinceLastCheckIn: 5 } as any,
-          },
-          {
-            memberId: 'mem-4',
-            memberCode: 'GR-1004',
-            fullName: 'Fatima Zahra',
-            phone: '+923121122334',
-            riskScore: 42,
-            riskLevel: 'MEDIUM',
-            factors: { daysSinceLastCheckIn: 4 } as any,
-          },
-        ];
-
-  // Filter members based on 3D Retention Radar segment selection
-  const atRiskMembers = baseAtRiskMembers.filter((m) => {
-    if (radarSegment === 'ALL') return true;
-    if (radarSegment === 'URGENT') return m.riskScore >= 70;
-    if (radarSegment === 'SLIPPING') return m.riskScore >= 40 && m.riskScore < 70;
-    if (radarSegment === 'HABIT_DISRUPTED') return m.riskLevel === 'MEDIUM';
-    if (radarSegment === 'HEALTHY') return m.riskScore < 40;
-    return true;
-  });
-
-  // Handle WhatsApp Nudge simulation
-  const handleNudge = async (member: MemberRiskDetails) => {
-    try {
-      setNudgedMembers((prev) => new Set(prev).add(member.memberId));
-      await api.simulateWhatsAppMessage({
-        memberId: member.memberId,
-        messageType: 'MISSED_VISIT',
-      });
-      showToast(`Personalized WhatsApp retention nudge sent to ${member.fullName}!`);
-    } catch {
-      showToast(`Nudge logged for ${member.fullName}.`);
-    }
-  };
-
-  // Trend Chart Calculation
-  const chartPoints = trendData.length > 0 ? trendData : [
-    { date: '2026-09-03', checkIns: 28 },
-    { date: '2026-09-08', checkIns: 34 },
-    { date: '2026-09-13', checkIns: 41 },
-    { date: '2026-09-18', checkIns: 31 },
-    { date: '2026-09-23', checkIns: 45 },
-    { date: '2026-09-28', checkIns: 39 },
-    { date: '2026-10-02', checkIns: membersCheckedInToday },
-  ];
-
-  const maxVal = Math.max(...chartPoints.map((p) => p.checkIns), 45);
-  const minVal = Math.max(0, Math.min(...chartPoints.map((p) => p.checkIns)) - 5);
-  const valRange = maxVal - minVal || 1;
-
-  const svgWidth = 800;
-  const svgHeight = 240;
-  const paddingX = 35;
-  const paddingY = 25;
-
-  const coords = chartPoints.map((pt, idx) => {
-    const x = paddingX + (idx / (chartPoints.length - 1)) * (svgWidth - paddingX * 2);
-    const y = svgHeight - paddingY - ((pt.checkIns - minVal) / valRange) * (svgHeight - paddingY * 2);
-    return { x, y, pt };
-  });
-
-  // Quadratic Bezier smoothing for SVG Path
-  let pathD = '';
-  if (coords.length > 0) {
-    pathD = `M ${coords[0].x},${coords[0].y}`;
-    for (let i = 0; i < coords.length - 1; i++) {
-      const p0 = coords[i];
-      const p1 = coords[i + 1];
-      const mx = (p0.x + p1.x) / 2;
-      pathD += ` C ${mx},${p0.y} ${mx},${p1.y} ${p1.x},${p1.y}`;
-    }
-  }
-
-  const areaD = coords.length > 0
-    ? `${pathD} L ${coords[coords.length - 1].x},${svgHeight - paddingY} L ${coords[0].x},${svgHeight - paddingY} Z`
-    : '';
-
-  const avgDailyVisits = Math.round(
-    chartPoints.reduce((acc, p) => acc + p.checkIns, 0) / chartPoints.length
+  const occupancy = kpis?.currentlyCheckedIn || 0;
+  const capacity = kpis?.capacity || 100;
+  const usage = Math.round((occupancy / capacity) * 100);
+  const collections = payments
+    .filter((payment) => payment.status === "COMPLETED")
+    .reduce((sum, payment) => sum + Number(payment.amount || 0) * 100, 0);
+  const renewals = subscriptions.filter(
+    (item) =>
+      item.status === "ACTIVE" &&
+      localDate(new Date(item.endDate), timezone) >= today &&
+      Date.parse(item.endDate) <= Date.now() + 7 * 86400000,
   );
-
+  const dues = subscriptions.filter(
+    (item) => item.status === "PENDING_PAYMENT" || item.status === "EXPIRED",
+  );
+  const tasks =
+    operations?.tasks
+      .filter((task) => !task.completed)
+      .sort((a, b) => a.dueDate.localeCompare(b.dueDate)) || [];
+  const sessions =
+    operations?.sessions
+      .filter(
+        (session) =>
+          localDate(new Date(session.startsAt), timezone) === today &&
+          session.status === "SCHEDULED",
+      )
+      .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt)) || [];
+  const leads =
+    operations?.leads.filter(
+      (lead) => !["JOINED", "LOST"].includes(lead.stage),
+    ) || [];
+  const attendanceTotal = trend.reduce((sum, point) => sum + point.checkIns, 0);
+  const max = Math.max(1, ...trend.map((point) => point.checkIns));
+  const finishTask = async (id: string) => {
+    if (!operations) return;
+    setBusyTask(id);
+    setTaskError("");
+    try {
+      setOperations(
+        await api.mutateOperations({
+          kind: "tasks",
+          action: "update",
+          id,
+          version: operations.version,
+          data: { completed: true },
+        }),
+      );
+    } catch (err) {
+      setTaskError(
+        err instanceof Error ? err.message : "Could not complete the task.",
+      );
+    } finally {
+      setBusyTask("");
+    }
+  };
+  const report = () =>
+    downloadCsv(
+      `gym-daily-brief-${today}.csv`,
+      ["Metric", "Value", "Period"],
+      [
+        ["Gym", activeGym?.name || "Demo gym", today],
+        ["Active members", kpis?.activeMembers ?? "Unavailable", today],
+        [
+          "Unique check-ins",
+          kpis?.membersCheckedInToday ?? "Unavailable",
+          today,
+        ],
+        ["Open visits", kpis?.currentlyCheckedIn ?? "Unavailable", today],
+        [
+          "Completed collections (PKR)",
+          failed.includes("Collections") ? "Unavailable" : collections / 100,
+          "All recorded payments",
+        ],
+        ["Follow-ups", risk.length, today],
+        [
+          "Sessions scheduled",
+          operations ? sessions.length : "Unavailable",
+          today,
+        ],
+        ...trend.map((point) => ["Attendance", point.checkIns, point.date]),
+      ],
+    );
   return (
-    <AppLayout onRefreshData={loadData}>
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-surface border border-surface-border text-content-primary shadow-2xl animate-in slide-in-from-bottom-5 duration-200">
-          <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" weight="fill" />
-          <span className="text-xs font-semibold">{toastMessage}</span>
-        </div>
-      )}
-
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
-        {/* ============================================================
-            1. TOP HEADER & KEY ACTIONS
-            ============================================================ */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-surface-border">
+    <AppLayout onRefreshData={load}>
+      <div className="studio-page studio-overview">
+        <div className="studio-page-heading">
           <div>
-            <div className="flex items-center gap-2.5 mb-1">
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-content-primary font-sans">
-                Gym Dashboard
-              </h1>
-            </div>
-            <p className="text-xs sm:text-sm text-content-secondary">
-              See today&apos;s check-ins, member workout streaks, and members who need a friendly follow-up.
+            <p className="premium-eyebrow">
+              Your gym, at a glance{" "}
+              <span className="studio-eyebrow-divider">/</span>{" "}
+              {new Intl.DateTimeFormat("en-PK", {
+                day: "numeric",
+                month: "long",
+                timeZone: timezone,
+              }).format(new Date())}
+            </p>
+            <h1>
+              A stronger gym.
+              <br />
+              <span className="studio-heading-soft">Every single day.</span>
+            </h1>
+            <p>
+              {user ? `Good to see you, ${user.name.split(" ")[0]}. ` : ""}Your
+              members, your business, and the next right move.
             </p>
           </div>
-
-          <div className="flex items-center flex-wrap gap-2.5">
-            <Link
-              href="/insights"
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/15 text-purple-600 dark:text-cyan-400 border border-purple-500/20 text-xs font-bold transition-all btn-shadow"
+          <div className="flex flex-wrap gap-2">
+            <button
+              className="studio-button"
+              disabled={loading}
+              onClick={load}
+              aria-label="Refresh dashboard"
             >
-              <Sparkle className="w-4 h-4" weight="fill" />
-              <span>Ask AI</span>
-            </Link>
-
-            <Link
-              href="/retention"
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-content-primary transition-all btn-shadow"
+              <RefreshCw
+                className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+              />
+            </button>
+            <button
+              className="studio-button"
+              onClick={report}
+              disabled={loading}
             >
-              <Warning className="w-4 h-4 text-amber-500" weight="fill" />
-              <span>Needs Attention</span>
-              <span className="px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-mono font-bold">
-                {highRiskCount}
-              </span>
-            </Link>
-
+              <Download className="w-4 h-4" />
+              Daily brief
+            </button>
             <Link
-              href="/check-in"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl btn-shadow-primary text-xs font-bold transition-all"
+              href="/members?new=1"
+              className="studio-button studio-button-primary"
             >
-              <UserCheck className="w-4 h-4" weight="bold" />
-              <span>+ Check In Member</span>
+              <Plus className="w-4 h-4" />
+              Add member
             </Link>
           </div>
         </div>
-
-        {/* ============================================================
-            2. 4 KEY GYM METRICS
-            ============================================================ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: Active Members */}
-          <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Active Members
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-cyan-400 flex items-center justify-center">
-                <Users className="w-4 h-4" weight="duotone" />
-              </div>
-            </div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-2xl sm:text-3xl font-extrabold text-content-primary tracking-tight font-sans">
-                {activeMembers}
-              </span>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
-                <TrendUp className="w-3.5 h-3.5" weight="bold" />
-                +8.2%
-              </span>
-            </div>
-            <p className="text-[11px] text-content-tertiary">
-              Members with an active gym pass
-            </p>
+        {!!failed.length && (
+          <div role="alert" data-tone="warning" className="studio-alert">
+            <Warning className="w-4 h-4 shrink-0" />
+            <span>
+              {failed.join(", ")} could not be loaded. Refresh or check your
+              connection before making decisions.
+            </span>
           </div>
-
-          {/* Card 2: Today's Attendance */}
-          <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Today&apos;s Attendance
+        )}
+        <div className="studio-overview-hero">
+          <section className="studio-business-card">
+            <div className="flex justify-between gap-4">
+              <span className="premium-eyebrow">
+                A healthy business starts with belonging
               </span>
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                <UserCheck className="w-4 h-4" weight="duotone" />
-              </div>
+              <CreditCard className="w-5 h-5 opacity-60" />
             </div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-2xl sm:text-3xl font-extrabold text-content-primary tracking-tight font-sans">
-                {membersCheckedInToday}
-              </span>
-              <span className="text-xs text-content-tertiary">
-                distinct ({visitsToday} visit{visitsToday !== 1 ? 's' : ''})
-              </span>
-            </div>
-            <p className="text-[11px] text-content-tertiary">
-              Avg duration:{' '}
-              {averageVisitDurationMinutes !== null && averageVisitDurationMinutes !== undefined
-                ? `${averageVisitDurationMinutes} mins`
-                : 'Not enough data'}
+            <p className="studio-business-label">
+              {canManage ? "Recorded collections" : "Member check-ins today"}
             </p>
-          </div>
-
-          {/* Card 3: At-Risk Members */}
-          <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Needs Attention
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center">
-                <Warning className="w-4 h-4" weight="duotone" />
-              </div>
+            <div className="studio-business-number">
+              {loading
+                ? "—"
+                : canManage
+                  ? failed.includes("Collections")
+                    ? "—"
+                    : money(collections)
+                  : (kpis?.membersCheckedInToday ?? "—")}
             </div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-2xl sm:text-3xl font-extrabold text-red-600 dark:text-red-400 tracking-tight font-sans">
-                {highRiskCount}
-              </span>
-              <span className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-0.5">
-                <TrendDown className="w-3.5 h-3.5" weight="bold" />
-                Follow up
-              </span>
-            </div>
-            <p className="text-[11px] text-content-tertiary">
-              Absent over a week · Est. ₨18,800 monthly dues at risk
+            <p className="studio-business-caption">
+              {canManage
+                ? "Completed payments in your ledger · all time"
+                : "Distinct members who visited today"}
             </p>
-          </div>
-
-          {/* Card 4: Retention Benchmark */}
-          <div className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-surface-border-hover transition-all duration-200 btn-shadow group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Monthly Retention
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                <Medal className="w-4 h-4" weight="duotone" />
-              </div>
-            </div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-2xl sm:text-3xl font-extrabold text-content-primary tracking-tight font-sans">
-                91.4%
-              </span>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                +9.4% vs industry
-              </span>
-            </div>
-            <p className="text-[11px] text-content-tertiary">
-              Members who renewed or stayed active this month
-            </p>
-          </div>
-        </div>
-
-        {/* ============================================================
-            3. INTERACTIVE RETENTION RADAR
-            ============================================================ */}
-        <div className="w-full">
-          <Retention3DRadar
-            activeSegment={radarSegment}
-            onSelectSegment={(segment) => {
-              setRadarSegment(segment);
-              if (segment !== 'ALL') {
-                showToast(`Filtered member list to ${segment.toLowerCase().replace('_', ' ')} group`);
-              }
-            }}
-            urgentCount={4}
-            slippingCount={2}
-            habitDisruptedCount={3}
-            healthyCount={133}
-            urgentRevenueAtRisk={20000}
-            slippingRevenueAtRisk={9000}
-          />
-        </div>
-
-        {/* ============================================================
-            4. ATTENDANCE TRENDS & GYM FLOOR ACTIVITY (8 / 4 COLS)
-            ============================================================ */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left: Attendance Chart (8 Cols) */}
-          <div className="lg:col-span-8 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div className="studio-business-footer">
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-content-primary">
-                  Daily gym attendance
-                </h3>
-                <p className="text-xs text-content-tertiary">
-                  Number of members checking in each day across all membership tiers
-                </p>
+                <span>
+                  {canManage ? "Renewals in 7 days" : "Current floor count"}
+                </span>
+                <strong>
+                  {loading
+                    ? "—"
+                    : canManage
+                      ? failed.includes("Memberships")
+                        ? "—"
+                        : renewals.length
+                      : occupancy}
+                </strong>
               </div>
-
-              {/* Timeframe Toggles */}
-              <div className="flex items-center gap-1 p-1 bg-surface-subtle border border-surface-border rounded-xl self-start sm:self-auto">
-                {(['7D', '14D', '30D', '90D'] as const).map((t) => (
+              <div>
+                <span>
+                  {canManage ? "Unpaid / expired plans" : "Active members"}
+                </span>
+                <strong>
+                  {loading
+                    ? "—"
+                    : canManage
+                      ? failed.includes("Memberships")
+                        ? "—"
+                        : dues.length
+                      : (kpis?.activeMembers ?? "—")}
+                </strong>
+              </div>
+              <Link
+                href={canManage ? "/subscriptions" : "/check-in"}
+                aria-label={
+                  canManage ? "Manage memberships and fees" : "Open front desk"
+                }
+                className="studio-round-link"
+              >
+                <ArrowUpRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </section>
+          <section className="studio-floor-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="premium-eyebrow">The floor, right now</p>
+                <h2>Room for good energy.</h2>
+              </div>
+              <span className="studio-label">
+                {api.dashboardUsesDemoData ? "Sample" : "Session count"}
+              </span>
+            </div>
+            <div className="studio-floor-body">
+              <div
+                className="studio-occupancy-ring"
+                style={{
+                  background: `conic-gradient(var(${usage >= 100 ? "--status-danger-accent" : usage >= 80 ? "--status-warning-accent" : "--accent-brand"}) ${Math.min(usage, 100) * 3.6}deg, var(--bg-subtle) 0deg)`,
+                }}
+              >
+                <div>
+                  <strong>{loading ? "—" : occupancy}</strong>
+                  <span>of {capacity} places</span>
+                </div>
+              </div>
+              <div className="studio-floor-details">
+                <span
+                  className="status-pill"
+                  data-tone={
+                    usage >= 100
+                      ? "danger"
+                      : usage >= 80
+                        ? "warning"
+                        : "success"
+                  }
+                >
+                  {usage >= 100
+                    ? "At capacity"
+                    : usage >= 80
+                      ? "Getting busy"
+                      : "Comfortable"}
+                </span>
+                <p>
+                  <strong>
+                    {loading ? "—" : (kpis?.membersCheckedInToday ?? "—")}
+                  </strong>{" "}
+                  unique visits today
+                </p>
+                <p>
+                  <strong>{kpis?.averageVisitDurationMinutes ?? "—"}</strong>{" "}
+                  min. average visit
+                </p>
+                <Link href="/settings" className="studio-text-link">
+                  Capacity settings <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+            <Link href="/check-in" className="studio-floor-action">
+              <QrCode className="w-4 h-4" />
+              Open the front desk <ArrowRight className="w-4 h-4 ml-auto" />
+            </Link>
+          </section>
+        </div>
+        <div className="studio-health-grid">
+          {[
+            {
+              label: "Active members",
+              value: kpis?.activeMembers,
+              detail: "People building a routine",
+              icon: Users,
+              tone: "success",
+              href: "/members",
+            },
+            {
+              label: "Retention queue",
+              value: failed.includes("Retention") ? undefined : risk.length,
+              detail: "A personal follow-up can help",
+              icon: Warning,
+              tone: risk.length ? "danger" : "success",
+              href: "/retention",
+            },
+            {
+              label: canManage ? "Open enquiries" : "Today’s attendance",
+              value: canManage
+                ? operations
+                  ? leads.length
+                  : undefined
+                : kpis?.membersCheckedInToday,
+              detail: canManage
+                ? "Your next members start here"
+                : "Every visit is a step forward",
+              icon: canManage ? Users : UserCheck,
+              tone: "warning",
+              href: canManage ? "/operations?view=leads" : "/check-in",
+            },
+            {
+              label: canManage ? "Sessions today" : "Visits today",
+              value: canManage
+                ? operations
+                  ? sessions.length
+                  : undefined
+                : kpis?.visitsToday,
+              detail: canManage
+                ? "Make every session count"
+                : "Including return visits",
+              icon: Calendar,
+              tone: "success",
+              href: canManage ? "/operations?view=sessions" : "/check-in",
+            },
+          ].map((metric) => (
+            <Link
+              key={metric.label}
+              href={metric.href}
+              className="studio-health-card"
+              data-tone={metric.tone}
+            >
+              <div>
+                <span>{metric.label}</span>
+                <metric.icon className="w-4 h-4" />
+              </div>
+              <strong>{loading ? "—" : (metric.value ?? "—")}</strong>
+              <p>
+                {metric.detail}
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </p>
+            </Link>
+          ))}
+        </div>
+        <div className="studio-main-grid">
+          <section className="premium-panel overflow-hidden">
+            <div className="studio-section-header">
+              <div>
+                <p className="premium-eyebrow">Consistency, in motion</p>
+                <h2>Attendance rhythm</h2>
+              </div>
+              <div className="studio-period" aria-label="Attendance period">
+                {[7, 14, 30].map((days) => (
                   <button
-                    key={t}
-                    onClick={() => setTimeframe(t)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                      timeframe === t
-                        ? 'bg-surface text-purple-600 dark:text-cyan-400 shadow-sm border border-surface-border'
-                        : 'text-content-tertiary hover:text-content-primary'
-                    }`}
+                    key={days}
+                    aria-pressed={period === days}
+                    onClick={() => setPeriod(days)}
                   >
-                    {t === '7D' ? '7 Days' : t === '14D' ? '14 Days' : t === '30D' ? '30 Days' : '90 Days'}
+                    {days}D
                   </button>
                 ))}
               </div>
             </div>
-
-            {/* Interactive SVG Chart Canvas */}
-            <div className="relative w-full h-[240px] select-none my-2">
-              <svg
-                viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-                className="w-full h-full overflow-visible"
-                preserveAspectRatio="none"
-              >
-                <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#7C3AED" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-
-                {/* Horizontal Guide Grid Lines */}
-                {[0.25, 0.5, 0.75].map((ratio, idx) => {
-                  const y = paddingY + ratio * (svgHeight - paddingY * 2);
-                  return (
-                    <line
-                      key={idx}
-                      x1={paddingX}
-                      y1={y}
-                      x2={svgWidth - paddingX}
-                      y2={y}
-                      stroke="currentColor"
-                      strokeOpacity="0.08"
-                      strokeDasharray="4 4"
-                    />
-                  );
-                })}
-
-                {/* Shaded Area */}
-                {areaD && <path d={areaD} fill="url(#chartGradient)" />}
-
-                {/* Line Path */}
-                {pathD && (
-                  <path
-                    d={pathD}
-                    fill="none"
-                    stroke="#7C3AED"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+            <div className="studio-chart-topline">
+              <strong>
+                {attendanceTotal.toLocaleString()}
+                <span> check-ins</span>
+              </strong>
+              <span>
+                {trend.length ? Math.round(attendanceTotal / trend.length) : 0}{" "}
+                daily average
+              </span>
+            </div>
+            <div
+              className="studio-bar-chart"
+              role="img"
+              aria-label={`Daily attendance for ${period} days, ${attendanceTotal} check-ins total`}
+            >
+              {trend.map((point) => (
+                <div key={point.date} className="studio-chart-column">
+                  <span className="studio-bar-tooltip">
+                    {point.date}
+                    <br />
+                    {point.checkIns} visits
+                  </span>
+                  <div
+                    className="studio-chart-bar"
+                    tabIndex={0}
+                    aria-label={`${point.date}: ${point.checkIns} visits`}
+                    style={{
+                      height: `${Math.max(2, (point.checkIns / max) * 100)}%`,
+                    }}
                   />
-                )}
-
-                {/* Data Points & Hover Targets */}
-                {coords.map((c, i) => {
-                  const isHovered = hoveredPoint?.date === c.pt.date;
-                  return (
-                    <g key={i}>
-                      <circle
-                        cx={c.x}
-                        cy={c.y}
-                        r={isHovered ? 6 : 3.5}
-                        className={`transition-all duration-150 ${
-                          isHovered
-                            ? 'fill-purple-600 stroke-surface stroke-2'
-                            : 'fill-purple-600 stroke-surface stroke-1'
-                        }`}
-                      />
-                      {/* Invisible wider target for smooth hovering */}
-                      <rect
-                        x={c.x - 18}
-                        y={0}
-                        width={36}
-                        height={svgHeight}
-                        fill="transparent"
-                        className="cursor-pointer"
-                        onMouseEnter={() =>
-                          setHoveredPoint({
-                            label: new Date(c.pt.date).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                            }),
-                            date: c.pt.date,
-                            val: c.pt.checkIns,
-                            x: c.x,
-                            y: c.y,
-                          })
-                        }
-                        onMouseLeave={() => setHoveredPoint(null)}
-                      />
-                    </g>
-                  );
-                })}
-              </svg>
-
-              {/* Tooltip Overlay */}
-              {hoveredPoint && (
-                <div
-                  className="absolute pointer-events-none -translate-x-1/2 -translate-y-full px-3 py-1.5 rounded-xl bg-surface border border-surface-border shadow-xl z-20 transition-all text-center"
-                  style={{
-                    left: `${(hoveredPoint.x / svgWidth) * 100}%`,
-                    top: `${(hoveredPoint.y / svgHeight) * 100 - 8}%`,
-                  }}
-                >
-                  <div className="text-[10px] text-content-tertiary font-medium">
-                    {hoveredPoint.label}
-                  </div>
-                  <div className="text-sm font-extrabold text-content-primary font-mono">
-                    {hoveredPoint.val} check-ins
-                  </div>
                 </div>
+              ))}
+              {!trend.length && (
+                <p className="studio-empty">No attendance data available.</p>
               )}
             </div>
-
-            {/* Bottom Summary Bar */}
-            <div className="pt-3 border-t border-surface-border flex items-center justify-between text-xs text-content-tertiary">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block" />
-                <span className="font-medium text-content-secondary">
-                  Daily check-in volume
-                </span>
-                <span className="text-[11px]">({timeframe === '7D' ? '7 days' : timeframe === '14D' ? '14 days' : timeframe === '30D' ? '30 days' : '90 days'})</span>
-              </div>
-              <div className="font-mono text-content-primary font-bold">
-                Average: {avgDailyVisits} visits/day
-              </div>
+            <div className="studio-chart-axis">
+              <span>{trend[0]?.date || "—"}</span>
+              <span>Last {period} days</span>
+              <span>{trend[trend.length - 1]?.date || "—"}</span>
             </div>
-          </div>
-
-          {/* Right: Gym Floor Live Pulse (4 Cols) */}
-          <div className="lg:col-span-4 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-base font-bold text-content-primary">
-                    Current gym floor activity
-                  </h3>
-                  <p className="text-xs text-content-tertiary">
-                    Live occupancy and today&apos;s busiest workout hours
-                  </p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live now
-                </span>
+          </section>
+          <section className="studio-agenda">
+            <div className="studio-section-header">
+              <div>
+                <p className="premium-eyebrow">
+                  A little focus goes a long way
+                </p>
+                <h2>
+                  {canManage ? "Your next right moves" : "Your quick actions"}
+                </h2>
               </div>
-
-              {/* Occupancy Radial Indicator */}
-              <div className="p-4 rounded-xl bg-surface-subtle border border-surface-border mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-content-secondary">
-                    Gym floor occupancy
-                  </span>
-                  <span className="text-xs font-mono font-bold text-content-primary">
-                    {currentlyCheckedIn} of {gymCapacity} on floor ({capacityUsagePercent}%)
-                  </span>
-                </div>
-                <div className="w-full bg-surface rounded-full h-2 overflow-hidden border border-surface-border">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      capacityUsagePercent >= 100
-                        ? 'bg-red-500'
-                        : capacityUsagePercent >= 80
-                        ? 'bg-amber-500'
-                        : 'bg-purple-600 dark:bg-cyan-500'
-                    }`}
-                    style={{ width: `${Math.min(100, capacityUsagePercent)}%` }}
-                  />
-                </div>
-                <div className="flex justify-between text-[10px] text-content-tertiary mt-2">
-                  <span>Policy: {capacityPolicy === 'BLOCK_AT_CAPACITY' ? 'Strict admission limit' : 'Warning only'}</span>
-                  <span className="font-bold text-purple-600 dark:text-cyan-400">
-                    {capacityUsagePercent > 100
-                      ? '⚠️ Over-Capacity'
-                      : capacityUsagePercent >= 85
-                      ? 'Near Peak'
-                      : 'Comfortable Pace'}
-                  </span>
-                  <span>Limit: {gymCapacity}</span>
-                </div>
-
-                {/* Over-capacity alert if current occupancy exceeds owner limit */}
-                {currentlyCheckedIn > gymCapacity && (
-                  <div className="mt-2.5 p-2 rounded-lg bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 text-[11px] font-semibold flex items-center gap-1.5">
-                    <Warning className="w-3.5 h-3.5 shrink-0" weight="fill" />
-                    <span>Floor capacity exceeded ({currentlyCheckedIn}/{gymCapacity}). Existing sessions preserved.</span>
-                  </div>
-                )}
-
-                {/* Accuracy notice per requirement 1 */}
-                <div className="mt-2.5 pt-2 border-t border-surface-border/50 text-[10px] text-content-tertiary flex items-start gap-1.5 leading-tight">
-                  <Clock className="w-3 h-3 text-content-secondary shrink-0 mt-0.5" />
-                  <span>{accuracyNotice}</span>
-                </div>
-              </div>
-
-              {/* Peak Hours Forecast */}
-              <div className="space-y-2.5">
-                <div className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                  Busiest arrival hours (historical)
-                </div>
-                {busiestArrivalHours.length > 0 ? (
-                  busiestArrivalHours.slice(0, 3).map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between text-xs py-1.5 border-b border-surface-border/50 last:border-b-0"
-                    >
-                      <span className="text-content-secondary">{item.label}</span>
-                      <span className="font-mono text-content-primary font-bold">
-                        {item.count} arrivals
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="py-2.5 text-xs text-content-tertiary italic">
-                    Not enough historical arrival data yet.
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-surface-border mt-4 space-y-2">
-              <button
-                type="button"
-                onClick={() => setIsCapacityModalOpen(true)}
-                className="w-full py-2 px-3 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-bold text-content-primary flex items-center justify-center gap-2 transition-all shadow-sm btn-shadow"
-              >
-                <span>⚙️ Manage Gym Floor Capacity</span>
-              </button>
-
               <Link
-                href="/check-in"
-                className="w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black flex items-center justify-center gap-2 transition-all shadow-sm btn-shadow"
+                href={canManage ? "/operations?view=tasks" : "/check-in"}
+                aria-label="Open daily tasks"
               >
-                <QrCode className="w-4 h-4" />
-                <span>Open Front-Desk Scanner</span>
+                <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
-          </div>
-        </div>
-
-        {/* ============================================================
-            5. MEMBERS NEEDING ATTENTION & AUTOMATIC FOLLOW-UPS (7 / 5 COLS)
-            ============================================================ */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left: Urgent Retention Queue (7 Cols) */}
-          <div className="lg:col-span-7 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-content-primary">
-                      Members who need a follow-up
-                    </h3>
-                    {radarSegment !== 'ALL' && (
-                      <button
-                        onClick={() => setRadarSegment('ALL')}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold hover:bg-cyan-500/20 transition-colors"
-                      >
-                        Filtered group (Show all ✕)
-                      </button>
-                    )}
+            <Link href="/retention" className="studio-action-row">
+              <span className="studio-action-symbol" data-tone="danger">
+                <Warning className="w-4 h-4" />
+              </span>
+              <div>
+                <strong>Reconnect with your members</strong>
+                <span>{risk.length} people in the follow-up queue</span>
+              </div>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link href="/subscriptions" className="studio-action-row">
+              <span className="studio-action-symbol" data-tone="warning">
+                <CreditCard className="w-4 h-4" />
+              </span>
+              <div>
+                <strong>Keep renewals on track</strong>
+                <span>
+                  {canManage
+                    ? `${renewals.length} renewals in the next 7 days`
+                    : "Review memberships and fees"}
+                </span>
+              </div>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            {canManage &&
+              tasks.slice(0, 3).map((task) => (
+                <div key={task.id} className="studio-task studio-agenda-task">
+                  <button
+                    className="studio-task-check"
+                    disabled={!!busyTask}
+                    aria-label={`Complete ${task.title}`}
+                    onClick={() => finishTask(task.id)}
+                  >
+                    {busyTask === task.id ? (
+                      <RefreshCw className="w-3 h-3 animate-spin" />
+                    ) : null}
+                  </button>
+                  <div>
+                    <strong>{task.title}</strong>
+                    <span>
+                      {task.dueDate < today
+                        ? "Overdue"
+                        : task.dueDate === today
+                          ? "Due today"
+                          : task.dueDate}
+                    </span>
                   </div>
-                  <p className="text-xs text-content-tertiary">
-                    Members who haven&apos;t visited recently. Reach out with a quick message to keep them on track.
-                  </p>
                 </div>
+              ))}
+            {taskError && (
+              <p
+                role="alert"
+                className="text-sm text-status-danger-text px-6 py-3"
+              >
+                {taskError}
+              </p>
+            )}
+            <Link
+              href={canManage ? "/operations?view=tasks" : "/check-in"}
+              className="studio-agenda-footer"
+            >
+              {canManage ? "View the team checklist" : "Manage attendance"}
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </section>
+        </div>
+        <div className="studio-main-grid">
+          <section className="premium-panel overflow-hidden">
+            <div className="studio-section-header">
+              <div>
+                <p className="premium-eyebrow">Care before churn</p>
+                <h2>A conversation worth having.</h2>
+              </div>
+              <Link className="studio-text-link" href="/retention">
+                View queue <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="studio-retention-list">
+              {risk.slice(0, 4).map((member) => (
                 <Link
                   href="/retention"
-                  className="text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
+                  key={member.memberId}
+                  className="studio-retention-row"
                 >
-                  <span>View all</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span className="studio-avatar">
+                    {member.fullName
+                      .split(" ")
+                      .map((word) => word[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </span>
+                  <div className="flex-1">
+                    <strong>{member.fullName}</strong>
+                    <small>
+                      {member.memberCode} ·{" "}
+                      {member.factors.daysSinceLastCheckIn} days since last
+                      visit
+                    </small>
+                  </div>
+                  <span
+                    className="status-pill"
+                    data-tone={
+                      member.riskLevel === "HIGH" ? "danger" : "warning"
+                    }
+                  >
+                    {member.riskLevel === "HIGH" ? "Priority" : "Slipping"}
+                  </span>
+                  <ArrowUpRight className="w-4 h-4" />
                 </Link>
-              </div>
-
-              {/* Clean Member List Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-surface-border text-content-tertiary uppercase text-[10px] font-bold">
-                      <th className="py-2.5 px-3">Member</th>
-                      <th className="py-2.5 px-3">Days absent</th>
-                      <th className="py-2.5 px-3">Status</th>
-                      <th className="py-2.5 px-3 text-right">Send message</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-surface-border/50">
-                    {atRiskMembers.map((member) => {
-                      const isNudged = nudgedMembers.has(member.memberId);
-                      const daysAbsent = member.factors?.daysSinceLastCheckIn ?? 12;
-                      const isCritical = daysAbsent >= 10;
-                      return (
-                        <tr key={member.memberId} className="hover:bg-surface-subtle/50 transition-colors">
-                          <td className="py-3 px-3">
-                            <div className="font-bold text-content-primary">{member.fullName}</div>
-                            <div className="text-[10px] text-content-tertiary font-mono">
-                              {member.memberCode}
-                            </div>
-                          </td>
-                          <td className="py-3 px-3">
-                            <span className="font-semibold text-content-secondary">
-                              {daysAbsent} days away
-                            </span>
-                          </td>
-                          <td className="py-3 px-3">
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                              isCritical
-                                ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
-                                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                            }`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${isCritical ? 'bg-red-500' : 'bg-amber-500'}`} />
-                              <span>{isCritical ? 'Needs call or message' : 'Attendance slipping'}</span>
-                            </span>
-                          </td>
-                          <td className="py-3 px-3 text-right">
-                            <button
-                              onClick={() => handleNudge(member)}
-                              disabled={isNudged}
-                              className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all btn-shadow ${
-                                isNudged
-                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default'
-                                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                              }`}
-                            >
-                              {isNudged ? 'Message sent ✓' : 'Send WhatsApp'}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              ))}
+              {!risk.length && (
+                <p className="studio-empty">
+                  {failed.includes("Retention")
+                    ? "The queue could not be loaded."
+                    : "No follow-ups in your queue right now."}
+                </p>
+              )}
             </div>
-
-            <div className="pt-3 border-t border-surface-border mt-3 text-right">
+          </section>
+          <section className="premium-panel overflow-hidden">
+            <div className="studio-section-header">
+              <div>
+                <p className="premium-eyebrow">On the calendar</p>
+                <h2>
+                  {canManage ? "Today’s sessions" : "Streaks worth celebrating"}
+                </h2>
+              </div>
               <Link
-                href="/retention"
-                className="text-xs font-bold text-content-secondary hover:text-content-primary transition-colors"
+                href={
+                  canManage ? "/operations?view=sessions" : "/rewards/winners"
+                }
+                aria-label="View all"
               >
-                View all members who need attention →
+                <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
-          </div>
-
-          {/* Right: Retention Loops & Streak Champions (5 Cols) */}
-          <div className="lg:col-span-5 p-5 sm:p-6 rounded-2xl bg-surface border border-surface-border flex flex-col justify-between btn-shadow">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-base font-bold text-content-primary">
-                    Automatic messages &amp; reminders
-                  </h3>
-                  <p className="text-xs text-content-tertiary">
-                    Helpful messages sent automatically to keep members motivated
-                  </p>
-                </div>
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                  <ShieldCheck className="w-4 h-4" weight="duotone" />
-                </div>
-              </div>
-
-              {/* Loop Status Items */}
-              <div className="space-y-3 mb-5">
-                {[
-                  {
-                    title: 'Missed workout reminder',
-                    desc: 'Friendly WhatsApp message sent after 5 days away',
-                    stat: '18 sent this week',
-                    active: true,
-                  },
-                  {
-                    title: 'Workout streak rewards',
-                    desc: 'Congratulates members and awards bonuses at 7, 14, and 30 days',
-                    stat: '6 redeemed',
-                    active: true,
-                  },
-                  {
-                    title: 'Membership renewal notice',
-                    desc: 'Reminds members 3 days before their pass expires',
-                    stat: '3 due soon',
-                    active: true,
-                  },
-                ].map((loop, i) => (
-                  <div
-                    key={i}
-                    className="p-3 rounded-xl bg-surface-subtle border border-surface-border flex items-center justify-between gap-3"
+            {canManage ? (
+              <div>
+                {sessions.slice(0, 3).map((session) => (
+                  <Link
+                    href="/operations?view=sessions"
+                    className="studio-compact-session"
+                    key={session.id}
                   >
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <span className="text-xs font-bold text-content-primary">{loop.title}</span>
-                      </div>
-                      <p className="text-[10px] text-content-tertiary mt-0.5">{loop.desc}</p>
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-content-secondary px-2 py-0.5 rounded-lg bg-surface border border-surface-border flex-shrink-0">
-                      {loop.stat}
+                    <span>
+                      {new Intl.DateTimeFormat("en-PK", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        timeZone: timezone,
+                      }).format(new Date(session.startsAt))}
                     </span>
+                    <div>
+                      <strong>{session.title}</strong>
+                      <small>
+                        {session.coach} · {session.attendees.length}/
+                        {session.capacity} booked
+                      </small>
+                    </div>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                ))}
+                {!sessions.length && (
+                  <div className="studio-empty">
+                    <Calendar className="w-6 h-6" />
+                    <p>
+                      {operations
+                        ? "No sessions scheduled for today."
+                        : "Connect Operations to see today’s schedule."}
+                    </p>
+                    <Link
+                      href="/operations?view=sessions"
+                      className="studio-text-link"
+                    >
+                      Open schedule <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div>
+                {summary?.streakLeaders?.slice(0, 3).map((member) => (
+                  <div key={member.memberId} className="studio-compact-session">
+                    <Fire className="w-4 h-4" />
+                    <strong>{member.memberName}</strong>
+                    <span>{member.currentStreak} days</span>
                   </div>
                 ))}
               </div>
-
-              {/* Top Streak Champion Box */}
-              <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                    <Fire className="w-5 h-5" weight="fill" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
-                      Longest active workout streak
-                    </span>
-                    <div className="text-xs font-extrabold text-content-primary">
-                      {topStreakLeader.memberName} ({topStreakLeader.memberCode})
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-base font-extrabold text-amber-600 dark:text-amber-400 font-mono">
-                    {topStreakLeader.currentStreak} Days
-                  </div>
-                  <span className="text-[9px] text-content-tertiary font-bold">In a row</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-surface-border mt-4 flex items-center justify-between">
-              <Link
-                href="/rewards/winners"
-                className="text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
-              >
-                <span>View streak leaderboard</span>
-                <ArrowRight className="w-3 h-3" />
-              </Link>
-
-              <Link
-                href="/rewards"
-                className="text-xs font-semibold text-content-tertiary hover:text-content-primary transition-colors"
-              >
-                Reward settings →
-              </Link>
-            </div>
-          </div>
+            )}
+          </section>
+        </div>
+        <div className="studio-product-footer">
+          <span>
+            <CheckCircle2 className="w-3.5 h-3.5" />A little more clarity. A lot
+            more care.
+          </span>
+          <Link href="/settings">
+            Workspace & subscription <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </div>
-      {/* Owner Gym Floor Capacity Management Modal */}
-      {isCapacityModalOpen && (
-        <div className="fixed inset-0 bg-black/60 dark:bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-surface max-w-md w-full rounded-2xl p-6 border border-surface-border shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-surface-border mb-4">
-              <div>
-                <h3 className="text-base font-bold text-content-primary">
-                  Gym Floor Capacity Settings
-                </h3>
-                <p className="text-xs text-content-tertiary">
-                  Owner operational floor threshold (separate from membership counts)
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsCapacityModalOpen(false)}
-                className="p-1.5 rounded-xl text-content-tertiary hover:text-content-primary hover:bg-surface-subtle btn-shadow"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-content-secondary block mb-1.5">
-                  Target Gym Floor Capacity
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="10000"
-                  value={capacityInput}
-                  onChange={(e) => setCapacityInput(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-subtle border border-surface-border text-sm font-bold text-content-primary font-mono focus:border-purple-500 outline-none"
-                />
-                <p className="text-[11px] text-content-tertiary mt-1">
-                  Note: This is an owner operational guide, not a certified fire safety or municipal occupancy code.
-                </p>
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-content-secondary block mb-1.5">
-                  Admission Policy at Capacity
-                </label>
-                <div className="space-y-2">
-                  <label className="flex items-start gap-2.5 p-3 rounded-xl border border-surface-border bg-surface-subtle cursor-pointer hover:bg-surface-subtle/80">
-                    <input
-                      type="radio"
-                      name="policy"
-                      checked={policyInput === 'WARNING_ONLY'}
-                      onChange={() => setPolicyInput('WARNING_ONLY')}
-                      className="mt-0.5 text-purple-600 focus:ring-0"
-                    />
-                    <div>
-                      <div className="text-xs font-bold text-content-primary">Warning-Only Policy</div>
-                      <div className="text-[11px] text-content-tertiary">
-                        Alert staff on floor when capacity is reached, but permit check-ins.
-                      </div>
-                    </div>
-                  </label>
-
-                  <label className="flex items-start gap-2.5 p-3 rounded-xl border border-surface-border bg-surface-subtle cursor-pointer hover:bg-surface-subtle/80">
-                    <input
-                      type="radio"
-                      name="policy"
-                      checked={policyInput === 'BLOCK_AT_CAPACITY'}
-                      onChange={() => setPolicyInput('BLOCK_AT_CAPACITY')}
-                      className="mt-0.5 text-purple-600 focus:ring-0"
-                    />
-                    <div>
-                      <div className="text-xs font-bold text-content-primary">Admission-Blocking Policy</div>
-                      <div className="text-[11px] text-content-tertiary">
-                        Atomically reject new check-ins until members check out.
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {currentlyCheckedIn > capacityInput && (
-                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-400 text-xs">
-                  ⚠️ Note: Current occupancy ({currentlyCheckedIn}) is higher than your new setting ({capacityInput}). Active member sessions will NOT be removed, but an over-capacity alert will remain active.
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-surface-border mt-5">
-              <button
-                type="button"
-                onClick={() => setIsCapacityModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-content-tertiary hover:text-content-primary hover:bg-surface-subtle btn-shadow"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveCapacity}
-                disabled={savingCapacity}
-                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-xs font-bold text-white dark:text-black shadow-md btn-shadow transition-all disabled:opacity-50"
-              >
-                {savingCapacity ? 'Saving...' : 'Save Settings'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </AppLayout>
   );
 }

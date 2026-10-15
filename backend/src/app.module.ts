@@ -1,3 +1,4 @@
+import { OperationsModule } from './modules/operations/operations.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
@@ -32,6 +33,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
       load: [appConfig, jwtConfig],
     }),
     PrismaModule,
+    OperationsModule,
     AuthModule,
     GymsModule,
     MembersModule,

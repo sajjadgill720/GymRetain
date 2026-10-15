@@ -380,8 +380,8 @@ export default function DietPlansPage() {
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto select-none">
         {/* Toast */}
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 bg-surface border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-semibold animate-in fade-in slide-in-from-bottom-2 duration-200">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          <div className="fixed bottom-6 right-6 z-50 bg-surface border border-status-success-border text-status-success-text px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-semibold animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <CheckCircle2 className="w-4 h-4 text-status-success-text" />
             <span>{toastMessage}</span>
           </div>
         )}
@@ -391,10 +391,10 @@ export default function DietPlansPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-content-primary flex items-center gap-2">
-                <Utensils className="w-6 h-6 text-purple-600 dark:text-cyan-400" />
+                <Utensils className="w-6 h-6 text-brand-600 dark:text-brass-400" />
                 Diet &amp; Meal Plans
               </h1>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20 font-mono">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20 font-mono">
                 {plans.length} Active Plans
               </span>
             </div>
@@ -411,7 +411,7 @@ export default function DietPlansPage() {
                 setBuilderMemberName('Sana Tariq');
                 setIsBuilderOpen(true);
               }}
-              className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all btn-shadow"
+              className="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all btn-shadow"
             >
               <Plus className="w-4 h-4" />
               <span>Create Meal Plan</span>
@@ -421,10 +421,10 @@ export default function DietPlansPage() {
 
         {/* 4 Summary Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-          <div className="p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
+          <div data-tone="success" className="status-summary status-surface p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-content-secondary">Total On Plans</span>
-              <Activity className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+              <Activity className="w-4 h-4 text-brand-600 dark:text-brass-400" />
             </div>
             <div className="text-2xl font-black text-content-primary mt-1 font-mono">
               {plans.length}
@@ -435,7 +435,7 @@ export default function DietPlansPage() {
           <div className="p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-content-secondary">Avg Daily Target</span>
-              <Flame className="w-4 h-4 text-amber-500" />
+              <Flame className="w-4 h-4 text-status-warning-text" />
             </div>
             <div className="text-2xl font-black text-content-primary mt-1 font-mono">
               {Math.round(plans.reduce((acc, p) => acc + (p.targetCalories || 2200), 0) / plans.length)} kcal
@@ -446,7 +446,7 @@ export default function DietPlansPage() {
           <div className="p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-content-secondary">Goal Distribution</span>
-              <Target className="w-4 h-4 text-emerald-500" />
+              <Target className="w-4 h-4 text-status-success-text" />
             </div>
             <div className="text-2xl font-black text-content-primary mt-1 font-mono">
               {plans.filter((p) => p.goal === 'WEIGHT_LOSS').length}W / {plans.filter((p) => p.goal === 'MUSCLE_GAIN').length}M
@@ -454,7 +454,7 @@ export default function DietPlansPage() {
             <div className="text-[11px] text-content-tertiary mt-0.5">Weight Loss vs Muscle Gain</div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
+          <div data-tone="success" className="status-summary status-surface p-4 rounded-2xl bg-surface border border-surface-border shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-content-secondary">Templates Ready</span>
               <FileText className="w-4 h-4 text-blue-500" />
@@ -472,7 +472,7 @@ export default function DietPlansPage() {
             onClick={() => setActiveTab('PLANS')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'PLANS'
-                ? 'bg-purple-600 text-white btn-shadow'
+                ? 'bg-brand-600 text-white btn-shadow'
                 : 'bg-surface hover:bg-surface-subtle border border-surface-border text-content-secondary hover:text-content-primary btn-shadow'
             }`}
           >
@@ -483,7 +483,7 @@ export default function DietPlansPage() {
             onClick={() => setActiveTab('TEMPLATES')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'TEMPLATES'
-                ? 'bg-purple-600 text-white btn-shadow'
+                ? 'bg-brand-600 text-white btn-shadow'
                 : 'bg-surface hover:bg-surface-subtle border border-surface-border text-content-secondary hover:text-content-primary btn-shadow'
             }`}
           >
@@ -494,7 +494,7 @@ export default function DietPlansPage() {
             onClick={() => setActiveTab('CALCULATOR')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'CALCULATOR'
-                ? 'bg-purple-600 text-white btn-shadow'
+                ? 'bg-brand-600 text-white btn-shadow'
                 : 'bg-surface hover:bg-surface-subtle border border-surface-border text-content-secondary hover:text-content-primary btn-shadow'
             }`}
           >
@@ -514,7 +514,7 @@ export default function DietPlansPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by member name, code, plan..."
-                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-surface-border text-xs text-content-primary placeholder-content-tertiary outline-none focus:border-purple-500"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-surface-border text-xs text-content-primary placeholder-content-tertiary outline-none focus:border-brand-500"
                 />
               </div>
 
@@ -525,7 +525,7 @@ export default function DietPlansPage() {
                     onClick={() => setGoalFilter(g)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
                       goalFilter === g
-                        ? 'bg-purple-500/15 text-purple-700 dark:text-cyan-400 font-semibold border border-purple-500/30'
+                        ? 'bg-brand-500/15 text-brand-700 dark:text-brass-400 font-semibold border border-brand-500/30'
                         : 'bg-surface text-content-secondary hover:text-content-primary border border-surface-border'
                     }`}
                   >
@@ -540,7 +540,7 @@ export default function DietPlansPage() {
               {filteredPlans.map((plan) => (
                 <div
                   key={plan.id}
-                  className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-purple-500/40 dark:hover:border-cyan-400/40 transition-all shadow-sm flex flex-col justify-between gap-4"
+                  className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-brand-500/40 dark:hover:border-brass-400/40 transition-all shadow-sm flex flex-col justify-between gap-4"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
@@ -553,7 +553,7 @@ export default function DietPlansPage() {
                             {plan.member.memberCode}
                           </span>
                         </div>
-                        <h3 className="text-xs font-bold text-purple-700 dark:text-cyan-400 mt-0.5">
+                        <h3 className="text-xs font-bold text-brand-700 dark:text-brass-400 mt-0.5">
                           {plan.title}
                         </h3>
                       </div>
@@ -561,10 +561,10 @@ export default function DietPlansPage() {
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono uppercase ${
                           plan.goal === 'WEIGHT_LOSS'
-                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                            ? 'bg-status-warning-bg text-status-warning-text border border-status-warning-border'
                             : plan.goal === 'MUSCLE_GAIN'
-                            ? 'bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20'
-                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                            ? 'bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20'
+                            : 'bg-status-success-bg text-status-success-text border border-status-success-border'
                         }`}
                       >
                         {plan.goal.replace('_', ' ')}
@@ -575,7 +575,7 @@ export default function DietPlansPage() {
                     <div className="p-3 rounded-xl bg-surface-subtle border border-surface-border space-y-2">
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-semibold text-content-primary flex items-center gap-1">
-                          <Flame className="w-3.5 h-3.5 text-amber-500" />
+                          <Flame className="w-3.5 h-3.5 text-status-warning-text" />
                           {plan.targetCalories || 2200} kcal/day
                         </span>
                         <span className="text-[11px] text-content-tertiary">
@@ -583,7 +583,7 @@ export default function DietPlansPage() {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-2 text-center text-[11px] pt-1 border-t border-surface-border/60">
+                      <div className="grid grid-cols-3 gap-2 text-center text-[11px] pt-1 border-t border-surface-border">
                         <div>
                           <div className="font-mono font-bold text-content-primary">
                             {plan.targetProteinG || 150}g
@@ -609,7 +609,7 @@ export default function DietPlansPage() {
                     <div className="space-y-1">
                       {plan.meals.slice(0, 2).map((m, idx) => (
                         <div key={idx} className="text-[11px] text-content-secondary truncate flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
                           <span className="font-bold text-content-primary">{m.mealType}:</span>
                           <span className="truncate">{m.description}</span>
                         </div>
@@ -623,12 +623,12 @@ export default function DietPlansPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-surface-border/60">
+                  <div className="flex items-center gap-2 pt-2 border-t border-surface-border">
                     <button
                       onClick={() => setViewPlan(plan)}
                       className="flex-1 py-1.5 rounded-xl bg-surface-subtle hover:bg-surface border border-surface-border text-xs font-semibold text-content-primary flex items-center justify-center gap-1.5 transition-all btn-shadow"
                     >
-                      <Eye className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400" />
+                      <Eye className="w-3.5 h-3.5 text-brand-600 dark:text-brass-400" />
                       <span>View Plan</span>
                     </button>
 
@@ -638,7 +638,7 @@ export default function DietPlansPage() {
                         navigator.clipboard.writeText(copy);
                         showToast(`WhatsApp diet template copied for ${plan.member.memberCode}! 📋`);
                       }}
-                      className="p-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs transition-all btn-shadow"
+                      className="p-1.5 rounded-xl bg-status-success-bg hover:bg-status-success-bg text-status-success-text border border-status-success-border text-xs transition-all btn-shadow"
                       title="Copy WhatsApp format"
                     >
                       <MessageCircle className="w-4 h-4" />
@@ -668,14 +668,14 @@ export default function DietPlansPage() {
               {templates.map((tmpl) => (
                 <div
                   key={tmpl.id}
-                  className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-purple-500/40 dark:hover:border-cyan-400/40 transition-all shadow-sm flex flex-col justify-between gap-4"
+                  className="p-5 rounded-2xl bg-surface border border-surface-border hover:border-brand-500/40 dark:hover:border-brass-400/40 transition-all shadow-sm flex flex-col justify-between gap-4"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-extrabold text-sm text-content-primary">
                         {tmpl.title}
                       </h3>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full font-mono uppercase bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full font-mono uppercase bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20">
                         {tmpl.goal.replace('_', ' ')}
                       </span>
                     </div>
@@ -700,7 +700,7 @@ export default function DietPlansPage() {
                       </span>
                       {tmpl.meals.map((m, i) => (
                         <div key={i} className="text-[11px] text-content-secondary truncate flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
                           <span className="font-bold text-content-primary">{m.mealType}:</span>
                           <span className="truncate">{m.description}</span>
                         </div>
@@ -710,7 +710,7 @@ export default function DietPlansPage() {
 
                   <button
                     onClick={() => setAssigningTemplate(tmpl)}
-                    className="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all btn-shadow"
+                    className="w-full py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all btn-shadow"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Assign Template to Member</span>
@@ -727,7 +727,7 @@ export default function DietPlansPage() {
             <div className="p-6 rounded-2xl bg-surface border border-surface-border shadow-sm space-y-4">
               <div>
                 <h2 className="text-base font-bold text-content-primary flex items-center gap-2">
-                  <Target className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
+                  <Target className="w-5 h-5 text-brand-600 dark:text-brass-400" />
                   Member Body Metrics &amp; Energy Expenditure
                 </h2>
                 <p className="text-xs text-content-tertiary mt-0.5">
@@ -748,7 +748,7 @@ export default function DietPlansPage() {
                         onClick={() => setCalcGender(g)}
                         className={`py-1.5 rounded-xl text-xs font-semibold transition-all ${
                           calcGender === g
-                            ? 'bg-purple-600 text-white btn-shadow'
+                            ? 'bg-brand-600 text-white btn-shadow'
                             : 'bg-surface-subtle text-content-secondary border border-surface-border'
                         }`}
                       >
@@ -827,7 +827,7 @@ export default function DietPlansPage() {
                       onClick={() => setCalcGoal(g.id as any)}
                       className={`p-2 rounded-xl text-center text-xs font-semibold transition-all ${
                         calcGoal === g.id
-                          ? 'bg-purple-600 text-white btn-shadow'
+                          ? 'bg-brand-600 text-white btn-shadow'
                           : 'bg-surface-subtle text-content-secondary border border-surface-border hover:text-content-primary'
                       }`}
                     >
@@ -843,7 +843,7 @@ export default function DietPlansPage() {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-base font-bold text-content-primary flex items-center gap-2">
-                    <Flame className="w-5 h-5 text-amber-500" />
+                    <Flame className="w-5 h-5 text-status-warning-text" />
                     Target Caloric &amp; Macro Breakdown
                   </h2>
                   <p className="text-xs text-content-tertiary mt-0.5">
@@ -863,11 +863,11 @@ export default function DietPlansPage() {
                   </div>
                 </div>
 
-                <div className="p-5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center space-y-1">
-                  <span className="text-xs font-semibold text-purple-700 dark:text-cyan-400 uppercase tracking-wider">
+                <div className="p-5 rounded-xl bg-brand-500/10 border border-brand-500/20 text-center space-y-1">
+                  <span className="text-xs font-semibold text-brand-700 dark:text-brass-400 uppercase tracking-wider">
                     Recommended Daily Target
                   </span>
-                  <div className="text-3xl font-black text-purple-900 dark:text-cyan-300 font-mono">
+                  <div className="text-3xl font-black text-brand-900 dark:text-brass-300 font-mono">
                     {targetCals} kcal
                   </div>
                 </div>
@@ -903,7 +903,7 @@ export default function DietPlansPage() {
                   setBuilderFat(targetFat);
                   setIsBuilderOpen(true);
                 }}
-                className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all btn-shadow"
+                className="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all btn-shadow"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create Plan Using These Targets</span>
@@ -924,7 +924,7 @@ export default function DietPlansPage() {
               </button>
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center border border-purple-500/20">
+                <div className="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center border border-brand-500/20">
                   <Utensils className="w-5 h-5" />
                 </div>
                 <div>
@@ -961,7 +961,7 @@ export default function DietPlansPage() {
                 {viewPlan.meals.map((meal, idx) => (
                   <div key={idx} className="p-3 rounded-xl bg-surface-subtle border border-surface-border space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-purple-700 dark:text-cyan-400">
+                      <span className="font-bold text-brand-700 dark:text-brass-400">
                         {meal.mealType}
                       </span>
                       {meal.calories && (
@@ -1006,7 +1006,7 @@ export default function DietPlansPage() {
               </button>
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center border border-purple-500/20">
+                <div className="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center border border-brand-500/20">
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
@@ -1115,7 +1115,7 @@ export default function DietPlansPage() {
                           { mealType: 'SNACK', description: 'Handful of almonds with green tea', calories: 150, proteinG: 6, carbsG: 6, fatG: 12 },
                         ])
                       }
-                      className="text-[11px] font-semibold text-purple-600 dark:text-cyan-400 hover:underline"
+                      className="text-[11px] font-semibold text-brand-600 dark:text-brass-400 hover:underline"
                     >
                       + Add Meal
                     </button>
@@ -1142,7 +1142,7 @@ export default function DietPlansPage() {
                         <button
                           type="button"
                           onClick={() => setBuilderMeals(builderMeals.filter((_, i) => i !== idx))}
-                          className="text-red-500 hover:text-red-700 text-xs p-1"
+                          className="text-status-danger-text hover:text-status-danger-text text-xs p-1"
                         >
                           Remove
                         </button>
@@ -1169,7 +1169,7 @@ export default function DietPlansPage() {
                     id="sendWa"
                     checked={sendWhatsAppOnCreate}
                     onChange={(e) => setSendWhatsAppOnCreate(e.target.checked)}
-                    className="rounded text-purple-600"
+                    className="rounded text-brand-600"
                   />
                   <label htmlFor="sendWa" className="text-xs text-content-secondary cursor-pointer">
                     Send WhatsApp nutrition summary notification to member now
@@ -1188,7 +1188,7 @@ export default function DietPlansPage() {
                 <button
                   type="button"
                   onClick={handleSaveDietPlan}
-                  className="flex-1 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold btn-shadow"
+                  className="flex-1 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold btn-shadow"
                 >
                   Save &amp; Assign Diet Plan
                 </button>
@@ -1209,7 +1209,7 @@ export default function DietPlansPage() {
               </button>
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center border border-purple-500/20">
+                <div className="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center border border-brand-500/20">
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
@@ -1251,7 +1251,7 @@ export default function DietPlansPage() {
                 <button
                   type="button"
                   onClick={handleApplyTemplate}
-                  className="flex-1 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold btn-shadow"
+                  className="flex-1 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold btn-shadow"
                 >
                   Confirm &amp; Assign Plan
                 </button>

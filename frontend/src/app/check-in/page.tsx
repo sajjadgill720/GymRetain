@@ -222,7 +222,7 @@ export default function CheckInTerminalPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-surface-border">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
+              <UserCheck className="w-5 h-5 text-brand-600 dark:text-brass-400" />
               Front Desk Attendance Terminal
             </h1>
             <p className="text-xs text-content-secondary mt-1">
@@ -231,8 +231,8 @@ export default function CheckInTerminalPage() {
           </div>
 
           {/* Floor Capacity Pill */}
-          <div className="flex items-center gap-3 bg-surface border border-surface-border p-3 rounded-2xl shadow-sm btn-shadow">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 flex items-center justify-center font-bold">
+          <div data-tone={capacityStatus.currentlyCheckedIn >= capacityStatus.capacity ? 'danger' : capacityStatus.capacityUsagePercent >= 80 ? 'warning' : 'success'} className="status-surface flex items-center gap-3 bg-surface border border-surface-border p-3 rounded-2xl shadow-sm btn-shadow">
+            <div className="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center font-bold">
               <Users className="w-4 h-4" />
             </div>
             <div>
@@ -243,10 +243,10 @@ export default function CheckInTerminalPage() {
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                     capacityStatus.currentlyCheckedIn >= capacityStatus.capacity
-                      ? 'bg-red-500/15 text-red-600 dark:text-red-400'
+                      ? 'bg-status-danger-bg text-status-danger-text'
                       : capacityStatus.capacityUsagePercent >= 80
-                      ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                      : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                      ? 'bg-status-warning-bg text-status-warning-text'
+                      : 'bg-status-success-bg text-status-success-text'
                   }`}
                 >
                   {capacityStatus.capacityUsagePercent}% Capacity
@@ -267,8 +267,8 @@ export default function CheckInTerminalPage() {
           <div
             className={`p-3.5 rounded-xl border flex items-center gap-2.5 text-xs font-semibold ${
               capacityStatus.capacityPolicy === 'BLOCK_AT_CAPACITY'
-                ? 'bg-red-500/10 border-red-500/25 text-red-600 dark:text-red-400'
-                : 'bg-amber-500/10 border-amber-500/25 text-amber-700 dark:text-amber-400'
+                ? 'bg-status-danger-bg border-status-danger-border text-status-danger-text'
+                : 'bg-status-warning-bg border-status-warning-border text-status-warning-text'
             }`}
           >
             <ShieldAlert className="w-4 h-4 shrink-0" />
@@ -306,12 +306,12 @@ export default function CheckInTerminalPage() {
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="Enter GR-1001, +923... or scan QR"
                     autoFocus
-                    className="w-full bg-surface-subtle border-2 border-surface-border focus:border-purple-500 rounded-xl px-4 py-3.5 text-base sm:text-lg font-mono text-content-primary placeholder-content-tertiary outline-none transition-all"
+                    className="w-full bg-surface-subtle border-2 border-surface-border focus:border-brand-500 rounded-xl px-4 py-3.5 text-base sm:text-lg font-mono text-content-primary placeholder-content-tertiary outline-none transition-all"
                   />
                   <button
                     type="submit"
                     disabled={lookupLoading}
-                    className="absolute right-2 top-2 bottom-2 px-5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow disabled:opacity-50 transition-all flex items-center gap-1.5"
+                    className="absolute right-2 top-2 bottom-2 px-5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow disabled:opacity-50 transition-all flex items-center gap-1.5"
                   >
                     <Search className="w-4 h-4" />
                     <span>{lookupLoading ? 'Looking up...' : 'Lookup Member'}</span>
@@ -319,7 +319,7 @@ export default function CheckInTerminalPage() {
                 </div>
 
                 {error && (
-                  <div className="flex items-center gap-2 p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 text-xs animate-in fade-in">
+                  <div className="flex items-center gap-2 p-3.5 rounded-xl bg-status-danger-bg border border-status-danger-border text-status-danger-text text-xs animate-in fade-in">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{error}</span>
                   </div>
@@ -355,14 +355,14 @@ export default function CheckInTerminalPage() {
 
             {/* 2. Staff Member Confirmation Card */}
             {confirmedMember && (
-              <div className="bg-surface border-2 border-purple-500/40 rounded-2xl p-5 sm:p-6 shadow-xl relative animate-in zoom-in-95 duration-150">
+              <div className="bg-surface border-2 border-brand-500/40 rounded-2xl p-5 sm:p-6 shadow-xl relative animate-in zoom-in-95 duration-150">
                 <div className="flex items-start justify-between pb-4 border-b border-surface-border">
                   <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 font-extrabold text-base flex items-center justify-center border border-purple-500/20">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-500/10 text-brand-600 dark:text-brass-400 font-extrabold text-base flex items-center justify-center border border-brand-500/20">
                       {confirmedMember.fullName[0]}
                     </div>
                     <div>
-                      <div className="text-[11px] font-semibold uppercase tracking-wider text-purple-600 dark:text-cyan-400">
+                      <div className="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brass-400">
                         Staff Verification Required
                       </div>
                       <h3 className="text-lg font-bold text-content-primary">
@@ -380,8 +380,8 @@ export default function CheckInTerminalPage() {
                     <span
                       className={`text-xs font-bold px-2.5 py-1 rounded-full ${
                         confirmedMember.hasActivePass
-                          ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                          : 'bg-red-500/15 text-red-600 dark:text-red-400'
+                          ? 'bg-status-success-bg text-status-success-text'
+                          : 'bg-status-danger-bg text-status-danger-text'
                       }`}
                     >
                       {confirmedMember.hasActivePass ? 'Pass Active' : 'Pass Expired'}
@@ -397,9 +397,9 @@ export default function CheckInTerminalPage() {
                 {/* Session Status Display */}
                 <div className="py-4">
                   {confirmedMember.currentSession ? (
-                    <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-800 dark:text-amber-300 space-y-1">
+                    <div className="p-3.5 rounded-xl bg-status-warning-bg border border-status-warning-border text-xs text-status-warning-text space-y-1">
                       <div className="font-bold flex items-center gap-1.5">
-                        <Clock className="w-4 h-4 text-amber-500" />
+                        <Clock className="w-4 h-4 text-status-warning-text" />
                         <span>Currently Checked In On Gym Floor</span>
                       </div>
                       <div className="text-[11px] text-content-secondary">
@@ -418,7 +418,7 @@ export default function CheckInTerminalPage() {
                   ) : (
                     <div className="p-3.5 rounded-xl bg-surface-subtle border border-surface-border text-xs text-content-secondary space-y-1">
                       <div className="font-semibold text-content-primary flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        <CheckCircle2 className="w-4 h-4 text-status-success-text" />
                         <span>Ready For New Visit Check-In</span>
                       </div>
                       <p className="text-[11px] text-content-tertiary">
@@ -477,14 +477,14 @@ export default function CheckInTerminalPage() {
 
             {/* 3. Action Feedback Result Card */}
             {lastActionResult && (
-              <div className="bg-surface border-2 border-emerald-500/40 rounded-2xl p-5 sm:p-6 relative shadow-lg animate-in zoom-in-95 duration-150">
+              <div className="bg-surface border-2 border-status-success-border rounded-2xl p-5 sm:p-6 relative shadow-lg animate-in zoom-in-95 duration-150">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                    <div className="w-10 h-10 rounded-xl bg-status-success-bg text-status-success-text flex items-center justify-center border border-status-success-border">
                       <CheckCircle2 className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-status-success-text">
                         {lastActionResult.type === 'CHECK_IN'
                           ? 'Attendance Session Started'
                           : 'Visit Check-Out Recorded'}
@@ -502,8 +502,8 @@ export default function CheckInTerminalPage() {
 
                   {lastActionResult.streak && (
                     <div className="text-right">
-                      <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-mono font-bold">
-                        <Flame className="w-3.5 h-3.5 text-amber-500" />
+                      <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-status-warning-bg text-status-warning-text text-xs font-mono font-bold">
+                        <Flame className="w-3.5 h-3.5 text-status-warning-text" />
                         <span>{lastActionResult.streak.current} Days</span>
                       </div>
                     </div>
@@ -524,7 +524,7 @@ export default function CheckInTerminalPage() {
                     onClick={() => setActiveTab('OPEN_SESSIONS')}
                     className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all btn-shadow ${
                       activeTab === 'OPEN_SESSIONS'
-                        ? 'bg-purple-500/15 text-purple-700 dark:text-cyan-400 shadow-sm'
+                        ? 'bg-brand-500/15 text-brand-700 dark:text-brass-400 shadow-sm'
                         : 'text-content-tertiary hover:text-content-primary'
                     }`}
                   >
@@ -535,14 +535,14 @@ export default function CheckInTerminalPage() {
                     onClick={() => setActiveTab('RECENT_LOG')}
                     className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all btn-shadow ${
                       activeTab === 'RECENT_LOG'
-                        ? 'bg-purple-500/15 text-purple-700 dark:text-cyan-400 shadow-sm'
+                        ? 'bg-brand-500/15 text-brand-700 dark:text-brass-400 shadow-sm'
                         : 'text-content-tertiary hover:text-content-primary'
                     }`}
                   >
                     Recent Activity
                   </button>
                 </div>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono font-medium border border-emerald-500/20">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-status-success-bg text-status-success-text font-mono font-medium border border-status-success-border">
                   Live
                 </span>
               </div>
@@ -588,7 +588,7 @@ export default function CheckInTerminalPage() {
                           <button
                             type="button"
                             onClick={() => handleConfirmCheckOut(session.member?.memberCode)}
-                            className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-400 border border-amber-500/30 transition-all btn-shadow"
+                            className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-status-warning-bg hover:bg-amber-500/25 text-status-warning-text border border-status-warning-border transition-all btn-shadow"
                           >
                             Check Out
                           </button>
@@ -674,7 +674,7 @@ export default function CheckInTerminalPage() {
                     type="datetime-local"
                     value={correctionTime}
                     onChange={(e) => setCorrectionTime(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary font-mono focus:border-purple-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary font-mono focus:border-brand-500 outline-none"
                   />
                 </div>
 
@@ -687,7 +687,7 @@ export default function CheckInTerminalPage() {
                     value={correctionNote}
                     onChange={(e) => setCorrectionNote(e.target.value)}
                     placeholder="e.g. Member forgot to scan at front desk"
-                    className="w-full px-3 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary focus:border-purple-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-surface-subtle border border-surface-border text-content-primary focus:border-brand-500 outline-none"
                   />
                 </div>
               </div>
@@ -704,7 +704,7 @@ export default function CheckInTerminalPage() {
                   type="button"
                   onClick={handleSaveCorrection}
                   disabled={correcting || !correctionTime}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white shadow-md btn-shadow transition-all disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold text-white shadow-md btn-shadow transition-all disabled:opacity-50"
                 >
                   {correcting ? 'Saving...' : 'Save Correction'}
                 </button>

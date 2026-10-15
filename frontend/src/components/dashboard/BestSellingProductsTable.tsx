@@ -24,7 +24,7 @@ export const BestSellingProductsTable: React.FC = () => {
       revenue: '$92.662',
       rating: '4.8',
       icon: Watch,
-      iconBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+      iconBg: 'bg-status-success-bg text-status-success-text',
     },
     {
       id: '#83004',
@@ -34,7 +34,7 @@ export const BestSellingProductsTable: React.FC = () => {
       revenue: '$74.048',
       rating: '4.7',
       icon: Smartphone,
-      iconBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+      iconBg: 'bg-brand-500/10 text-brand-600 dark:text-brand-400',
     },
     {
       id: '#83012',
@@ -44,7 +44,7 @@ export const BestSellingProductsTable: React.FC = () => {
       revenue: '$62.450',
       rating: '4.9',
       icon: Dumbbell,
-      iconBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+      iconBg: 'bg-status-warning-bg text-status-warning-text',
     },
   ];
 
@@ -78,7 +78,7 @@ export const BestSellingProductsTable: React.FC = () => {
               <th className="pb-3 text-right pr-1">RATING</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-border/60">
+          <tbody className="divide-y divide-surface-border">
             {items.map((row) => (
               <tr key={row.id} className="hover:bg-surface-subtle/50 transition-colors group">
                 {/* ID */}
@@ -116,7 +116,7 @@ export const BestSellingProductsTable: React.FC = () => {
                 {/* Rating with Yellow Star */}
                 <td className="py-3 text-right pr-1">
                   <div className="inline-flex items-center gap-1 font-semibold text-content-primary">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-status-warning-text" />
                     <span>({row.rating})</span>
                   </div>
                 </td>

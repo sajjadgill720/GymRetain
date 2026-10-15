@@ -256,14 +256,14 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
   return (
     <div className="rounded-3xl glass-panel-elevated p-5 sm:p-6 border border-surface-border relative overflow-hidden transition-all duration-300">
       {/* Background radial atmosphere */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-brass-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-status-danger-bg rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Header & Interactive Group Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-surface-border/80 relative z-10">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-surface-border relative z-10">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-cyan-400 border border-purple-500/20">
+            <span className="p-2 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20">
               <Planet className="w-5 h-5" weight="duotone" />
             </span>
             <div>
@@ -288,12 +288,12 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
           >
             {viewMode === '3D' ? (
               <>
-                <Table className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                <Table className="w-4 h-4 text-brand-600 dark:text-brass-400" />
                 <span>View as table</span>
               </>
             ) : (
               <>
-                <Planet className="w-4 h-4 text-purple-600 dark:text-cyan-400" />
+                <Planet className="w-4 h-4 text-brand-600 dark:text-brass-400" />
                 <span>View as visual chart</span>
               </>
             )}
@@ -370,7 +370,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
               onClick={() => onSelectSegment(activeSegment === 'URGENT' ? 'ALL' : 'URGENT')}
               className={`w-full p-3.5 rounded-2xl text-left transition-all flex items-center justify-between border btn-shadow ${
                 activeSegment === 'URGENT'
-                  ? 'bg-red-500/15 border-red-500 text-content-primary'
+                  ? 'bg-status-danger-bg border-red-500 text-content-primary'
                   : 'bg-surface hover:bg-surface-subtle border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
@@ -379,7 +379,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 <div>
                   <div className="text-xs font-bold text-content-primary flex items-center gap-1.5">
                     <span>Needs urgent contact</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-600 dark:text-red-400 font-mono font-semibold">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-status-danger-bg text-status-danger-text font-mono font-semibold">
                       10+ days absent
                     </span>
                   </div>
@@ -389,7 +389,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <span className="text-sm font-extrabold text-red-600 dark:text-red-400 font-mono">
+                <span className="text-sm font-extrabold text-status-danger-text font-mono">
                   {urgentCount} members
                 </span>
                 <span className="text-[10px] text-content-tertiary block">
@@ -403,7 +403,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
               onClick={() => onSelectSegment(activeSegment === 'SLIPPING' ? 'ALL' : 'SLIPPING')}
               className={`w-full p-3.5 rounded-2xl text-left transition-all flex items-center justify-between border btn-shadow ${
                 activeSegment === 'SLIPPING'
-                  ? 'bg-amber-500/15 border-amber-500 text-content-primary'
+                  ? 'bg-status-warning-bg border-amber-500 text-content-primary'
                   : 'bg-surface hover:bg-surface-subtle border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
@@ -412,7 +412,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 <div>
                   <div className="text-xs font-bold text-content-primary flex items-center gap-1.5">
                     <span>Attendance is slipping</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 font-mono font-semibold">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-status-warning-bg text-status-warning-text font-mono font-semibold">
                       Visits halved
                     </span>
                   </div>
@@ -422,7 +422,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <span className="text-sm font-extrabold text-amber-600 dark:text-amber-400 font-mono">
+                <span className="text-sm font-extrabold text-status-warning-text font-mono">
                   {slippingCount} members
                 </span>
                 <span className="text-[10px] text-content-tertiary block">
@@ -436,12 +436,12 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
               onClick={() => onSelectSegment(activeSegment === 'HABIT_DISRUPTED' ? 'ALL' : 'HABIT_DISRUPTED')}
               className={`w-full p-3.5 rounded-2xl text-left transition-all flex items-center justify-between border btn-shadow ${
                 activeSegment === 'HABIT_DISRUPTED'
-                  ? 'bg-purple-500/15 border-purple-500 text-content-primary'
+                  ? 'bg-brand-500/15 border-brand-500 text-content-primary'
                   : 'bg-surface hover:bg-surface-subtle border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="w-3.5 h-3.5 rounded-full bg-purple-500 flex-shrink-0" />
+                <span className="w-3.5 h-3.5 rounded-full bg-brand-500 flex-shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-content-primary">
                     Routine has changed
@@ -452,7 +452,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <span className="text-sm font-extrabold text-purple-600 dark:text-purple-400 font-mono">
+                <span className="text-sm font-extrabold text-brand-600 dark:text-brand-400 font-mono">
                   {habitDisruptedCount} members
                 </span>
                 <span className="text-[10px] text-content-tertiary block">Routine alert</span>
@@ -464,7 +464,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
               onClick={() => onSelectSegment(activeSegment === 'HEALTHY' ? 'ALL' : 'HEALTHY')}
               className={`w-full p-3.5 rounded-2xl text-left transition-all flex items-center justify-between border btn-shadow ${
                 activeSegment === 'HEALTHY'
-                  ? 'bg-emerald-500/15 border-emerald-500 text-content-primary'
+                  ? 'bg-status-success-bg border-emerald-500 text-content-primary'
                   : 'bg-surface hover:bg-surface-subtle border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
@@ -480,7 +480,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                <span className="text-sm font-extrabold text-status-success-text font-mono">
                   {healthyCount} members
                 </span>
                 <span className="text-[10px] text-content-tertiary block">Attending normally</span>
@@ -491,7 +491,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
             {activeSegment !== 'ALL' && (
               <button
                 onClick={() => onSelectSegment('ALL')}
-                className="w-full py-2 text-center text-xs font-bold text-purple-600 dark:text-cyan-400 hover:underline"
+                className="w-full py-2 text-center text-xs font-bold text-brand-600 dark:text-brass-400 hover:underline"
               >
                 ← Show all members
               </button>
@@ -511,9 +511,9 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 <th className="py-2.5 px-3 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-border/60">
+            <tbody className="divide-y divide-surface-border">
               <tr className="hover:bg-surface-subtle/50">
-                <td className="py-3 px-3 font-bold text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                <td className="py-3 px-3 font-bold text-status-danger-text flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                   <span>Needs urgent contact</span>
                 </td>
@@ -521,7 +521,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                   Absent 10+ days or membership renewal is overdue
                 </td>
                 <td className="py-3 px-3 font-mono font-bold">{urgentCount} members</td>
-                <td className="py-3 px-3 font-mono text-red-600 dark:text-red-400 font-bold">
+                <td className="py-3 px-3 font-mono text-status-danger-text font-bold">
                   ₨{urgentRevenueAtRisk.toLocaleString()}/mo
                 </td>
                 <td className="py-3 px-3 text-right">
@@ -534,7 +534,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 </td>
               </tr>
               <tr className="hover:bg-surface-subtle/50">
-                <td className="py-3 px-3 font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                <td className="py-3 px-3 font-bold text-status-warning-text flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
                   <span>Attendance is slipping</span>
                 </td>
@@ -542,7 +542,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                   Visits dropped by half compared with previous month
                 </td>
                 <td className="py-3 px-3 font-mono font-bold">{slippingCount} members</td>
-                <td className="py-3 px-3 font-mono text-amber-600 dark:text-amber-400 font-bold">
+                <td className="py-3 px-3 font-mono text-status-warning-text font-bold">
                   ₨{slippingRevenueAtRisk.toLocaleString()}/mo
                 </td>
                 <td className="py-3 px-3 text-right">
@@ -555,8 +555,8 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 </td>
               </tr>
               <tr className="hover:bg-surface-subtle/50">
-                <td className="py-3 px-3 font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />
+                <td className="py-3 px-3 font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />
                   <span>Routine has changed</span>
                 </td>
                 <td className="py-3 px-3 text-content-secondary">
@@ -569,14 +569,14 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                 <td className="py-3 px-3 text-right">
                   <button
                     onClick={() => onSelectSegment('HABIT_DISRUPTED')}
-                    className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs btn-shadow"
+                    className="px-3 py-1 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs btn-shadow"
                   >
                     View members
                   </button>
                 </td>
               </tr>
               <tr className="hover:bg-surface-subtle/50">
-                <td className="py-3 px-3 font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                <td className="py-3 px-3 font-bold text-status-success-text flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
                   <span>Regular attendance</span>
                 </td>
@@ -584,7 +584,7 @@ export const Retention3DRadar: React.FC<Retention3DRadarProps> = ({
                   Checking in consistently on their normal schedule
                 </td>
                 <td className="py-3 px-3 font-mono font-bold">{healthyCount} members</td>
-                <td className="py-3 px-3 font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                <td className="py-3 px-3 font-mono text-status-success-text font-bold">
                   Active
                 </td>
                 <td className="py-3 px-3 text-right">

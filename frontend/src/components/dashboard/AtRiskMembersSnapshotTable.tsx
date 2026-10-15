@@ -14,9 +14,9 @@ export const AtRiskMembersSnapshotTable: React.FC = () => {
       plan: 'Monthly Standard (₨5K)',
       score: 88,
       level: 'HIGH',
-      badgeClass: 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20',
+      badgeClass: 'bg-status-danger-bg text-status-danger-text border border-status-danger-border',
       initials: 'AM',
-      avatarBg: 'bg-red-500/10 text-red-600 dark:text-red-400',
+      avatarBg: 'bg-status-danger-bg text-status-danger-text',
     },
     {
       code: 'GR-1007',
@@ -26,9 +26,9 @@ export const AtRiskMembersSnapshotTable: React.FC = () => {
       plan: 'Quarterly VIP (₨16K)',
       score: 78,
       level: 'HIGH',
-      badgeClass: 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20',
+      badgeClass: 'bg-status-danger-bg text-status-danger-text border border-status-danger-border',
       initials: 'OF',
-      avatarBg: 'bg-red-500/10 text-red-600 dark:text-red-400',
+      avatarBg: 'bg-status-danger-bg text-status-danger-text',
     },
     {
       code: 'GR-1005',
@@ -38,9 +38,9 @@ export const AtRiskMembersSnapshotTable: React.FC = () => {
       plan: 'Monthly Gold (₨6.5K)',
       score: 68,
       level: 'MEDIUM',
-      badgeClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+      badgeClass: 'bg-status-warning-bg text-status-warning-text border border-status-warning-border',
       initials: 'BA',
-      avatarBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+      avatarBg: 'bg-status-warning-bg text-status-warning-text',
     },
     {
       code: 'GR-1001',
@@ -50,9 +50,9 @@ export const AtRiskMembersSnapshotTable: React.FC = () => {
       plan: 'Monthly Gold (₨6.5K)',
       score: 12,
       level: 'HEALTHY',
-      badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+      badgeClass: 'bg-status-success-bg text-status-success-text border border-status-success-border',
       initials: 'HS',
-      avatarBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+      avatarBg: 'bg-status-success-bg text-status-success-text',
     },
   ];
 
@@ -89,7 +89,7 @@ export const AtRiskMembersSnapshotTable: React.FC = () => {
               <th className="pb-3 text-right pr-1">CHURN RISK</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-border/60">
+          <tbody className="divide-y divide-surface-border">
             {members.map((row) => (
               <tr key={row.code} className="hover:bg-surface-subtle/50 transition-colors group">
                 {/* Code */}
@@ -129,8 +129,8 @@ export const AtRiskMembersSnapshotTable: React.FC = () => {
                   <span
                     className={`inline-flex items-center gap-1 font-semibold text-[10px] px-2 py-0.5 rounded-full ${row.badgeClass}`}
                   >
-                    {row.level === 'HIGH' && <AlertTriangle className="w-3 h-3 text-red-500" />}
-                    {row.level === 'HEALTHY' && <CheckCircle2 className="w-3 h-3 text-emerald-500" />}
+                    {row.level === 'HIGH' && <AlertTriangle className="w-3 h-3 text-status-danger-text" />}
+                    {row.level === 'HEALTHY' && <CheckCircle2 className="w-3 h-3 text-status-success-text" />}
                     <span>Risk: {row.score}</span>
                   </span>
                 </td>

@@ -44,7 +44,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
             <h2 className="text-sm font-semibold text-content-primary tracking-tight">
               Attendance Trends
             </h2>
-            <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span className="flex items-center gap-1 text-[11px] font-medium text-status-success-text bg-status-success-bg px-2 py-0.5 rounded-full border border-status-success-border">
               <TrendingUp className="w-3 h-3" /> +14.2% MoM
             </span>
           </div>
@@ -85,11 +85,11 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
         </div>
         <div className="p-3.5 rounded-xl bg-surface-subtle border border-surface-border">
           <div className="text-[11px] text-content-tertiary font-medium uppercase tracking-wider">Daily Average Visits</div>
-          <div className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-1">{avgDaily} <span className="text-xs font-normal text-content-secondary">/ day</span></div>
+          <div className="text-xl font-bold font-mono text-status-success-text mt-1">{avgDaily} <span className="text-xs font-normal text-content-secondary">/ day</span></div>
         </div>
         <div className="hidden sm:block p-3.5 rounded-xl bg-surface-subtle border border-surface-border">
           <div className="text-[11px] text-content-tertiary font-medium uppercase tracking-wider">Peak Day Volume</div>
-          <div className="text-xl font-bold font-mono text-purple-600 dark:text-neon-cyan mt-1">{maxVal} <span className="text-xs font-normal text-content-secondary">visits</span></div>
+          <div className="text-xl font-bold font-mono text-brand-600 dark:text-neon-cyan mt-1">{maxVal} <span className="text-xs font-normal text-content-secondary">visits</span></div>
         </div>
       </div>
 

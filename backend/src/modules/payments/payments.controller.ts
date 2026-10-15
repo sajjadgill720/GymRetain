@@ -1,3 +1,4 @@
+import { Roles } from '../../common/decorators/roles.decorator';
 import {
   Controller,
   Get,
@@ -19,6 +20,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { JwtPayload } from '../../common/interfaces/jwt-payload.interface';
 
 @Controller('payments')
+@Roles('GYM_OWNER', 'GYM_MANAGER', 'GYM_STAFF')
 @UseGuards(TenantAccessGuard, RolesGuard)
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
@@ -67,7 +69,7 @@ export class PaymentsController {
     @CurrentUser() user: JwtPayload,
     @Body() dto: RecordPaymentDto,
   ) {
-    return this.paymentsService.recordPayment(gymId, user.sub, dto);
+    return this.paymentsService.recordPayment(gymId, user.sub, dto, user.role);
   }
 
   @Get('metrics')

@@ -118,8 +118,8 @@ export const RetentionSparklineRow: React.FC<RetentionSparklineRowProps> = ({ su
                   <div
                     className={`text-[10px] font-bold ${
                       c.isPositive
-                        ? 'text-emerald-700 dark:text-emerald-400'
-                        : 'text-amber-700 dark:text-amber-400'
+                        ? 'text-status-success-text'
+                        : 'text-status-warning-text'
                     }`}
                   >
                     {c.change}

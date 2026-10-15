@@ -37,8 +37,8 @@ export const StatCardShopeers: React.FC<StatCardShopeersProps> = ({
           <span
             className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
               isPositive
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                ? 'bg-status-success-bg text-status-success-text'
+                : 'bg-status-danger-bg text-status-danger-text'
             }`}
           >
             {isPositive ? (

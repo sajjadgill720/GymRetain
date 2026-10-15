@@ -2,7 +2,7 @@ import React from 'react';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   padding?: 'none' | 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'highlight' | 'warning' | 'danger';
+  variant?: 'default' | 'highlight' | 'success' | 'warning' | 'danger';
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -20,18 +20,15 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const variantStyles = {
-    default:
-      'bg-[#161310] border-[#2A2520] shadow-sm shadow-black/30 hover:border-[#38312A]',
-    highlight:
-      'bg-gradient-to-br from-[#221C16] via-[#1A1612] to-[#14110E] border-[#BFA785]/35 shadow-md shadow-black/40',
-    warning:
-      'bg-gradient-to-br from-[#241C12] via-[#1A1611] to-[#14110E] border-[#E5A13B]/30 shadow-md shadow-black/40',
-    danger:
-      'bg-gradient-to-br from-[#261515] via-[#1A1313] to-[#141010] border-[#D9534F]/30 shadow-md shadow-black/40',
+    default: 'bg-surface border-surface-border shadow-card',
+    highlight: 'bg-surface border-brand-500/30 dark:border-brass-500/30 shadow-card',
+    warning: 'bg-surface border-status-warning-border shadow-card',
+    danger: 'bg-surface border-status-danger-border shadow-card',
   };
 
   return (
     <div
+      data-tone={variant === 'success' || variant === 'warning' || variant === 'danger' ? variant : undefined}
       className={`rounded-2xl border transition-all duration-200 ${variantStyles[variant]} ${paddingStyles[padding]} ${className}`}
       {...props}
     >
@@ -45,7 +42,7 @@ export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className = '',
   ...props
 }) => (
-  <div className={`flex flex-col gap-1 pb-4 border-b border-[#2A2520] ${className}`} {...props}>
+  <div className={`flex flex-col gap-1 pb-4 border-b border-surface-border ${className}`} {...props}>
     {children}
   </div>
 );
@@ -55,7 +52,7 @@ export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
   className = '',
   ...props
 }) => (
-  <h3 className={`text-sm sm:text-base font-bold text-[#F7F5F2] tracking-tight ${className}`} {...props}>
+  <h3 className={`text-sm sm:text-base font-bold text-content-primary tracking-tight ${className}`} {...props}>
     {children}
   </h3>
 );
@@ -65,7 +62,7 @@ export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement
   className = '',
   ...props
 }) => (
-  <p className={`text-xs text-[#A39E98] leading-relaxed ${className}`} {...props}>
+  <p className={`text-xs text-content-secondary leading-relaxed ${className}`} {...props}>
     {children}
   </p>
 );

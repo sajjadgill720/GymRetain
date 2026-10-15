@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { SaasBillingService } from './saas-billing.service';
 import { CreateCheckoutDto, SimulateWebhookDto } from './dto/create-checkout.dto';
@@ -44,6 +45,9 @@ export class SaasBillingController {
     @CurrentUser() user: JwtPayload,
     @Body() dto: SimulateWebhookDto,
   ) {
+    if (process.env.NODE_ENV === 'production' || process.env.ENABLE_BILLING_SANDBOX !== 'true') {
+      throw new ForbiddenException('Payment simulation is disabled. A verified payment provider is required.');
+    }
     return this.billingService.confirmSubscriptionPayment(
       gymId,
       dto.plan,

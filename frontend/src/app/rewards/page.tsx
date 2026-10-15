@@ -13,6 +13,7 @@ import {
   Gift,
   Tag,
   CheckCircle2,
+  Clock,
   X,
   ArrowRight,
 } from '@/components/icons';
@@ -77,7 +78,7 @@ export default function RewardsPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
-                <Award className="w-5 h-5 text-purple-600 dark:text-cyan-400" />
+                <Award className="w-5 h-5 text-brand-600 dark:text-brass-400" />
                 Attendance Rewards &amp; Milestones
               </h1>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-subtle text-content-secondary border border-surface-border">
@@ -92,16 +93,16 @@ export default function RewardsPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/rewards/winners"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-amber-600 dark:text-amber-400 transition-colors btn-shadow"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-surface hover:bg-surface-subtle border border-surface-border text-xs font-semibold text-status-warning-text transition-colors btn-shadow"
             >
-              <Trophy className="w-3.5 h-3.5 text-amber-500" />
+              <Trophy className="w-3.5 h-3.5 text-status-warning-text" />
               <span>View Rewarded Members</span>
               <ArrowRight className="w-3.5 h-3.5 text-content-tertiary" />
             </Link>
 
             <button
               onClick={() => setIsAddRewardOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Reward Milestone</span>
@@ -114,12 +115,13 @@ export default function RewardsPage() {
           {rewards.map((reward) => (
             <div
               key={reward.id}
-              className="bg-surface border border-surface-border rounded-2xl p-4 sm:p-5 relative group hover:border-purple-500/40 dark:hover:border-cyan-400/40 transition-all flex flex-col justify-between shadow-sm"
+              data-tone={reward.isActive ? 'success' : 'warning'}
+              className="status-surface bg-surface border border-surface-border rounded-2xl p-4 sm:p-5 relative group hover:border-brand-500/40 dark:hover:border-brass-400/40 transition-all flex flex-col justify-between shadow-sm"
             >
               <div>
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs font-mono font-medium border border-amber-500/20">
-                    <Flame className="w-3.5 h-3.5 text-amber-500" />
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-status-warning-bg text-status-warning-text text-xs font-mono font-medium border border-status-warning-border">
+                    <Flame className="w-3.5 h-3.5 text-status-warning-text" />
                     <span>{reward.triggerThreshold}-Day Streak</span>
                   </div>
 
@@ -144,8 +146,8 @@ export default function RewardsPage() {
                     {reward._count?.redemptions ?? 0} members
                   </span>
                 </div>
-                <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Active Rule
+                <span className="text-[11px] font-medium text-status-success-text flex items-center gap-1">
+                  {reward.isActive ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />} {reward.isActive ? 'Active rule' : 'Paused rule'}
                 </span>
               </div>
             </div>
@@ -165,7 +167,7 @@ export default function RewardsPage() {
             </button>
 
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-status-warning-bg text-status-warning-text flex items-center justify-center">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
@@ -185,7 +187,7 @@ export default function RewardsPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. 21-Day Habit Master"
-                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-brand-500 dark:focus:border-brass-400"
                 />
               </div>
 
@@ -199,7 +201,7 @@ export default function RewardsPage() {
                   required
                   value={triggerThreshold}
                   onChange={(e) => setTriggerThreshold(parseInt(e.target.value, 10))}
-                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary font-mono focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary font-mono focus:outline-none focus:border-brand-500 dark:focus:border-brass-400"
                 />
               </div>
 
@@ -210,7 +212,7 @@ export default function RewardsPage() {
                 <select
                   value={rewardType}
                   onChange={(e) => setRewardType(e.target.value as any)}
-                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400"
+                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary focus:outline-none focus:border-brand-500 dark:focus:border-brass-400"
                 >
                   <option value="BADGE">Digital Badge &amp; Profile Flair</option>
                   <option value="FREE_ITEM">Free Item / Smoothie / Shake</option>
@@ -227,7 +229,7 @@ export default function RewardsPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                   placeholder="e.g. Show badge at reception juice bar to claim free whey protein shake."
-                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-purple-500 dark:focus:border-cyan-400 resize-none"
+                  className="w-full bg-surface-subtle border border-surface-border rounded-xl px-3 py-2 text-xs text-content-primary placeholder-content-tertiary focus:outline-none focus:border-brand-500 dark:focus:border-brass-400 resize-none"
                 />
               </div>
 
@@ -242,7 +244,7 @@ export default function RewardsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow disabled:opacity-50 transition-all"
+                  className="px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black font-semibold text-xs shadow-sm btn-shadow disabled:opacity-50 transition-all"
                 >
                   {submitting ? 'Saving...' : 'Save Milestone'}
                 </button>

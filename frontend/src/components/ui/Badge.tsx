@@ -19,24 +19,24 @@ export const Badge: React.FC<BadgeProps> = ({
 }) => {
   const variantStyles: Record<BadgeVariant, { container: string; dot: string }> = {
     neutral: {
-      container: 'bg-[#24201C] text-[#A39E98] border-[#38332E]',
+      container: 'bg-surface-subtle text-content-secondary border-surface-border',
       dot: 'bg-[#A39E98]',
     },
     brand: {
-      container: 'bg-[#D96A38]/15 text-[#E68758] border-[#D96A38]/30',
-      dot: 'bg-[#D96A38]',
+      container: 'bg-brand-500/10 text-brand-700 border-brand-500/20 dark:bg-brass-400/10 dark:text-brass-400 dark:border-brass-400/20',
+      dot: 'bg-brand-600 dark:bg-brass-400',
     },
     success: {
-      container: 'bg-[#4E9F6E]/15 text-[#6EBE8E] border-[#4E9F6E]/30',
-      dot: 'bg-[#4E9F6E]',
+      container: 'bg-status-success-bg text-status-success-text border-status-success-border',
+      dot: 'bg-status-success',
     },
     warning: {
-      container: 'bg-[#E5A13B]/15 text-[#F0B865] border-[#E5A13B]/30',
-      dot: 'bg-[#E5A13B]',
+      container: 'bg-status-warning-bg text-status-warning-text border-status-warning-border',
+      dot: 'bg-status-warning',
     },
     danger: {
-      container: 'bg-[#D9534F]/15 text-[#E87875] border-[#D9534F]/30',
-      dot: 'bg-[#D9534F]',
+      container: 'bg-status-danger-bg text-status-danger-text border-status-danger-border',
+      dot: 'bg-status-danger',
     },
   };
 

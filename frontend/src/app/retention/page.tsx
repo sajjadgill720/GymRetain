@@ -7,12 +7,8 @@ import { AtRiskMembersTable } from "../../components/AtRiskMembersTable";
 import { api } from "../../lib/api";
 import { MemberRiskDetails } from "../../types";
 import {
-  ArrowRight,
   ArrowsClockwise,
   ShieldCheck,
-  AlertTriangle,
-  Clock,
-  CheckCircle2,
 } from "@/components/icons";
 
 function RetentionContent() {
@@ -44,20 +40,11 @@ function RetentionContent() {
 
   return (
     <AppLayout onRefreshData={fetchRisk}>
-      <div className="max-w-[1480px] w-full mx-auto p-5 sm:p-8 lg:p-10 space-y-8 lg:space-y-10">
-        <div className="flex flex-wrap items-end justify-between gap-5">
+      <div className="retention-workspace max-w-[1480px] w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        <div className="membership-heading flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="premium-eyebrow mb-4">
-              Member experience / Retention
-            </p>
-            <h1 className="premium-title">
-              A little attention goes a long way.
-            </h1>
-            <p className="text-sm text-content-secondary mt-4 max-w-xl leading-relaxed">
-              Notice the change in a routine. Reach out at the right moment.
-              <br className="hidden sm:block" /> Help your members find their
-              momentum again.
-            </p>
+            <h1>Retention</h1>
+            <p className="text-xs sm:text-sm text-content-secondary mt-1">Spot changing routines. Plan the next follow-up.</p>
           </div>
           <button
             onClick={fetchRisk}
@@ -71,81 +58,11 @@ function RetentionContent() {
           </button>
         </div>
 
-        <div className="premium-panel overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 px-6 sm:px-8 py-6 bg-[var(--accent-brand-light)] border-b border-surface-border">
-            <div className="flex items-center gap-4">
-              <div className="w-11 h-11 shrink-0 rounded-full border border-[var(--border-hover)] flex items-center justify-center text-[var(--accent-brand)]">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-content-primary">
-                  {loading
-                    ? "Finding the members who need you."
-                    : urgent
-                      ? `${urgent} member${urgent === 1 ? "" : "s"} could use a personal check-in.`
-                      : "A good routine starts with staying connected."}
-                </p>
-                <p className="text-xs text-content-secondary mt-1">
-                  A thoughtful conversation can make all the difference.
-                </p>
-              </div>
-            </div>
-            <a
-              href="#follow-up-queue"
-              className="flex items-center gap-3 text-xs font-semibold text-[var(--accent-brand)] whitespace-nowrap"
-            >
-              Review follow-ups <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-          <div className="retention-metrics grid grid-cols-3">
-            {[
-              {
-                label: "Priority follow-ups",
-                value: urgent,
-                detail: "Members with a high retention risk",
-                tone: "danger",
-                icon: AlertTriangle,
-              },
-              {
-                label: "Changing routines",
-                value: slipping,
-                detail: "Members whose attendance is slipping",
-                tone: "warning",
-                icon: Clock,
-              },
-              {
-                label: "Payments up to date",
-                value: members.length - overdue,
-                detail: "Members in this queue without overdue fees",
-                tone: "success",
-                icon: CheckCircle2,
-              },
-            ].map((metric) => (
-              <div
-                key={metric.label}
-                data-tone={metric.tone}
-                className="status-metric px-4 sm:px-8 py-6 sm:py-8"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="metric-label text-xs font-medium">
-                    {metric.label}
-                  </p>
-                  <metric.icon
-                    aria-hidden="true"
-                    className="hidden sm:block w-4 h-4 shrink-0 status-text"
-                  />
-                </div>
-                <p className="metric-value text-4xl sm:text-[42px] font-medium tracking-[-0.05em] leading-none mt-5 tabular-nums">
-                  {loading ? "—" : String(metric.value).padStart(2, "0")}
-                </p>
-                <p className="metric-detail hidden sm:block text-xs mt-4">
-                  {metric.detail}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
+        <dl className="membership-summary retention-summary" aria-label="Retention overview">
+          <div><dt>Priority follow-ups</dt><dd className="text-status-danger-text">{loading ? "—" : urgent}</dd><span className="sr-only">Members with high retention risk</span></div>
+          <div><dt>Changing routines</dt><dd className="text-status-warning-text">{loading ? "—" : slipping}</dd><span className="sr-only">Members whose attendance is slipping</span></div>
+          <div><dt>Payments up to date</dt><dd>{loading ? "—" : members.length - overdue}</dd><span className="sr-only">Members in this queue without overdue fees</span></div>
+        </dl>
         {error && (
           <p role="alert" className="text-sm text-status-danger-text">
             {error}
@@ -168,8 +85,7 @@ function RetentionContent() {
         </section>
         <p className="text-[11px] text-content-tertiary flex items-center gap-2 pb-3">
           <ShieldCheck className="w-3.5 h-3.5" />
-          Built around better relationships. Risk signals are a guide for your
-          team’s judgment.
+          Risk signals guide your team’s judgment.
         </p>
       </div>
     </AppLayout>

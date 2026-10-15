@@ -74,7 +74,7 @@ export default function RewardsPage() {
     <AppLayout onRefreshData={fetchRewards}>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
         {/* Page Context Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-surface-border">
+        <div className="page-context flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-surface-border">
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">

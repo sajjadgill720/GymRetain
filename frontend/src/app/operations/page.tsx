@@ -363,7 +363,7 @@ function OperationsContent() {
   return (
     <AppLayout onRefreshData={load}>
       <div className="studio-page">
-        <div className="studio-page-heading">
+        <div className="page-context studio-page-heading">
           <div>
             <p className="premium-eyebrow">The business behind the training</p>
             <h1>Keep your gym moving.</h1>

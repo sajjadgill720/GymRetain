@@ -264,7 +264,7 @@ export default function AiChatPage() {
     <AppLayout>
       <div className="flex flex-col h-[calc(100vh-65px)] max-w-[1600px] w-full mx-auto select-none">
         {/* Top Header */}
-        <div className="px-4 py-3 sm:px-6 border-b border-surface-border bg-surface flex items-center justify-between gap-3">
+        <div className="page-context px-4 py-3 sm:px-6 border-b border-surface-border bg-surface flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center border border-brand-500/20">
               <Sparkles className="w-5 h-5" />

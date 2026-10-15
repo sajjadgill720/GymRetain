@@ -169,7 +169,7 @@ export default function SettingsAndBillingPage() {
 
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1500px] w-full mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-surface-border">
+        <div className="page-context flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-surface-border">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-brand-600 dark:text-brass-400" />

@@ -7,16 +7,11 @@ import { Modal } from "../../components/ui/Modal";
 import { api } from "../../lib/api";
 import {
   CreditCard,
-  CurrencyDollar,
   Plus,
   CheckCircle,
-  Warning,
-  Clock,
   ArrowRight,
   ArrowsClockwise,
-  Users,
   Search,
-  Funnel,
   ShieldCheck,
   Receipt,
   X,
@@ -147,6 +142,7 @@ function SubscriptionsContent() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [renewalSub, setRenewalSub] = useState<MemberSubscription | null>(null);
+  const [detailSub, setDetailSub] = useState<MemberSubscription | null>(null);
   const [renewalPaid, setRenewalPaid] = useState(false);
   const [renewalError, setRenewalError] = useState("");
   const [loadError, setLoadError] = useState("");
@@ -395,7 +391,8 @@ function SubscriptionsContent() {
     const code = s.member?.memberCode?.toLowerCase() || "";
     const plan = s.planName.toLowerCase();
     return (
-      fullName.includes(query) || code.includes(query) || plan.includes(query)
+      (statusFilter === "ALL" || s.status === statusFilter) &&
+      (fullName.includes(query) || code.includes(query) || plan.includes(query))
     );
   });
 
@@ -412,23 +409,19 @@ function SubscriptionsContent() {
         </div>
       )}
 
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
+      <div className="membership-workspace p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
         {/* ============================================================
             1. TOP HEADER & HIGH-IMPACT ACTIONS
             ============================================================ */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-surface-border">
+        <div className="membership-heading flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5 mb-1">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-content-primary font-sans">
-                Memberships &amp; Payments
+                Memberships
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20">
-                Payment Register
-              </span>
             </div>
             <p className="text-xs sm:text-sm text-content-secondary">
-              Track active gym memberships, check upcoming renewal dates, and
-              record fee payments at the desk.
+              Manage plans, renewals and payments.
             </p>
           </div>
 
@@ -460,7 +453,7 @@ function SubscriptionsContent() {
               className="flex items-center gap-2 px-4 py-2 rounded-xl btn-shadow-primary text-xs font-bold transition-all"
             >
               <Plus className="w-4 h-4" weight="bold" />
-              <span>+ Assign Membership</span>
+              <span>Assign membership</span>
             </button>
           </div>
         </div>
@@ -476,101 +469,26 @@ function SubscriptionsContent() {
         {/* ============================================================
             2. KEY FINANCIAL & MEMBERSHIP METRICS
             ============================================================ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div
-            data-tone="success"
-            className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Active Memberships
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center">
-                <Users className="w-4 h-4" weight="duotone" />
-              </div>
-            </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-content-primary tracking-tight font-sans mb-1">
-              {metrics.activeSubscriptions} Members
-            </div>
-            <p className="text-[11px] text-content-tertiary">
-              Enrolled in monthly, quarterly, or annual plans
-            </p>
-          </div>
-
-          <div
-            data-tone={metrics.expiringWithin7Days > 0 ? "warning" : "success"}
-            className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Expiring Within 7 Days
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-status-warning-bg text-status-warning-text flex items-center justify-center">
-                <Clock className="w-4 h-4" weight="duotone" />
-              </div>
-            </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-status-warning-text tracking-tight font-sans mb-1">
-              {metrics.expiringWithin7Days} Renewals
-            </div>
-            <p className="text-[11px] text-content-tertiary">
-              Friendly renewal reminders ready to send
-            </p>
-          </div>
-
-          <div
-            data-tone="success"
-            className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Fees Collected (Month)
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-status-success-bg text-status-success-text flex items-center justify-center">
-                <CurrencyDollar className="w-4 h-4" weight="duotone" />
-              </div>
-            </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-status-success-text tracking-tight font-sans mb-1">
-              ₨{metrics.totalRevenueRecorded.toLocaleString()}
-            </div>
-            <p className="text-[11px] text-content-tertiary">
-              Cash, bank transfer, and mobile payments
-            </p>
-          </div>
-
-          <div
-            data-tone={metrics.pendingPayments > 0 ? "danger" : "success"}
-            className="status-summary status-surface p-5 rounded-2xl bg-surface border border-surface-border btn-shadow"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-content-secondary uppercase tracking-wider">
-                Unpaid Dues
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-status-danger-bg text-status-danger-text flex items-center justify-center">
-                <Warning className="w-4 h-4" weight="duotone" />
-              </div>
-            </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-status-danger-text tracking-tight font-sans mb-1">
-              {metrics.pendingPayments} Pending
-            </div>
-            <p className="text-[11px] text-content-tertiary">
-              ₨31,000 awaiting desk collection
-            </p>
-          </div>
-        </div>
-
+        <dl className="membership-summary" aria-label="Membership overview">
+          <div><dt>Active memberships</dt><dd>{metrics.activeSubscriptions}</dd></div>
+          <div><dt>Renewals in 7 days</dt><dd><span className={metrics.expiringWithin7Days ? "text-status-warning-text" : ""}>{metrics.expiringWithin7Days}</span></dd></div>
+          <div><dt>Recorded collections</dt><dd>Rs {metrics.totalRevenueRecorded.toLocaleString()}</dd></div>
+          <div><dt>Pending payments</dt><dd><span className={metrics.pendingPayments ? "text-status-danger-text" : ""}>{metrics.pendingPayments}</span></dd></div>
+        </dl>
         {/* ============================================================
             3. TAB NAVIGATION
             ============================================================ */}
-        <div className="flex items-center gap-2 border-b border-surface-border">
+        <div className="membership-tabs flex items-center gap-2 border-b border-surface-border" role="group" aria-label="Membership workspace views">
           <button
             onClick={() => setActiveTab("SUBSCRIPTIONS")}
+            aria-pressed={activeTab === "SUBSCRIPTIONS"}
             className={`pb-3 px-4 text-xs font-bold transition-all relative ${
               activeTab === "SUBSCRIPTIONS"
                 ? "text-brand-600 dark:text-brass-400"
                 : "text-content-tertiary hover:text-content-primary"
             }`}
           >
-            <span>Active Memberships</span>
+            <span>Memberships</span>
             {activeTab === "SUBSCRIPTIONS" && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brass-400 rounded-full" />
             )}
@@ -578,13 +496,14 @@ function SubscriptionsContent() {
 
           <button
             onClick={() => setActiveTab("PAYMENTS")}
+            aria-pressed={activeTab === "PAYMENTS"}
             className={`pb-3 px-4 text-xs font-bold transition-all relative ${
               activeTab === "PAYMENTS"
                 ? "text-brand-600 dark:text-brass-400"
                 : "text-content-tertiary hover:text-content-primary"
             }`}
           >
-            <span>Payment Records ({payments.length})</span>
+            <span>Payments <span className="membership-tab-count">{payments.length}</span></span>
             {activeTab === "PAYMENTS" && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brass-400 rounded-full" />
             )}
@@ -592,13 +511,14 @@ function SubscriptionsContent() {
 
           <button
             onClick={() => setActiveTab("PLANS")}
+            aria-pressed={activeTab === "PLANS"}
             className={`pb-3 px-4 text-xs font-bold transition-all relative ${
               activeTab === "PLANS"
                 ? "text-brand-600 dark:text-brass-400"
                 : "text-content-tertiary hover:text-content-primary"
             }`}
           >
-            <span>Membership Plans ({DEFAULT_PLANS.length})</span>
+            <span>Plans <span className="membership-tab-count">{DEFAULT_PLANS.length}</span></span>
             {activeTab === "PLANS" && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 dark:bg-brass-400 rounded-full" />
             )}
@@ -616,49 +536,36 @@ function SubscriptionsContent() {
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-content-tertiary" />
                 <input
                   type="text"
-                  placeholder="Search by member name, code (e.g. GR-1001), or plan..."
+                  aria-label="Search memberships"
+                  placeholder="Search members or plans…"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface border border-surface-border text-xs text-content-primary placeholder-content-tertiary outline-none focus:border-brand-600 dark:focus:border-brass-400 transition-all btn-shadow"
                 />
               </div>
 
-              {/* Status Filter Buttons */}
-              <div className="flex items-center gap-1 p-1 bg-surface-subtle border border-surface-border rounded-xl">
-                {[
-                  { id: "ALL", label: "All" },
-                  { id: "ACTIVE", label: "Active" },
-                  { id: "PENDING_PAYMENT", label: "Pending Payment" },
-                  { id: "EXPIRED", label: "Expired" },
-                  { id: "CANCELLED", label: "Cancelled" },
-                ].map((st) => (
-                  <button
-                    key={st.id}
-                    onClick={() => setStatusFilter(st.id as any)}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all btn-shadow ${
-                      statusFilter === st.id
-                        ? "bg-surface text-brand-600 dark:text-brass-400 shadow-sm border border-surface-border"
-                        : "text-content-tertiary hover:text-content-primary"
-                    }`}
-                  >
-                    {st.label}
-                  </button>
-                ))}
-              </div>
+              <label className="membership-status-filter">
+                <span>Status</span>
+                <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
+                  <option value="ALL">All memberships</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="PENDING_PAYMENT">Pending payment</option>
+                  <option value="EXPIRED">Expired</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              </label>
             </div>
-
             {/* Subscriptions Table */}
             <div className="rounded-2xl bg-surface border border-surface-border overflow-hidden btn-shadow">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="membership-table w-full text-left text-xs">
+                  <caption className="sr-only">Memberships matching the current search and status. Open Details for contact, billing and payment history.</caption>
                   <thead>
                     <tr className="border-b border-surface-border bg-surface-subtle/50 text-content-tertiary uppercase text-[10px] font-bold">
                       <th className="py-3 px-4">Member</th>
-                      <th className="py-3 px-4">Membership Plan</th>
-                      <th className="py-3 px-4">Price &amp; Billing</th>
-                      <th className="py-3 px-4">Valid Period</th>
+                      <th className="py-3 px-4">Plan</th>
+                      <th className="py-3 px-4">Ends on</th>
                       <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Last Payment</th>
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -678,7 +585,7 @@ function SubscriptionsContent() {
                               {sub.member?.firstName} {sub.member?.lastName}
                             </div>
                             <div className="text-[10px] text-content-tertiary font-mono">
-                              {sub.member?.memberCode} · {sub.member?.phone}
+                              {sub.member?.memberCode}
                             </div>
                           </td>
 
@@ -686,29 +593,12 @@ function SubscriptionsContent() {
                             <div className="font-bold text-content-primary">
                               {sub.planName}
                             </div>
-                            <span className="inline-block mt-0.5 px-2 py-0.5 rounded-md text-[9px] font-bold font-mono bg-brand-500/10 text-brand-600 dark:text-brass-400">
-                              {sub.planType}
-                            </span>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <div className="font-extrabold text-content-primary font-mono text-sm">
-                              ₨{sub.price.toLocaleString()}
-                            </div>
-                            <div className="text-[10px] text-content-tertiary">
-                              {sub.autoRenew
-                                ? "Renewal preferred"
-                                : "Manual renewal"}
-                            </div>
+                            <p className="membership-secondary">Rs {sub.price.toLocaleString()} · {sub.planType.toLowerCase().replaceAll("_", " ")}</p>
                           </td>
 
                           <td className="py-3.5 px-4">
                             <div className="font-semibold text-content-primary">
-                              {new Date(sub.startDate).toLocaleDateString()} →{" "}
-                              {new Date(sub.endDate).toLocaleDateString()}
-                            </div>
-                            <div className="text-[10px] text-content-tertiary">
-                              {isExpired ? "Ended" : "Active window"}
+                              {new Date(sub.endDate).toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"})}
                             </div>
                           </td>
 
@@ -739,28 +629,6 @@ function SubscriptionsContent() {
                             )}
                           </td>
 
-                          <td className="py-3.5 px-4">
-                            {sub.latestPayment ? (
-                              <div>
-                                <div className="font-bold text-content-primary">
-                                  ₨{sub.latestPayment.amount.toLocaleString()} (
-                                  {sub.latestPayment.provider})
-                                </div>
-                                <div className="text-[10px] text-content-tertiary">
-                                  {sub.latestPayment.paidAt
-                                    ? new Date(
-                                        sub.latestPayment.paidAt,
-                                      ).toLocaleDateString()
-                                    : "Recorded"}
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="text-[11px] text-status-danger-text font-semibold">
-                                No record found
-                              </span>
-                            )}
-                          </td>
-
                           <td className="py-3.5 px-4 text-right">
                             <div className="flex items-center justify-end gap-1.5">
                               {isPending ? (
@@ -786,26 +654,17 @@ function SubscriptionsContent() {
                                 </button>
                               )}
 
-                              {!isCancelled && (
-                                <button
-                                  disabled={saving || !!loadError}
-                                  onClick={() =>
-                                    handleCancelSub(
-                                      sub.id,
-                                      `${sub.member.firstName} ${sub.member.lastName}`,
-                                    )
-                                  }
-                                  className="p-1 rounded-lg text-content-tertiary hover:text-status-danger-text hover:bg-surface-subtle transition-colors"
-                                  title="Cancel subscription"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
+                              <button
+                                onClick={() => setDetailSub(sub)}
+                                className="membership-details-button"
+                                aria-label={`Membership details for ${sub.member.firstName} ${sub.member.lastName}`}
+                              >Details</button>
                             </div>
                           </td>
                         </tr>
                       );
                     })}
+                    {filteredSubs.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-content-secondary">No memberships match your search and status.</td></tr>}
                   </tbody>
                 </table>
               </div>
@@ -1266,6 +1125,28 @@ function SubscriptionsContent() {
           </div>
         </div>
       )}
+      <Modal isOpen={!!detailSub} onClose={() => setDetailSub(null)} title="Membership details" description={detailSub ? `${detailSub.member.firstName} ${detailSub.member.lastName} · ${detailSub.member.memberCode}` : undefined}>
+        {detailSub && <div className="space-y-5">
+          <dl className="membership-detail-grid">
+            <div><dt>Plan</dt><dd>{detailSub.planName}</dd></div>
+            <div><dt>Price</dt><dd>Rs {detailSub.price.toLocaleString()} · {detailSub.currency}</dd></div>
+            <div><dt>Phone</dt><dd>{detailSub.member.phone || "Not provided"}</dd></div>
+            <div><dt>Billing</dt><dd>{detailSub.planType.toLowerCase().replaceAll("_", " ")}</dd></div>
+            <div><dt>Starts</dt><dd>{new Date(detailSub.startDate).toLocaleDateString("en-GB")}</dd></div>
+            <div><dt>Ends</dt><dd>{new Date(detailSub.endDate).toLocaleDateString("en-GB")}</dd></div>
+            <div><dt>Status</dt><dd>{detailSub.status.toLowerCase().replaceAll("_", " ")}</dd></div>
+            <div><dt>Renewal</dt><dd>{detailSub.autoRenew ? "Renewal preferred" : "Manual renewal"}</dd></div>
+          </dl>
+          <div className="membership-payment-detail">
+            <h4>Last payment</h4>
+            {detailSub.latestPayment ? <><p>Rs {detailSub.latestPayment.amount.toLocaleString()} · {detailSub.latestPayment.provider.replaceAll("_", " ")}</p><p className="membership-secondary">{detailSub.latestPayment.paidAt ? new Date(detailSub.latestPayment.paidAt).toLocaleDateString("en-GB") : "Recorded"}</p></> : <p className="membership-secondary">No payment record found.</p>}
+          </div>
+          <div className="flex flex-wrap justify-between gap-3 pt-3 border-t border-surface-border">
+            {detailSub.status !== "CANCELLED" && <button className="studio-button text-status-danger-text" disabled={saving || !!loadError} onClick={async () => { await handleCancelSub(detailSub.id, `${detailSub.member.firstName} ${detailSub.member.lastName}`); setDetailSub(null); }}>Cancel membership</button>}
+            <button className="studio-button ml-auto" onClick={() => setDetailSub(null)}>Done</button>
+          </div>
+        </div>}
+      </Modal>
       <Modal
         isOpen={!!renewalSub}
         onClose={() => {

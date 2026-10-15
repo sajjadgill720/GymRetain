@@ -111,18 +111,18 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
   };
 
   return (
-    <div className="premium-panel overflow-hidden">
-      <div className="px-6 sm:px-8 pt-7 pb-6 flex flex-wrap items-center justify-between gap-5">
+    <div className="retention-queue premium-panel overflow-hidden">
+      <div className="retention-queue-toolbar">
         <div>
-          <p className="premium-eyebrow mb-2">Make the next move</p>
-          <h2 className="text-xl font-medium tracking-tight text-content-primary">
-            Your follow-up queue
+          <h2 className="text-lg font-medium tracking-tight text-content-primary">
+            Follow-up queue
             <span className="ml-3 text-sm text-content-tertiary font-normal">
-              {members.length}
+              {loading ? "—" : filtered.length}
             </span>
           </h2>
         </div>
-        <div className="relative w-full sm:w-64">
+        <div className="retention-queue-controls">
+        <div className="relative w-full sm:w-56">
           <Search className="absolute left-3 top-3 w-4 h-4 text-content-tertiary" />
           <input
             type="search"
@@ -130,41 +130,12 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
             placeholder="Find a member"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="h-10 w-full pl-10 pr-3 rounded-lg border border-surface-border bg-transparent text-xs outline-none focus:border-[var(--accent-brand)]"
+            className="h-11 w-full pl-10 pr-3 rounded-lg border border-surface-border bg-transparent text-xs outline-none focus:border-[var(--accent-brand)]"
           />
         </div>
-      </div>
-      {showFilters && (
-        <div className="flex gap-5 sm:gap-7 border-b border-surface-border px-6 sm:px-8 overflow-x-auto">
-          {(
-            [
-              { key: "ALL", label: "All members", count: members.length },
-              {
-                key: "HIGH",
-                label: "Priority",
-                count: members.filter((m) => m.riskLevel === "HIGH").length,
-              },
-              {
-                key: "MEDIUM",
-                label: "Slipping",
-                count: members.filter((m) => m.riskLevel === "MEDIUM").length,
-              },
-            ] as const
-          ).map((filter) => (
-            <button
-              key={filter.key}
-              onClick={() => setSelectedFilter(filter.key)}
-              aria-pressed={selectedFilter === filter.key}
-              className={`relative flex items-center gap-2 pb-4 pt-1 text-xs whitespace-nowrap border-b-2 rounded-none ${selectedFilter === filter.key ? "border-[var(--accent-brand)] text-content-primary font-semibold" : "border-transparent text-content-secondary"}`}
-            >
-              {filter.label}
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-subtle text-content-secondary">
-                {filter.count}
-              </span>
-            </button>
-          ))}
+        {showFilters && <label className="retention-risk-filter"><span className="sr-only">Risk level</span><select value={selectedFilter} onChange={(event) => setSelectedFilter(event.target.value as typeof selectedFilter)}><option value="ALL">All risk levels</option><option value="HIGH">Priority</option><option value="MEDIUM">Slipping</option></select></label>}
         </div>
-      )}
+      </div>
       {loading ? (
         <div
           role="status"
@@ -347,7 +318,6 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
           {displayList.length} of {members.length} members
           {search ? " matching your search" : " in your queue"}
         </span>
-        <span>Personal follow-ups. Meaningful progress.</span>
       </div>
 
       <Modal

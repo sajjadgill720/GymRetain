@@ -21,9 +21,10 @@ export const Card: React.FC<CardProps> = ({
 
   const variantStyles = {
     default: 'bg-surface border-surface-border shadow-card',
-    highlight: 'bg-surface border-brand-500/30 dark:border-brass-500/30 shadow-card',
-    warning: 'bg-surface border-status-warning-border shadow-card',
-    danger: 'bg-surface border-status-danger-border shadow-card',
+    highlight: 'bg-[var(--accent-brand-light)] border-brand-500/30 dark:border-brass-500/30 shadow-card',
+    success: 'bg-status-success-bg border-status-success-border shadow-card',
+    warning: 'bg-status-warning-bg border-status-warning-border shadow-card',
+    danger: 'bg-status-danger-bg border-status-danger-border shadow-card',
   };
 
   return (

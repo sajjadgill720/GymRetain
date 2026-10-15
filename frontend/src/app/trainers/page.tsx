@@ -530,7 +530,7 @@ export default function TrainersPage() {
         )}
 
         {/* 1. Header & Controls */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-surface-border">
+        <div className="page-context flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-surface-border">
           <div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-brand-600/10 dark:bg-brass-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center border border-brand-500/20 dark:border-brass-500/20 shadow-sm">

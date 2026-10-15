@@ -387,7 +387,7 @@ export default function DietPlansPage() {
         )}
 
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-surface-border">
+        <div className="page-context flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-surface-border">
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-content-primary flex items-center gap-2">

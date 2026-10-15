@@ -219,7 +219,7 @@ export default function CheckInTerminalPage() {
     <AppLayout>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1500px] w-full mx-auto">
         {/* Terminal Header & Live Capacity Status Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-surface-border">
+        <div className="page-context flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-surface-border">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-content-primary flex items-center gap-2">
               <UserCheck className="w-5 h-5 text-brand-600 dark:text-brass-400" />

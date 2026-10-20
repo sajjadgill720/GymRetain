@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ChevronRight, QrCode, Dumbbell, Calendar, Utensils, MessageCircle, Award, Flame, Target, TrendingUp, User, CreditCard, Bell, HelpCircle, Users, LogOut, Clock } from '@/components/icons';
+import { ArrowRight, ChevronRight, Dumbbell, Calendar, Utensils, MessageCircle, Award, Flame, Target, TrendingUp, User, CreditCard, Bell, HelpCircle, Users, LogOut, Clock } from '@/components/icons';
 import { Button, Modal, ProgressRing } from '@/components/ui';
 import { MEMBER_TOKEN_KEY, memberPost, portalMoney } from '@/lib/member-api';
-import { crowdStatus, memberHref } from '@/lib/member-navigation';
+import { memberHref } from '@/lib/member-navigation';
+import { PERSONAL_MODE_KEY, takeTrainingWithMe } from '@/lib/member-personal';
+import { PersonalHome, PersonalAccount, PersonalWorkouts } from './PersonalExperience';
 import { usePortal } from './PortalProvider';
 
 function MemberLink({ href, children, className = '' }: { href: string; children: React.ReactNode; className?: string }) {
@@ -30,17 +32,17 @@ const shortcuts = [
 ];
 
 export function MemberHome() {
-  const { data, preview } = usePortal();
+  const { data, preview, personal } = usePortal();
+  if (personal) return <PersonalHome />;
   if (!data) return null;
   const { member, gym, profile } = data;
-  const crowd = crowdStatus(gym.insideNow, gym.capacity);
   const next = data.classes.filter(item => item.booking === 'BOOKED' && new Date(item.startsAt) > new Date()).sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
   const assigned = data.requests.find(item => item.kind === 'WORKOUT_PLAN' && item.status === 'ASSIGNED');
   return <div className="member-experience">
     <div className="member-welcome"><div><p className="portal-eyebrow">A little stronger, every visit</p><h1>Hey, {member.firstName}.</h1></div><MemberLink href="/portal/me" className="member-avatar-link"><Initials name={`${member.firstName} ${member.lastName}`} /><span className="sr-only">My account</span></MemberLink></div>
     <div className="member-hero-grid">
       <section className="member-photo-hero"><Image src="/portal/member-gym.png" alt="Gym equipment and dumbbell racks in natural light" fill priority sizes="(max-width: 760px) 100vw, 70vw" /><div className="member-photo-copy"><span className="portal-eyebrow">Your time. Your progress.</span><h2>SHOW UP.<br />FEEL STRONGER.</h2><p>Your next good move starts here.</p><MemberLink href="/portal/workouts" className="member-hero-link">Find my next move<ArrowRight aria-hidden="true" /></MemberLink></div></section>
-      <section className="member-club-card"><div><span className="portal-eyebrow">My home gym</span><h2>{gym.name}</h2></div><div className="member-crowd-heading"><h3>{crowd.label}</h3><span className="member-live-dot">{preview ? 'Sample' : 'Now'}</span></div><div className="member-crowd-bars" role="meter" aria-label="Gym occupancy" aria-valuemin={0} aria-valuemax={Math.max(gym.capacity, gym.insideNow, 1)} aria-valuenow={gym.insideNow} aria-valuetext={gym.capacity > 0 ? `${gym.insideNow} of ${gym.capacity} people` : 'Capacity unavailable'}>{Array.from({ length: 12 }, (_, i) => <span key={i} className={i < Math.ceil(crowd.fraction * 12) ? 'filled' : ''} />)}</div><p className="portal-caption">{gym.insideNow} people inside{gym.capacity > 0 && ` · ${gym.capacity} capacity`}<br />Based on open check-ins.</p><MemberLink href="/portal/pass" className="member-pass-button"><QrCode aria-hidden="true" /><span>Open my gym pass<small>Ready when you are</small></span><ChevronRight aria-hidden="true" /></MemberLink></section>
+      <section className="member-club-card"><span className="portal-eyebrow">My training focus</span><h2>{profile.goal}</h2><p className="mt-4">Your workouts and progress, wherever you train.</p><MemberLink href="/portal/progress?log=workout" className="member-checkin-button mt-6"><Dumbbell /><span>Log a workout</span></MemberLink><MemberLink href="/portal/onboarding" className="member-text-link mt-4">Adjust my goal<ArrowRight /></MemberLink></section>
     </div>
     <div className="member-shortcuts">{shortcuts.map(({ href, label, detail, icon: Icon }) => <MemberLink key={href} href={href} className="member-shortcut"><span className="member-icon-tile"><Icon aria-hidden="true" /></span><span><strong>{label}</strong><small>{detail}</small></span><ChevronRight aria-hidden="true" /></MemberLink>)}</div>
     <div className="member-content-grid"><section className="portal-card"><SectionTitle title="Your week, in motion" href="/portal/progress" action="My activity" /><div className="member-week-summary"><div><strong className="member-big-number">{data.weeklyVisits}<small> / {profile.weeklyTarget}</small></strong><p>visits this week</p><span className="member-goal-note">{data.weeklyVisits >= profile.weeklyTarget ? 'Weekly goal reached. Keep that feeling.' : `${Math.max(0, profile.weeklyTarget - data.weeklyVisits)} more to your weekly goal`}</span></div><ProgressRing value={data.weeklyVisits} max={profile.weeklyTarget} label="Weekly visit goal" size={100} /></div><div className="member-stat-strip"><div><Flame /><strong>{data.streak?.currentStreak || 0}</strong><span>day streak</span></div><div><TrendingUp /><strong>{data.totalVisits}</strong><span>total visits</span></div><div><Award /><strong>{data.points}</strong><span>points earned</span></div></div></section>
@@ -51,8 +53,9 @@ export function MemberHome() {
 }
 
 export function MemberAccount() {
-  const { data, preview } = usePortal();
+  const { data, preview, personal } = usePortal();
   const router = useRouter();
+  if (personal) return <PersonalAccount />;
   if (!data) return null;
   const groups = [
     { title: 'My training', items: [{ href: '/portal/workouts', label: 'My workouts', detail: 'Your plan and session history', icon: Dumbbell }, { href: '/portal/diet', label: 'Nutrition plan', detail: 'Meals and daily checklists', icon: Utensils }, { href: '/portal/chat', label: 'My trainer', detail: data.trainer?.name || 'Guidance from your gym', icon: MessageCircle }] },
@@ -61,14 +64,16 @@ export function MemberAccount() {
     { title: 'Here to help', items: [{ href: '/portal/buddies', label: 'Bring a buddy', detail: 'Request a visit with a friend', icon: Users }, { href: '/portal/help', label: 'Contact my gym', detail: 'Questions, requests and feedback', icon: HelpCircle }] },
   ];
   return <div className="member-experience"><div className="member-page-title"><span className="portal-eyebrow">Your member space</span><h1>My account</h1></div><section className="member-identity"><Initials name={`${data.member.firstName} ${data.member.lastName}`} /><div><h2>{data.member.firstName} {data.member.lastName}</h2><p>{data.gym.name}</p><small>Member {data.member.memberCode}</small></div><MemberLink href="/portal/profile" className="member-text-link">Edit profile<ChevronRight /></MemberLink></section>
-    <div className="member-account-feature-grid"><MemberLink href="/portal/membership" className="member-membership-tile"><div><span className="portal-eyebrow">My membership</span><h2>{data.membership?.planName || 'View your membership'}</h2><p>{data.membership ? `${portalMoney(data.membership.price, data.membership.currency)} · ${data.membership.status.replaceAll('_', ' ')}` : 'Your plan and payments, together'}</p></div><ChevronRight /></MemberLink><MemberLink href="/portal/pass" className="member-account-pass"><QrCode /><div><h2>Your gym pass</h2><p>One tap. Ready to check in.</p></div><ChevronRight /></MemberLink></div>
+    <div className="member-account-feature-grid"><MemberLink href="/portal/membership" className="member-membership-tile"><div><span className="portal-eyebrow">My membership</span><h2>{data.membership?.planName || 'View your membership'}</h2><p>{data.membership ? `${portalMoney(data.membership.price, data.membership.currency)} · ${data.membership.status.replaceAll('_', ' ')}` : 'Your plan and payments, together'}</p></div><ChevronRight /></MemberLink><MemberLink href="/portal/onboarding" className="member-account-goal"><Target /><div><h2>Your training goals</h2><p>{data.profile.weeklyTarget} sessions each week</p></div><ChevronRight /></MemberLink></div>
+    <section className="portal-card"><h2>Changing gyms? Keep your training with you.</h2><p className="mt-3">Personal mode works without a gym account. Your workouts, records, measurements, and goals can stay in this browser, with backup and restore.</p><Button className="mt-4" onClick={() => { if (!preview) takeTrainingWithMe(data); localStorage.setItem(PERSONAL_MODE_KEY, '1'); window.location.assign('/portal'); }}>{preview ? 'Try personal mode with a fresh tracker' : 'Take my training into personal mode'}</Button></section>
     <div className="member-account-groups">{groups.map(group => <section key={group.title} className="member-account-group"><h2>{group.title}</h2><div>{group.items.map(({ href, label, detail, icon: Icon }) => <MemberLink key={href} href={href} className="member-account-row"><Icon /><span><strong>{label}</strong><small>{detail}</small></span><ChevronRight /></MemberLink>)}</div></section>)}</div><button className="member-signout" onClick={() => { if (!preview) localStorage.removeItem(MEMBER_TOKEN_KEY); router.push('/portal/login'); }}><LogOut />{preview ? 'Exit preview' : 'Sign out'}</button>
   </div>;
 }
 
 export function MemberWorkouts() {
-  const { data } = usePortal();
+  const { data, personal } = usePortal();
   const [tab, setTab] = useState('plan');
+  if (personal) return <PersonalWorkouts />;
   if (!data) return null;
   const assigned = data.requests.find(item => item.kind === 'WORKOUT_PLAN' && item.status === 'ASSIGNED');
   return <div className="member-experience"><div className="member-page-title member-title-action"><div><span className="portal-eyebrow">Find your next good move</span><h1>My workouts</h1><p>A routine that feels like yours.</p></div><MemberLink href="/portal/progress?log=workout" className="member-checkin-button"><Dumbbell />Log workout</MemberLink></div><div className="member-segmented" aria-label="Workout view"><button aria-pressed={tab === 'plan'} onClick={() => setTab('plan')}>My plan</button><button aria-pressed={tab === 'history'} onClick={() => setTab('history')}>History ({data.workouts.length})</button></div>

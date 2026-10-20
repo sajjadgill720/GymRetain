@@ -14,9 +14,9 @@ Observed public patterns include prominent digital check-in, club crowd informat
 
 ## Implemented experience
 
-- Home: personal greeting, gym photograph, club occupancy, gym pass, four everyday shortcuts, weekly activity, trainer plan, booked class, and gym announcements.
+- Home: personal greeting, gym photograph, training focus, workout logging, everyday shortcuts, and weekly activity. Connected-gym information is optional.
 - Workouts: assigned trainer plan, trainer messaging, workout history, and a direct log-workout action.
-- Account: member identity, membership summary, pass access, and grouped settings with concise descriptions.
+- Account: personal profile, goals, browser backup/restore, and optional connected-gym settings. Gym pass access has been removed.
 - Classes: upcoming/booked filters, dates in the gym timezone, available spots, and a confirmation before cancellation.
 - Navigation: desktop navigation, a fixed mobile dock, clear parent links, keyboard focus indicators, and preview-preserving URLs.
 
@@ -38,6 +38,6 @@ The localhost PostgreSQL service was offline, so authenticated database-backed m
 
 ## Reviewed screenshots
 
-[Mobile account](assets/member-experience/member-account-mobile.png)
+The earlier account screenshot was retired after removing passes. See [Personal member mode](PERSONAL_MEMBER_MODE.md) for the current independent tracking behavior.
 
 The member home hero retains the original gym photograph and banner treatment. An image edit removes the person and reconstructs the background. The replacement image has a new URL to prevent cached versions with the person from appearing.

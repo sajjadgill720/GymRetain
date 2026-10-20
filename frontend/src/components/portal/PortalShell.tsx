@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Dumbbell, Award, TrendingUp, User, QrCode, WifiOff, ChevronLeft } from '@/components/icons';
+import { Home, Dumbbell, Award, TrendingUp, User, WifiOff, ChevronLeft } from '@/components/icons';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { GymLogo } from '@/components/GymLogo';
 import { memberHref, memberNavSection } from '@/lib/member-navigation';
@@ -18,7 +18,7 @@ const tabs = [
 ];
 
 export function PortalShell({ children }: { children: React.ReactNode }) {
-  const { data, preview } = usePortal();
+  const { data, preview, personal } = usePortal();
   const pathname = usePathname();
   const [online, setOnline] = useState(true);
   const section = memberNavSection(pathname);
@@ -35,7 +35,7 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const nav = (className: string, label: string) => <nav className={className} aria-label={label}>
-    {tabs.map(({ href, section: tabSection, label: tabLabel, icon: Icon }) => <Link key={href} href={memberHref(href, preview)} aria-current={section === tabSection ? 'page' : undefined}><Icon aria-hidden="true" /><span>{tabLabel}</span></Link>)}
+    {tabs.filter(tab=>!personal||tab.section!=='rewards').map(({ href, section: tabSection, label: tabLabel, icon: Icon }) => <Link key={href} href={memberHref(href, preview)} aria-current={section === tabSection ? 'page' : undefined}><Icon aria-hidden="true" /><span>{tabLabel}</span></Link>)}
   </nav>;
 
   return <div className="portal-shell">
@@ -43,14 +43,15 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
     <header className="portal-header"><div className="portal-header-inner">
       <Link href={memberHref('/portal', preview)} className="portal-brand"><GymLogo size={32} /><span>GymRetain<small>YOUR MEMBER SPACE</small></span></Link>
       {!publicPage && nav('member-desktop-nav', 'Member desktop navigation')}
-      <div className="member-header-tools"><ThemeToggle />{!publicPage && <Link href={memberHref('/portal/pass', preview)} className="member-checkin-button" aria-label="Open gym pass to check in"><QrCode aria-hidden="true" /><span>Check in</span></Link>}</div>
+      <div className="member-header-tools"><ThemeToggle />{!publicPage && <Link href={memberHref('/portal/progress?log=workout', preview)} className="member-checkin-button" aria-label="Log a workout"><Dumbbell aria-hidden="true" /><span>Log workout</span></Link>}</div>
     </div></header>
     {preview && <div className="portal-preview"><span><span className="member-preview-dot" />Member preview <span className="member-preview-detail">· Sample data, read-only</span></span><Link href="/portal/login">Sign in</Link></div>}
-    {!online && <div role="status" className="portal-offline"><WifiOff className="w-4 h-4" /> You’re offline. Reconnect to load or save changes.</div>}
+    {personal && <div className="portal-preview"><span>Personal mode · Saved in this browser</span><Link href="/portal/me">Back up my data</Link></div>}
+    {!online && <div role="status" className="portal-offline"><WifiOff className="w-4 h-4" /> You’re offline. Connected gym services need a connection.</div>}
     <main id="portal-main" tabIndex={-1} className="portal-main page-enter">
       {!publicPage && !primaryPage && <Link className="member-back" href={memberHref(section === 'workouts' ? '/portal/workouts' : '/portal/me', preview)}><ChevronLeft aria-hidden="true" />{section === 'workouts' ? 'Workouts' : 'My account'}</Link>}
       {children}
-      {data && <footer className="member-page-footer"><GymLogo size={18} /><span>Your routine. Your pace. Your gym.</span></footer>}
+      {data && <footer className="member-page-footer"><GymLogo size={18} /><span>Your routine. Your pace. Anywhere.</span></footer>}
     </main>
     {!publicPage && nav('portal-tabs', 'Member navigation')}
   </div>;

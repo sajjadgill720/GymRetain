@@ -1,6 +1,9 @@
 export const MEMBER_TOKEN_KEY='gymretain_member_token';
 const base=process.env.NEXT_PUBLIC_API_URL||'http://localhost:4000/api/v1';
+let personalHandler:((path:string,options?:RequestInit)=>Promise<unknown>)|null=null;
+export function setPersonalMemberHandler(handler:typeof personalHandler) {personalHandler=handler;}
 export async function memberRequest<T>(path:string,options:RequestInit={}):Promise<T> {
+  if(personalHandler&&path.startsWith('/member/'))return personalHandler(path,options) as Promise<T>;
   const token=typeof window!=='undefined'?localStorage.getItem(MEMBER_TOKEN_KEY):null;
   const response=await fetch(`${base}${path}`,{...options,cache:'no-store',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`} : {}),...options.headers}});
   const body=await response.json().catch(()=>({message:'Could not read the response'}));

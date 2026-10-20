@@ -50,18 +50,6 @@
 .member-hero-link svg { width:16px; height:16px; }
 .member-club-card { display:flex; flex-direction:column; padding:24px; border:1px solid var(--border-color); background:var(--bg-surface); border-radius:22px; }
 .member-club-card h2 { margin-top:5px; }
-.member-crowd-heading { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:24px; }
-.member-crowd-heading h3 { font-size:14px; }
-.member-live-dot { font-size:10px; color:var(--text-secondary); display:flex; align-items:center; gap:5px; }
-.member-live-dot:before { content:''; width:5px; height:5px; border-radius:50%; background:var(--accent-brand); }
-.member-crowd-bars { display:flex; height:23px; gap:4px; margin:10px 0; }
-.member-crowd-bars span { flex:1; background:var(--bg-subtle); border-radius:3px; border:1px solid var(--border-color); }
-.member-crowd-bars .filled { background:var(--accent-brand); border-color:var(--accent-brand); }
-.member-pass-button { display:flex; align-items:center; gap:12px; background:var(--accent-brand-bg); padding:13px; margin-top:auto; border-radius:12px; color:var(--accent-brand); box-shadow:var(--shadow-btn); }
-.member-pass-button > svg { width:25px; height:25px; flex-shrink:0; }
-.member-pass-button span { font-size:13px; font-weight:700; flex:1; }
-.member-pass-button small { display:block; font-size:10px; color:var(--text-secondary); font-weight:400; margin-top:3px; }
-.member-pass-button > svg:last-child { width:16px; }
 .member-shortcuts { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
 .member-shortcut { display:flex; align-items:center; gap:12px; min-height:88px; padding:16px; border:1px solid var(--border-color); border-radius:16px; box-shadow:var(--shadow-btn); background:var(--bg-surface); }
 .member-icon-tile { display:flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:12px; background:var(--accent-brand-bg); color:var(--accent-brand); flex-shrink:0; }
@@ -107,12 +95,12 @@
 .member-account-feature-grid { display:grid; grid-template-columns:1.35fr 1fr; gap:16px; }
 .member-membership-tile { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:24px; border-radius:18px; background:var(--accent-brand-bg); border:1px solid var(--border-color); box-shadow:var(--shadow-btn); }
 .member-membership-tile h2 { margin:7px 0; }
-.member-membership-tile > svg,.member-account-pass > svg:last-child { width:18px; flex-shrink:0; }
-.member-account-pass { display:flex; align-items:center; gap:16px; border:1px solid var(--border-color); border-radius:18px; background:var(--bg-surface); padding:24px; box-shadow:var(--shadow-btn); }
-.member-account-pass > svg:first-child { width:40px; height:40px; color:var(--accent-brand); flex-shrink:0; }
-.member-account-pass div { flex:1; }
-.member-account-pass h2 { font-size:17px; }
-.member-account-pass p { margin-top:6px; font-size:11px; }
+.member-membership-tile > svg,.member-account-goal > svg:last-child { width:18px; flex-shrink:0; }
+.member-account-goal { display:flex; align-items:center; gap:16px; border:1px solid var(--border-color); border-radius:18px; background:var(--bg-surface); padding:24px; box-shadow:var(--shadow-btn); }
+.member-account-goal > svg:first-child { width:40px; height:40px; color:var(--accent-brand); flex-shrink:0; }
+.member-account-goal div { flex:1; }
+.member-account-goal h2 { font-size:17px; }
+.member-account-goal p { margin-top:6px; font-size:11px; }
 .member-account-groups { display:grid; grid-template-columns:1fr 1fr; gap:28px 24px; }
 .member-account-group > h2 { font-size:13px; margin:0 4px 10px; color:var(--text-secondary); }
 .member-account-group > div { border:1px solid var(--border-color); border-radius:16px; background:var(--bg-surface); overflow:hidden; }
@@ -191,9 +179,6 @@
   .member-club-card > div:first-child { display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .member-club-card > div:first-child h2 { margin:0; font-size:16px; }
   .member-club-card > div:first-child .portal-eyebrow { font-size:8px; }
-  .member-crowd-heading { margin-top:18px; }
-  .member-crowd-bars { height:18px; }
-  .member-pass-button { margin-top:18px; }
   .member-shortcuts { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   .member-shortcut { min-height:76px; padding:12px; border-radius:14px; gap:10px; }
   .member-shortcut strong { font-size:12px; }
@@ -209,8 +194,8 @@
   .member-identity h2 { font-size:21px; }
   .member-identity > a { margin-left:74px; min-height:32px; margin-top:-10px; }
   .member-account-feature-grid { gap:12px; }
-  .member-membership-tile,.member-account-pass { padding:20px; }
-  .member-account-pass > svg:first-child { width:32px; height:32px; }
+  .member-membership-tile,.member-account-goal { padding:20px; }
+  .member-account-goal > svg:first-child { width:32px; height:32px; }
   .member-account-groups { gap:24px; }
   .member-account-row { padding:14px 16px; min-height:72px; }
   .member-title-action { align-items:flex-start; flex-direction:column; }

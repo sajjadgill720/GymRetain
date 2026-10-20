@@ -17,6 +17,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node prisma/seed.ts",
     "prisma:seed:canary": "ts-node prisma/seed-canary.ts",
+    "prisma:seed:portal": "ts-node prisma/seed-portal.ts",
+    "test:member:rls": "node --test test/member-rls.integration.cjs",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -42,9 +44,11 @@
     "passport-jwt": "^4.0.1",
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10",
     "@nestjs/cli": "^10.4.9",
     "@nestjs/schematics": "^10.2.3",
     "@nestjs/testing": "^10.4.15",
@@ -55,6 +59,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/qrcode": "^1.5.5",
     "@types/supertest": "^6.0.2",
+    "@types/web-push": "^3.6.4",
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "@typescript-eslint/parser": "^8.20.0",
     "eslint": "^9.18.0",

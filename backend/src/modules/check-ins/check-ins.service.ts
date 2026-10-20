@@ -1,3 +1,4 @@
+import { MemberPassService } from '../member/member-pass.service';
 import {
   Injectable,
   NotFoundException,
@@ -41,6 +42,14 @@ export class CheckInsService {
     dto: RecordCheckInDto,
     staffId?: string,
   ) {
+    // Rotating member passes are checked before resolving identifiers or idempotency.
+    const rawPass = dto.memberIdentifier.startsWith('grm.') ? dto.memberIdentifier : null;
+    let signedPass = rawPass;
+    if (dto.qrPayload) {
+      try { const parsed = JSON.parse(dto.qrPayload); if (parsed.type === 'MEMBER_PASS') signedPass = parsed.token; }
+      catch { throw new BadRequestException('Malformed QR code payload'); }
+    }
+    if (signedPass) { dto.memberIdentifier = new MemberPassService().verify(signedPass, gymId); dto.qrCredential = undefined; }
     // 1. Check idempotency if client supplied idempotencyKey
     if (dto.idempotencyKey) {
       const existingKey = await this.prisma.checkIn.findFirst({

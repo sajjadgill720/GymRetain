@@ -114,6 +114,8 @@ import {
   Sun,
   Moon,
   Bell,
+  WifiSlash,
+  Question,
   IconContext,
 } from '@phosphor-icons/react';
 
@@ -270,6 +272,9 @@ export const Download = DownloadSimple;
 export const Info = Lightbulb;
 export const PhoneCall = Phone;
 export const Layers = Stack;
+export const Home = House;
+export const WifiOff = WifiSlash;
+export const HelpCircle = Question;
 export const Menu = List;
 export const PanelLeftClose = SidebarSimple;
 export const PanelLeftOpen = SidebarSimple;

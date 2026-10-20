@@ -1,0 +1,2 @@
+import type { MetadataRoute } from 'next';
+export default function manifest():MetadataRoute.Manifest {return {id:'/portal',name:'GymRetain Member',short_name:'GymRetain',description:'Your gym, your progress, your routine.',start_url:'/portal',scope:'/portal/',display:'standalone',background_color:'#151F19',theme_color:'#151F19',icons:[{src:'/portal/icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},{src:'/portal/icon-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}]};}

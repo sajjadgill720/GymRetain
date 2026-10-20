@@ -1,3 +1,4 @@
+import { MemberModule } from './modules/member/member.module';
 import { OperationsModule } from './modules/operations/operations.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -35,6 +36,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     PrismaModule,
     OperationsModule,
     AuthModule,
+    MemberModule,
     GymsModule,
     MembersModule,
     StreaksModule,

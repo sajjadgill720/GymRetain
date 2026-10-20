@@ -223,6 +223,15 @@ model Gym {
   staffInvitations    StaffInvitation[]
   memberOtps          MemberOtp[]
   portalRateLimits    PortalRateLimit[]
+  portalProfiles      MemberProfile[]
+  classBookings       ClassBooking[]
+  workouts            WorkoutLog[]
+  personalRecords     PersonalRecord[]
+  measurements        Measurement[]
+  trainerMessages     TrainerMessage[]
+  pushSubscriptions   PushSubscription[]
+  announcements       Announcement[]
+  memberRequests      MemberRequest[]
 
   @@map("gyms")
 }
@@ -286,8 +295,17 @@ model Member {
   trainerAssignments  TrainerAssignment[]
   dietPlans           DietPlan[]
   otps                MemberOtp[]
+  portalProfile       MemberProfile?
+  classBookings       ClassBooking[]
+  workouts            WorkoutLog[]
+  personalRecords     PersonalRecord[]
+  measurements        Measurement[]
+  trainerMessages     TrainerMessage[]
+  pushSubscriptions   PushSubscription[]
+  requests            MemberRequest[]
 
   @@unique([gymId, memberCode])
+  @@unique([gymId, id])
   @@index([gymId, phone])
   @@index([gymId, status])
   @@index([gymId, isOptedOut])
@@ -561,9 +579,138 @@ model Trainer {
   gym         Gym                 @relation(fields: [gymId], references: [id], onDelete: Cascade)
   staff       GymStaff?           @relation(fields: [staffId], references: [id], onDelete: SetNull)
   assignments TrainerAssignment[]
+  portalMessages TrainerMessage[]
 
   @@index([gymId, isActive, isArchived])
   @@map("trainers")
+}
+
+model MemberProfile {
+  id                String   @id @default(uuid()) @db.Uuid
+  gymId             String   @map("gym_id") @db.Uuid
+  memberId          String   @unique @map("member_id") @db.Uuid
+  goal              String   @default("Build a consistent routine") @db.VarChar(200)
+  weeklyTarget      Int      @default(3) @map("weekly_target")
+  onboarded         Boolean  @default(false)
+  notifications     Boolean  @default(true)
+  mealChecklist     Json     @default("{}") @map("meal_checklist")
+  freezeUsedOn      DateTime? @map("freeze_used_on") @db.Date
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  gym               Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member            Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  @@unique([gymId, memberId])
+  @@map("member_profiles")
+}
+
+model ClassBooking {
+  id           String   @id @default(uuid()) @db.Uuid
+  gymId        String   @map("gym_id") @db.Uuid
+  memberId     String   @map("member_id") @db.Uuid
+  sessionId    String   @map("session_id") @db.Uuid
+  status       String   @default("BOOKED") @db.VarChar(20)
+  attendeeLabel String  @map("attendee_label") @db.VarChar(255)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  gym          Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member       Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  @@unique([gymId, memberId, sessionId])
+  @@index([gymId, sessionId, status, createdAt])
+  @@map("class_bookings")
+}
+
+model WorkoutLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  gymId     String   @map("gym_id") @db.Uuid
+  memberId  String   @map("member_id") @db.Uuid
+  title     String   @db.VarChar(200)
+  minutes   Int
+  notes     String?  @db.VarChar(2000)
+  loggedAt  DateTime @default(now()) @map("logged_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member    Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  @@index([gymId, memberId, loggedAt])
+  @@map("workout_logs")
+}
+
+model PersonalRecord {
+  id        String   @id @default(uuid()) @db.Uuid
+  gymId     String   @map("gym_id") @db.Uuid
+  memberId  String   @map("member_id") @db.Uuid
+  exercise  String   @db.VarChar(100)
+  weightKg  Float    @map("weight_kg")
+  reps      Int
+  loggedAt  DateTime @default(now()) @map("logged_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member    Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  @@index([gymId, memberId, loggedAt])
+  @@map("personal_records")
+}
+
+model Measurement {
+  id        String   @id @default(uuid()) @db.Uuid
+  gymId     String   @map("gym_id") @db.Uuid
+  memberId  String   @map("member_id") @db.Uuid
+  weightKg  Float    @map("weight_kg")
+  waistCm   Float?   @map("waist_cm")
+  loggedAt  DateTime @default(now()) @map("logged_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member    Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  @@index([gymId, memberId, loggedAt])
+  @@map("measurements")
+}
+
+model TrainerMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  gymId     String   @map("gym_id") @db.Uuid
+  memberId  String   @map("member_id") @db.Uuid
+  trainerId String   @map("trainer_id") @db.Uuid
+  sender    String   @db.VarChar(10)
+  content   String   @db.VarChar(2000)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member    Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  trainer   Trainer  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  @@index([gymId, memberId, createdAt])
+  @@map("trainer_messages")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid()) @db.Uuid
+  gymId     String   @map("gym_id") @db.Uuid
+  memberId  String   @map("member_id") @db.Uuid
+  endpoint  String   @unique @db.Text
+  p256dh    String   @db.Text
+  auth      String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member    Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  @@index([gymId, memberId])
+  @@map("push_subscriptions")
+}
+
+model Announcement {
+  id        String   @id @default(uuid()) @db.Uuid
+  gymId     String   @map("gym_id") @db.Uuid
+  title     String   @db.VarChar(200)
+  body      String   @db.VarChar(2000)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  @@index([gymId, createdAt])
+  @@map("announcements")
+}
+
+model MemberRequest {
+  id        String   @id @default(uuid()) @db.Uuid
+  gymId     String   @map("gym_id") @db.Uuid
+  memberId  String   @map("member_id") @db.Uuid
+  kind      String   @db.VarChar(30)
+  message   String   @db.VarChar(2000)
+  status    String   @default("PENDING") @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member    Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  @@index([gymId, memberId, createdAt])
+  @@map("member_requests")
 }
 
 model TrainerAssignment {

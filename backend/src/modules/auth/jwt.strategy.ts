@@ -15,6 +15,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<JwtPayload> {
+    if ((payload as any).role === 'MEMBER' || (payload as any).aud === 'gymretain-member') {
+      throw new UnauthorizedException('Member sessions cannot access staff APIs');
+    }
     const staff = await this.prisma.gymStaff.findUnique({
       where: { id: payload.sub },
       select: { id: true, email: true, role: true, gymId: true, isActive: true, name: true },

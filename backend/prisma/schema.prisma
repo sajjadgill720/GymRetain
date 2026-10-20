@@ -221,6 +221,8 @@ model Gym {
   chatConversations   ChatConversation[]
   saasBillingRecords  SaaSBillingRecord[]
   staffInvitations    StaffInvitation[]
+  memberOtps          MemberOtp[]
+  portalRateLimits    PortalRateLimit[]
 
   @@map("gyms")
 }
@@ -283,6 +285,7 @@ model Member {
   whatsappLogs        WhatsAppMessageLog[]
   trainerAssignments  TrainerAssignment[]
   dietPlans           DietPlan[]
+  otps                MemberOtp[]
 
   @@unique([gymId, memberCode])
   @@index([gymId, phone])
@@ -290,6 +293,32 @@ model Member {
   @@index([gymId, isOptedOut])
   @@index([gymId, createdAt])
   @@map("members")
+}
+
+model MemberOtp {
+  id         String    @id @default(uuid()) @db.Uuid
+  gymId      String    @map("gym_id") @db.Uuid
+  memberId   String?   @map("member_id") @db.Uuid
+  phoneHash  String    @map("phone_hash") @db.VarChar(64)
+  codeHash   String    @map("code_hash") @db.VarChar(64)
+  attempts   Int       @default(0)
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt DateTime? @map("consumed_at") @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  gym        Gym       @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member     Member?   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  @@index([gymId, phoneHash, createdAt])
+  @@map("member_otps")
+}
+
+model PortalRateLimit {
+  id        String   @id @db.VarChar(64)
+  gymId     String   @map("gym_id") @db.Uuid
+  count     Int      @default(1)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  @@index([expiresAt])
+  @@map("portal_rate_limits")
 }
 
 model Membership {

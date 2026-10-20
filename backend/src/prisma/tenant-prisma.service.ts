@@ -35,7 +35,7 @@ export class TenantPrismaService {
 
     return this.prisma.$transaction(async (tx) => {
       // Set PostgreSQL session variables locally for this transaction
-      await tx.$executeRawUnsafe(`SET LOCAL app.current_gym_id = '${gymId}';`);
+      await tx.$executeRaw`SELECT set_config('app.current_gym_id', ${gymId}, true)`;
       await tx.$executeRawUnsafe(`SET LOCAL app.is_super_admin = 'false';`);
 
       return operation(tx);

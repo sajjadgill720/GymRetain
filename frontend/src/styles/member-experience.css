@@ -1,5 +1,6 @@
 /* Member experience: all color aliases resolve to the existing green/brass theme. */
-.portal-shell { background:var(--bg-canvas); }
+.portal-shell { background:var(--bg-canvas); --member-photo-text:var(--accent-foreground); --member-photo-shade:var(--accent-brand); }
+.dark .portal-shell { --member-photo-text:var(--text-primary); --member-photo-shade:var(--bg-canvas); }
 .portal-header { display:block; padding:0 24px; min-height:72px; backdrop-filter:blur(8px); }
 .portal-header-inner { max-width:1240px; margin:auto; display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:72px; }
 .portal-brand { font-size:19px; letter-spacing:-.7px; flex-shrink:0; }
@@ -38,14 +39,13 @@
 .member-avatar-link { border-radius:50%; box-shadow:var(--shadow-btn); }
 .member-avatar { display:flex; width:46px; height:46px; border-radius:50%; align-items:center; justify-content:center; background:var(--accent-brand-bg); border:1px solid var(--border-color); color:var(--accent-brand); font-size:14px; font-weight:700; flex-shrink:0; }
 .member-hero-grid { display:grid; grid-template-columns:minmax(0,1.85fr) minmax(290px,1fr); gap:20px; }
-.member-motivation-hero { min-height:320px; border-radius:22px; position:relative; overflow:hidden; isolation:isolate; color:var(--text-primary); background:linear-gradient(120deg,var(--accent-brand-bg),var(--bg-surface)); border:1px solid var(--border-color); }
-.member-hero-art { position:absolute; right:-24px; bottom:-30px; width:240px; height:240px; border:1px solid var(--border-hover); border-radius:50%; display:grid; place-items:center; opacity:.3; transform:rotate(-24deg); z-index:-1; }
-.member-hero-art:before { content:""; position:absolute; inset:24px; border:1px solid var(--border-hover); border-radius:50%; }
-.member-hero-art svg { width:100px; height:100px; color:var(--accent-brand); }
-.member-motivation-copy { padding:36px; max-width:78%; }
-.member-motivation-copy .portal-eyebrow { color:inherit; opacity:.8; }
-.member-motivation-copy h2 { font-size:clamp(32px,3.6vw,49px); letter-spacing:-1.9px; font-weight:800; line-height:1.08; margin:16px 0; }
-.member-motivation-copy p { color:inherit; opacity:.85; font-size:12px; }
+.member-photo-hero { min-height:320px; border-radius:22px; position:relative; overflow:hidden; isolation:isolate; color:var(--member-photo-text); }
+.member-photo-hero > img { object-fit:cover; object-position:center 20%; z-index:-2; }
+.member-photo-hero:after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,color-mix(in srgb,var(--member-photo-shade) 85%,transparent),color-mix(in srgb,var(--member-photo-shade) 24%,transparent) 70%,transparent); z-index:-1; }
+.member-photo-copy { padding:36px; max-width:78%; }
+.member-photo-copy .portal-eyebrow { color:inherit; opacity:.8; }
+.member-photo-copy h2 { font-size:clamp(32px,3.6vw,49px); letter-spacing:-1.9px; font-weight:800; line-height:1.08; margin:16px 0; }
+.member-photo-copy p { color:inherit; opacity:.85; font-size:12px; }
 .member-hero-link { display:inline-flex; align-items:center; gap:14px; min-height:44px; font-size:12px; font-weight:700; margin-top:14px; padding:0 16px; border:1px solid color-mix(in srgb,currentColor 35%,transparent); border-radius:10px; box-shadow:var(--shadow-btn); }
 .member-hero-link svg { width:16px; height:16px; }
 .member-club-card { display:flex; flex-direction:column; padding:24px; border:1px solid var(--border-color); background:var(--bg-surface); border-radius:22px; }
@@ -181,11 +181,12 @@
   .member-experience h1 { font-size:29px; }
   .member-hero-grid,.member-content-grid,.member-account-feature-grid,.member-account-groups { grid-template-columns:1fr; }
   .member-hero-grid { gap:16px; }
-  .member-motivation-hero { min-height:260px; border-radius:18px; }
-  .member-motivation-copy { padding:26px 22px; max-width:85%; }
-  .member-motivation-copy h2 { font-size:34px; letter-spacing:-1.5px; }
-  .member-motivation-copy p { font-size:11px; }
-  .member-motivation-copy .portal-eyebrow { font-size:8px; }
+  .member-photo-hero { min-height:260px; border-radius:18px; }
+  .member-photo-copy { padding:26px 22px; max-width:85%; }
+  .member-photo-copy h2 { font-size:34px; letter-spacing:-1.5px; }
+  .member-photo-copy p { font-size:11px; }
+  .member-photo-copy .portal-eyebrow { font-size:8px; }
+  .member-photo-hero > img { object-position:62% center; }
   .member-club-card { padding:20px; border-radius:18px; }
   .member-club-card > div:first-child { display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .member-club-card > div:first-child h2 { margin:0; font-size:16px; }
@@ -223,8 +224,8 @@
 @media(max-width:359px) {
   .portal-main { padding-left:14px; padding-right:14px; }
   .member-preview-detail { display:none; }
-  .member-motivation-copy h2 { font-size:30px; }
-  .member-motivation-copy { padding:24px 18px; }
+  .member-photo-copy h2 { font-size:30px; }
+  .member-photo-copy { padding:24px 18px; }
   .member-shortcut { padding:10px; gap:7px; }
   .member-shortcut small { display:none; }
   .member-section-title { align-items:flex-start; }

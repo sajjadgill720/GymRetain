@@ -10,11 +10,11 @@ REA evidence:
 - App Store capture `ev_6530f38a7209d5e11d538e39a117cbb8e9314338200ab33ef787bfc9c4e62bed`: public listing and app screenshots, including home/club, training, and fitness profile presentation.
 - GymRetain before capture `ev_08b24820ff79dd3394265e1ae7c8e26eaa91b1a0aa226e4cda8a8d578a3aaca8`: account page at 390 × 844, with a repetitive card hierarchy and floating navigation.
 
-Observed public patterns include prominent digital check-in, club crowd information, a workout destination, and scannable activity milestones. These observations informed the design; signed-in workflows and performance remain unverified. GymRetain retains its own green/brass theme, name, copy, and abstract CSS illustration. No Planet Fitness assets were copied.
+Observed public patterns include prominent digital check-in, club crowd information, a workout destination, and scannable activity milestones. These observations informed the design; signed-in workflows and performance remain unverified. GymRetain retains its own green/brass theme, name, copy, and original gym photograph with the person removed. No Planet Fitness assets were copied.
 
 ## Implemented experience
 
-- Home: personal greeting, abstract illustration, club occupancy, gym pass, four everyday shortcuts, weekly activity, trainer plan, booked class, and gym announcements.
+- Home: personal greeting, gym photograph, club occupancy, gym pass, four everyday shortcuts, weekly activity, trainer plan, booked class, and gym announcements.
 - Workouts: assigned trainer plan, trainer messaging, workout history, and a direct log-workout action.
 - Account: member identity, membership summary, pass access, and grouped settings with concise descriptions.
 - Classes: upcoming/booked filters, dates in the gym timezone, available spots, and a confirmation before cancellation.
@@ -40,4 +40,4 @@ The localhost PostgreSQL service was offline, so authenticated database-backed m
 
 [Mobile account](assets/member-experience/member-account-mobile.png)
 
-The member home hero uses CSS rings and a dumbbell icon. Person photography was removed at the user’s request, along with the unused public image and superseded home screenshots.
+The member home hero retains the original gym photograph and banner treatment. An image edit removes the person and reconstructs the background. The replacement image has a new URL to prevent cached versions with the person from appearing.

@@ -54,3 +54,5 @@
 .portal-inline-label input[type=checkbox] { width:22px; height:22px; accent-color:var(--accent-brand); flex-shrink:0; }
 .portal-shell .ui-toast { bottom:7rem; }
 @media(max-width:767px) { .portal-main { padding:1.75rem 1rem 7rem; } .portal-grid { grid-template-columns:1fr; } .portal-heading { align-items:start; } .portal-heading h1 { font-size:2.25rem; } .portal-card { padding:1.25rem; } .portal-hero { padding:1.5rem; } .portal-hero h1 { font-size:2.5rem; } .portal-menu { grid-template-columns:1fr; } .portal-chart { gap:.5rem; } }
+
+.portal-qr { display:block; width:min(100%,320px); margin:2rem auto; border-radius:1.5rem; }

@@ -1,6 +1,6 @@
 # Personal member mode
 
-The member app no longer exposes gym passes or QR check-in. `/portal/pass` is removed from the frontend route allowlist, and its rotating-pass component and timers have been deleted. Owner check-in and backend security remain unchanged.
+Gym passes are available for connected gym members from the header, Home, and Account. `/portal/pass` uses the existing signed rotating QR endpoint; preview shows a non-scannable placeholder. Personal mode offers workout logging in the header and does not issue a pass. Opening the pass URL in personal mode explains the optional gym connection. Owner check-in and backend security remain unchanged.
 
 ## Use without a participating gym
 
@@ -20,8 +20,10 @@ Switching back to a gym uses the existing OTP login and tenant-scoped backend. P
 
 Frontend tests cover persistent local entries, goal edits, backup restore, invalid writes/imports, repeated history transfer, unsupported connected-gym actions, and switching the client transport back to authenticated requests. Production build includes TypeScript and lint checks.
 
-All 32 frontend tests, TypeScript, ESLint, and the production build passed. REA browser evidence `ev_54636d2cb6af23a1a132d3cac146c49c1d6913a53892c95f8edbf5e51cfa88b5` verifies a fresh personal home, logging a workout without an account, preserving it after a full navigation/reload, and accessing backup controls. All actions completed with no page errors. A direct request to `/portal/pass` returned HTTP 404.
+All 32 frontend tests, TypeScript, ESLint, and the production build passed. REA browser evidence `ev_54636d2cb6af23a1a132d3cac146c49c1d6913a53892c95f8edbf5e51cfa88b5` verifies a fresh personal home, logging a workout without an account, preserving it after a full navigation/reload, and accessing backup controls. All actions completed with no page errors. At that revision, the pass URL returned HTTP 404. Pass access was subsequently restored for connected gym accounts at the user’s request.
 
 ![Personal home](assets/member-experience/personal-home.png)
 
 ![Persistent session history](assets/member-experience/personal-history.png)
+
+Restored-pass verification: REA evidence `ev_71e64752bb4832da58ab73f6901439cf0bd53978f0bf7bfadfc5f3bd549fa716` confirms Account opens the pass preview and personal mode instead presents the gym-connection prompt with its workout shortcut intact. All actions completed without page errors. Production build passed. Live signed-QR issuance still requires the gym backend and database; the preview does not issue a usable code.

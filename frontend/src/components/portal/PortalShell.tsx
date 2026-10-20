@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Dumbbell, Award, TrendingUp, User, WifiOff, ChevronLeft } from '@/components/icons';
+import { Home, Dumbbell, Award, TrendingUp, User, QrCode, WifiOff, ChevronLeft } from '@/components/icons';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { GymLogo } from '@/components/GymLogo';
 import { memberHref, memberNavSection } from '@/lib/member-navigation';
@@ -22,6 +22,7 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [online, setOnline] = useState(true);
   const section = memberNavSection(pathname);
+  const gymConnected = !!data && !personal;
   const publicPage = pathname.includes('/login') || pathname.includes('/join/');
   const primaryPage = tabs.some(tab => tab.href === pathname);
 
@@ -43,7 +44,7 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
     <header className="portal-header"><div className="portal-header-inner">
       <Link href={memberHref('/portal', preview)} className="portal-brand"><GymLogo size={32} /><span>GymRetain<small>YOUR MEMBER SPACE</small></span></Link>
       {!publicPage && nav('member-desktop-nav', 'Member desktop navigation')}
-      <div className="member-header-tools"><ThemeToggle />{!publicPage && <Link href={memberHref('/portal/progress?log=workout', preview)} className="member-checkin-button" aria-label="Log a workout"><Dumbbell aria-hidden="true" /><span>Log workout</span></Link>}</div>
+      <div className="member-header-tools"><ThemeToggle />{!publicPage && <Link href={memberHref(gymConnected ? '/portal/pass' : '/portal/progress?log=workout', preview)} className="member-checkin-button" aria-label={gymConnected ? 'Open my gym pass' : 'Log a workout'}>{gymConnected ? <QrCode aria-hidden="true" /> : <Dumbbell aria-hidden="true" />}<span>{gymConnected ? 'Gym pass' : 'Log workout'}</span></Link>}</div>
     </div></header>
     {preview && <div className="portal-preview"><span><span className="member-preview-dot" />Member preview <span className="member-preview-detail">· Sample data, read-only</span></span><Link href="/portal/login">Sign in</Link></div>}
     {personal && <div className="portal-preview"><span>Personal mode · Saved in this browser</span><Link href="/portal/me">Back up my data</Link></div>}

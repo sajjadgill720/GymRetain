@@ -16,7 +16,7 @@ Observed public patterns include prominent digital check-in, club crowd informat
 
 - Home: personal greeting, gym photograph, training focus, workout logging, everyday shortcuts, and weekly activity. Connected-gym information is optional.
 - Workouts: assigned trainer plan, trainer messaging, workout history, and a direct log-workout action.
-- Account: personal profile, goals, browser backup/restore, and optional connected-gym settings. Gym pass access has been removed.
+- Account: personal profile, goals, browser backup/restore, and optional connected-gym settings. Gym pass access is available only with a connected gym account.
 - Classes: upcoming/booked filters, dates in the gym timezone, available spots, and a confirmation before cancellation.
 - Navigation: desktop navigation, a fixed mobile dock, clear parent links, keyboard focus indicators, and preview-preserving URLs.
 

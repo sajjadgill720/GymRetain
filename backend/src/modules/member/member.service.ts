@@ -13,7 +13,7 @@ export class MemberService {
       const scope=this.scope(who);
       const member=await tx.member.findFirst({where:{id:who.memberId,gymId:who.gymId},select:{id:true,firstName:true,lastName:true,phone:true,email:true,memberCode:true,status:true}});
       if(!member)throw new NotFoundException('Member not found');
-      const gym=await tx.gym.findFirstOrThrow({where:{id:who.gymId},select:{name:true,timezone:true,capacity:true,settings:true}});
+      const gym=await tx.gym.findFirstOrThrow({where:{id:who.gymId},select:{name:true,timezone:true,capacity:true}});
       const profile=await tx.memberProfile.upsert({where:{memberId:who.memberId},create:scope,update:{}});
       const [streak,visits,membership,rewards,bookings,diet,workouts,records,measurements,requests,announcements,trainer]=await Promise.all([
         tx.streak.findFirst({where:scope}),tx.checkIn.findMany({where:scope,select:{checkInDate:true,checkInTime:true},orderBy:{checkInTime:'desc'},take:365}),
@@ -30,7 +30,8 @@ export class MemberService {
       const payments=await tx.payment.findMany({where:scope,orderBy:{createdAt:'desc'},take:50});
       // Occupancy is aggregate-only: no member names/IDs leave the security-definer function.
       const rows=await tx.$queryRaw<{count:number}[]>`SELECT portal_occupancy(${who.gymId}::uuid)::int AS count`;
-      const settings=gym.settings as any;const sessions=(settings?.operations?.sessions||[]).filter((s:any)=>s.status==='SCHEDULED').map((s:any)=>({id:s.id,title:s.title,coach:s.coach,startsAt:s.startsAt,duration:s.duration,capacity:s.capacity,spotsLeft:Math.max(0,s.capacity-(s.attendees?.length||0)),booking:bookings.find(b=>b.sessionId===s.id)?.status||null}));
+      const classRows=await tx.$queryRaw<{sessions:any[]}[]>`SELECT portal_class_schedule(${who.gymId}::uuid) AS sessions`;
+      const sessions=(classRows[0]?.sessions||[]).map(s=>({...s,booking:bookings.find(b=>b.sessionId===s.id)?.status||null}));
       const today=getLocalDayBoundsUtc(gym.timezone,new Date()).dateStr;
       const todayDate=new Date(`${today}T00:00:00Z`);const monday=new Date(todayDate);monday.setUTCDate(monday.getUTCDate()-((monday.getUTCDay()+6)%7));
       const weeklyVisits=new Set(visits.filter(v=>new Date(v.checkInDate)>=monday).map(v=>new Date(v.checkInDate).toISOString().slice(0,10))).size;

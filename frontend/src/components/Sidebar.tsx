@@ -74,6 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       .slice(0, 2) || 'GO';
 
   const navItems = [
+    { name: 'Member inbox', href: '/member-inbox', icon: MessageCircle },
     { name: 'Overview', href: '/', icon: LayoutDashboard },
     { name: 'Operations', href: '/operations', icon: Calendar },
     {
@@ -142,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
   ];
 
-  const navOrder = ['/', '/operations', '/members', '/subscriptions', '/check-in', '/retention', '/trainers', '/diet-plans', '/rewards', '/rewards/winners', '/insights', '/settings'];
+  const navOrder = ['/', '/member-inbox', '/operations', '/members', '/subscriptions', '/check-in', '/retention', '/trainers', '/diet-plans', '/rewards', '/rewards/winners', '/insights', '/settings'];
   navItems.sort((a,b) => navOrder.indexOf(a.href)-navOrder.indexOf(b.href));
 
   const sidebarContent = (

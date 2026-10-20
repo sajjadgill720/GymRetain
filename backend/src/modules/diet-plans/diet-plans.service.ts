@@ -19,6 +19,12 @@ export class DietPlansService {
     private readonly prisma: PrismaService,
     private readonly messagingService: MessagingService,
   ) {}
+  async listAll(gymId:string,staffId:string,role:string) {
+    return this.prisma.$transaction(async tx=>{
+      await tx.$executeRaw`SELECT set_config('app.current_gym_id',${gymId},true),set_config('app.is_super_admin','false',true)`;
+      return tx.dietPlan.findMany({where:{gymId,isActive:true,...(role==='TRAINER'?{member:{trainerAssignments:{some:{gymId,isActive:true,trainer:{staffId,gymId}}}}}:{})},include:{member:{select:{id:true,firstName:true,lastName:true,memberCode:true,phone:true,streak:true}},meals:{orderBy:{orderIndex:'asc'}}},orderBy:{updatedAt:'desc'},take:500});
+    });
+  }
 
   /**
    * Helper to format meal-by-meal structured text for WhatsApp delivery

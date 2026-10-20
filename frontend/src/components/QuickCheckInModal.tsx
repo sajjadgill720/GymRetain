@@ -1,5 +1,6 @@
 "use client";
 
+import { scannedMemberPass } from '@/lib/member-pass';
 import React, { useEffect, useId, useState } from "react";
 import { Modal } from "./ui/Modal";
 import { api } from "../lib/api";
@@ -52,7 +53,8 @@ export const QuickCheckInModal: React.FC<QuickCheckInModalProps> = ({
     setError(null);
 
     try {
-      const result = await api.recordCheckIn(target.trim(), "MANUAL_STAFF");
+      const pass = scannedMemberPass(target.trim());
+      const result = await api.recordCheckIn(pass || target.trim(), pass ? "QR_SCAN" : "MANUAL_STAFF");
       setSuccessResult(result);
       if (onCheckInSuccess) onCheckInSuccess();
     } catch (err: any) {

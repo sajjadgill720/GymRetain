@@ -1,4 +1,5 @@
 'use client';
+import { useLiveRefresh } from '@/lib/use-live-refresh';
 
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/AppLayout';
@@ -171,6 +172,7 @@ export default function TrainersPage() {
     }
   };
 
+  useLiveRefresh(fetchData);
   useEffect(() => {
     fetchData();
   }, []);

@@ -6,6 +6,9 @@ import { MemberService } from './member.service';
 import { MemberPaymentService } from './member-payment.service';
 import { MemberPassService } from './member-pass.service';
 import { MemberJoinService } from './member-join.service';
+import { MemberPushService } from './member-push.service';
+import { PortalEventsService } from './portal-events.service';
+import { StaffPortalController } from './staff-portal.controller';
 
-@Module({imports:[AuthModule],controllers:[MemberController,MemberPublicController],providers:[MemberService,MemberPaymentService,MemberPassService,MemberJoinService]})
+@Module({imports:[AuthModule],controllers:[MemberController,MemberPublicController,StaffPortalController],providers:[MemberService,MemberPaymentService,MemberPassService,MemberJoinService,MemberPushService,PortalEventsService]})
 export class MemberModule {}

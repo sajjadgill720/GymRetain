@@ -1,5 +1,6 @@
 'use client';
 
+import { useLiveRefresh } from '@/lib/use-live-refresh';
 import React, { useState, useEffect, useRef } from 'react';
 import { AppLayout } from '../../components/AppLayout';
 import { api } from '../../lib/api';
@@ -126,6 +127,8 @@ export default function InsightsPage() {
       console.error('Failed to load conversations:', err);
     }
   };
+
+  useLiveRefresh(loadAnalytics);
 
   const selectConversation = async (convId: string) => {
     setActiveConversationId(convId);

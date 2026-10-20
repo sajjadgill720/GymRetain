@@ -10,6 +10,8 @@ export class MemberPrismaService {
     assertMember(identity);
     return this.tenant.runWithTenantRLS(identity.gymId,async tx=>{
       await tx.$executeRaw`SELECT set_config('app.current_member_id',${identity.memberId},true)`;
+      // RLS must still apply when a local installation uses a superuser DB URL.
+      await tx.$executeRaw`SET LOCAL ROLE gymretain_member_runtime`;
       return operation(tx);
     });
   }

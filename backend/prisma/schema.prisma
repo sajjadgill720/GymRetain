@@ -232,6 +232,7 @@ model Gym {
   pushSubscriptions   PushSubscription[]
   announcements       Announcement[]
   memberRequests      MemberRequest[]
+  portalEvents        PortalEvent[]
 
   @@map("gyms")
 }
@@ -303,6 +304,7 @@ model Member {
   trainerMessages     TrainerMessage[]
   pushSubscriptions   PushSubscription[]
   requests            MemberRequest[]
+  portalEvents        PortalEvent[]
 
   @@unique([gymId, memberCode])
   @@unique([gymId, id])
@@ -711,6 +713,19 @@ model MemberRequest {
   member    Member   @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
   @@index([gymId, memberId, createdAt])
   @@map("member_requests")
+}
+
+model PortalEvent {
+  id        BigInt   @id @default(autoincrement())
+  gymId     String   @map("gym_id") @db.Uuid
+  memberId  String?  @map("member_id") @db.Uuid
+  kind      String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  member    Member?  @relation(fields: [gymId, memberId], references: [gymId, id], onDelete: Cascade)
+  @@index([gymId, id])
+  @@index([createdAt])
+  @@map("portal_events")
 }
 
 model TrainerAssignment {

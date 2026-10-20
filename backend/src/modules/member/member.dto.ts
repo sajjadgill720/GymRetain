@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsString, IsUUID, Length, Matches, Max, Min, ValidateNested, IsUrl } from 'class-validator';
+import { IsBoolean, IsDefined, IsIn, IsInt, IsNumber, IsOptional, IsString, IsUUID, Length, Matches, Max, Min, ValidateNested, IsUrl } from 'class-validator';
 export class ProfileDto {
   @IsOptional() @IsString() @Length(1,200) goal?:string;
   @IsOptional() @IsInt() @Min(1) @Max(7) weeklyTarget?:number;
@@ -40,7 +40,7 @@ class PushKeysDto {
 }
 export class PushDto {
   @IsUrl({protocols:['https'],require_protocol:true}) @Length(1,2000) endpoint:string;
-  @ValidateNested() @Type(()=>PushKeysDto) keys:PushKeysDto;
+  @IsDefined() @ValidateNested() @Type(()=>PushKeysDto) keys:PushKeysDto;
 }
 export class AnnouncementDto { @IsString() @Length(1,200) title:string; @IsString() @Length(1,2000) body:string; }
 export class GatewayCallbackDto {

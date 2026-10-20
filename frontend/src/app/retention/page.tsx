@@ -1,4 +1,5 @@
 "use client";
+import { useLiveRefresh } from '@/lib/use-live-refresh';
 
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -27,6 +28,7 @@ function RetentionContent() {
       setLoading(false);
     }
   }, []);
+  useLiveRefresh(fetchRisk);
   useEffect(() => {
     fetchRisk();
   }, [fetchRisk]);

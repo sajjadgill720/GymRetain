@@ -1,4 +1,5 @@
 "use client";
+import { useLiveRefresh } from '@/lib/use-live-refresh';
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -149,6 +150,7 @@ export function DashboardWorkspace() {
     load();
     setChartRevision((value) => value + 1);
   };
+  useLiveRefresh(refresh);
   useEffect(() => {
     if (!authLoading) load();
     return () => {

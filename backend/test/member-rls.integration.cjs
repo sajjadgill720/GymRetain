@@ -8,8 +8,9 @@ let db;
 const a='11111111-1111-1111-1111-111111111111',b='22222222-2222-2222-2222-222222222222';
 const alice='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1',amy='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2',bob='bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1';
 const session='cccccccc-cccc-cccc-cccc-ccccccccccc1';
-async function asMember(gym,member,fn) {
- await db.exec('BEGIN; SET LOCAL ROLE portal_runtime;');
+async function asMember(gym,member,fn,role='portal_runtime') {
+ assert.ok(['portal_runtime','gymretain_member_runtime'].includes(role));
+ await db.exec(`BEGIN; SET LOCAL ROLE ${role};`);
  try {await db.query("SELECT set_config('app.current_gym_id',$1,true),set_config('app.current_member_id',$2,true),set_config('app.is_super_admin','false',true)",[gym,member]);const result=await fn();await db.exec('COMMIT');return result;}catch(error){await db.exec('ROLLBACK');throw error;}
 }
 before(async()=>{
@@ -26,6 +27,8 @@ before(async()=>{
  const auth=fs.readFileSync(path.join(migrations,'20261020000000_member_auth/migration.sql'),'utf8');
  await db.exec(auth.slice(auth.indexOf('ALTER TABLE "member_otps" ENABLE')));
  await db.exec(fs.readFileSync(path.join(migrations,'20261020011000_member_portal_security/migration.sql'),'utf8'));
+ const eventSql=fs.readFileSync(path.join(migrations,'20261020020000_portal_events/migration.sql'),'utf8');await db.exec(eventSql.slice(eventSql.indexOf('ALTER TABLE portal_events ENABLE')));
+ await db.exec(fs.readFileSync(path.join(migrations,'20261020021000_member_runtime_role/migration.sql'),'utf8'));
  await db.exec("CREATE ROLE portal_runtime NOLOGIN NOSUPERUSER NOBYPASSRLS; GRANT USAGE ON SCHEMA public TO portal_runtime; GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO portal_runtime; GRANT USAGE,SELECT ON ALL SEQUENCES IN SCHEMA public TO portal_runtime;");
  for(const [id,name] of [[a,'Gym A'],[b,'Gym B']])await db.query('INSERT INTO gyms(id,name,slug,phone,"qrCodeSecret",updated_at) VALUES($1,$2,$3,$4,$5,now())',[id,name,id,'+923001234567',id]);
  for(const [id,gym,name] of [[alice,a,'Alice'],[amy,a,'Amy'],[bob,b,'Bob']]) {
@@ -74,4 +77,18 @@ test('cancellation promotes the waitlist and updates the owner Operations schedu
 test('transaction-local identity resets and unscoped runtime reads return zero rows',async()=>{
  await db.exec('BEGIN; SET LOCAL ROLE portal_runtime;');
  try{assert.equal((await db.query('SELECT * FROM workout_logs')).rows.length,0);}finally{await db.exec('ROLLBACK');}
+});
+test('event outbox is atomic and never reveals another member’s private events',async()=>{
+ await asMember(a,alice,async()=>{const rows=await db.query('SELECT member_id FROM portal_events');assert.ok(rows.rows.length>0);assert.ok(rows.rows.every(row=>row.member_id===null||row.member_id===alice));});
+ const before=(await db.query('SELECT count(*)::int AS count FROM portal_events')).rows[0].count;
+ await db.exec('BEGIN');await db.query("UPDATE workout_logs SET title='Uncommitted' WHERE member_id=$1",[alice]);await db.exec('ROLLBACK');
+ assert.equal((await db.query('SELECT count(*)::int AS count FROM portal_events')).rows[0].count,before);
+});
+test('the actual member runtime role enforces self isolation even from an administrator connection',async()=>{
+ await asMember(a,alice,async()=>{const rows=await db.query('SELECT id FROM members');assert.deepEqual(rows.rows.map(r=>r.id),[alice]);assert.equal((await db.query('SELECT portal_class_schedule($1) AS sessions',[a])).rows[0].sessions.length,1);},'gymretain_member_runtime');
+ await assert.rejects(()=>asMember(a,alice,()=>db.query('SELECT settings FROM gyms'),'gymretain_member_runtime'),/permission denied/);
+ await assert.rejects(()=>asMember(a,alice,()=>db.query('SELECT * FROM member_otps'),'gymretain_member_runtime'),/permission denied/);
+});
+test('members cannot fabricate completed payments at the database layer',async()=>{
+ await assert.rejects(()=>asMember(a,alice,()=>db.query("INSERT INTO payments(id,gym_id,member_id,amount,status,updated_at) VALUES(gen_random_uuid(),$1,$2,500000,'COMPLETED',now())",[a,alice]),'gymretain_member_runtime'),/row-level security/);
 });

@@ -24,6 +24,9 @@ import { JwtPayload } from '../../common/interfaces/jwt-payload.interface';
 @UseGuards(JwtAuthGuard, TenantAccessGuard, RolesGuard)
 export class DietPlansController {
   constructor(private readonly dietPlansService: DietPlansService) {}
+  @Get()
+  @Roles('TRAINER','GYM_OWNER','GYM_MANAGER','SUPER_ADMIN')
+  listAll(@CurrentGymId() gymId:string,@CurrentUser() user:JwtPayload) {return this.dietPlansService.listAll(gymId,user.sub,user.role);}
 
   /**
    * List all templates (Platform defaults + Gym specific)

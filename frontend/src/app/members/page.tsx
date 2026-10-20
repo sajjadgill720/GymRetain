@@ -1,4 +1,5 @@
 'use client';
+import { useLiveRefresh } from '@/lib/use-live-refresh';
 
 import { Modal, ProgressRing } from '@/components/ui';
 import React, { useState, useEffect, useRef, Suspense } from 'react';
@@ -128,6 +129,7 @@ function MembersDirectory() {
     }
   };
 
+  useLiveRefresh(fetchMembers);
   useEffect(() => {
     let cancelled = false;
     api.getTrainers().then(result => {

@@ -2,6 +2,8 @@
 
 GymRetain is a B2B SaaS platform for gym owners to stop silent member churn through **automated retention loops, attendance streaks, reward milestones, WhatsApp nudges, and local payment integration**.
 
+The shared member PWA is at `/portal`; the owner/staff workspace remains at `/`. Both use the same database and backend. See [Member portal setup, authentication, environments and live sync](Readme/MEMBER_PORTAL.md). The read-only member preview is available at `/portal?preview=1`, and staff announcements, requests and trainer conversations are at `/member-inbox`.
+
 ---
 
 ## 🏛 Multi-Tenancy Architecture (Dual-Layer Isolation)

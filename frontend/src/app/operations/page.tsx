@@ -1,4 +1,5 @@
 "use client";
+import { useLiveRefresh } from '@/lib/use-live-refresh';
 
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -106,6 +107,7 @@ function OperationsContent() {
       setLoading(false);
     }
   }, []);
+  useLiveRefresh(load);
   useEffect(() => {
     if (!authLoading && allowed) load();
     else if (!authLoading) setLoading(false);

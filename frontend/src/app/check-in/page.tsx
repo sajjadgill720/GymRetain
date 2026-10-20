@@ -1,5 +1,7 @@
 'use client';
+import { useLiveRefresh } from '@/lib/use-live-refresh';
 
+import { scannedMemberPass } from '@/lib/member-pass';
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/AppLayout';
 import { api } from '../../lib/api';
@@ -87,12 +89,14 @@ export default function CheckInTerminalPage() {
     }
   };
 
+  useLiveRefresh(loadTerminalData);
   useEffect(() => {
     loadTerminalData();
     const interval = setInterval(loadTerminalData, 15000);
     return () => clearInterval(interval);
   }, []);
 
+  const [scanToken,setScanToken] = useState<string|null>(null);
   // Lookup member by code, phone, or scanned QR credential
   const handleLookup = async (targetId?: string) => {
     const target = (targetId || identifier).trim();
@@ -106,7 +110,9 @@ export default function CheckInTerminalPage() {
     setLastActionResult(null);
 
     try {
-      const member = await api.lookupMemberForCheckIn(target);
+      const pass=scannedMemberPass(target);
+      const member = await api.lookupMemberForCheckIn(pass || target);
+      setScanToken(pass);
       setConfirmedMember(member);
     } catch (err: any) {
       setError(err?.message || 'Member lookup failed');

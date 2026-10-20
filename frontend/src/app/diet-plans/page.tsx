@@ -1,5 +1,8 @@
 'use client';
 
+import { staffPortalRequest } from '@/lib/staff-portal-api';
+import { useLiveRefresh } from '@/lib/use-live-refresh';
+import { useAuth } from '@/lib/AuthProvider';
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../components/AppLayout';
 import { api } from '../../lib/api';
@@ -211,7 +214,10 @@ const INITIAL_PLANS: MemberDietItem[] = [
 ];
 
 export default function DietPlansPage() {
-  const [plans, setPlans] = useState<MemberDietItem[]>(INITIAL_PLANS);
+  const { activeGym } = useAuth();
+  const [plans, setPlans] = useState<MemberDietItem[]>([]);
+  const [loadError,setLoadError] = useState('');
+  const [saving,setSaving] = useState(false);
   const [templates, setTemplates] = useState<DietTemplate[]>(DEFAULT_TEMPLATES);
   const [activeTab, setActiveTab] = useState<'PLANS' | 'TEMPLATES' | 'CALCULATOR'>('PLANS');
   const [search, setSearch] = useState('');
@@ -262,6 +268,18 @@ export default function DietPlansPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  const normalizePlan = (plan:any):MemberDietItem => ({...plan,member:{...plan.member,currentStreak:plan.member?.streak?.currentStreak||0},mealsCount:plan.meals?.length||0,targetCalories:plan.meals?.reduce((n:number,m:any)=>n+(m.calories||0),0),targetProteinG:plan.meals?.reduce((n:number,m:any)=>n+(m.proteinG||0),0),targetCarbsG:plan.meals?.reduce((n:number,m:any)=>n+(m.carbsG||0),0),targetFatG:plan.meals?.reduce((n:number,m:any)=>n+(m.fatG||0),0)});
+  const loadPlans = async () => { if(!api.hasSession()){setPlans(INITIAL_PLANS);return;} try{const rows=await staffPortalRequest<any[]>('/diet-plans');setPlans(rows.map(normalizePlan));setLoadError('');}catch(error){setLoadError(error instanceof Error?error.message:'Could not load diet plans');} };
+  useEffect(()=>{loadPlans();},[activeGym?.id]);
+  useLiveRefresh(loadPlans);
+  const persistPlan = async (plan:MemberDietItem) => {
+    if(!api.hasSession()){setPlans(previous=>[plan,...previous]);showToast('Demo plan saved in this page. Sign in to share plans with members.');return true;}
+    if(saving)return false;setSaving(true);
+    try{const code=plan.member.memberCode;const matches=await api.getMembers({search:code});const member=matches.members.find(m=>m.memberCode===code);if(!member)throw new Error('Choose an existing member code from your gym directory.');
+      await api.createDietPlan({memberId:member.id,title:plan.title,goal:plan.goal,meals:plan.meals,sendWhatsAppNotification:sendWhatsAppOnCreate});await loadPlans();showToast('Diet plan saved. It is now available in the member portal.');return true;
+    }catch(error){showToast(error instanceof Error?error.message:'Could not save the plan');return false;}finally{setSaving(false);}
+  };
+
   // Filter plans
   const filteredPlans = plans.filter((p) => {
     const matchesSearch =
@@ -292,7 +310,7 @@ export default function DietPlansPage() {
   const targetFat = Math.round((targetCals * 0.25) / 9);
   const targetCarbs = Math.max(50, Math.round((targetCals - targetProtein * 4 - targetFat * 9) / 4));
 
-  const handleSaveDietPlan = () => {
+  const handleSaveDietPlan = async () => {
     if (!builderTitle.trim()) {
       showToast('Please provide a title for the plan');
       return;
@@ -320,17 +338,10 @@ export default function DietPlansPage() {
       meals: builderMeals,
     };
 
-    setPlans([newPlan, ...plans]);
-    setIsBuilderOpen(false);
-
-    if (sendWhatsAppOnCreate) {
-      showToast(`Diet plan "${builderTitle}" saved & WhatsApp delivered to ${newPlan.member.memberCode}! `);
-    } else {
-      showToast(`Diet plan "${builderTitle}" saved successfully!`);
-    }
+    if(await persistPlan(newPlan))setIsBuilderOpen(false);
   };
 
-  const handleApplyTemplate = () => {
+  const handleApplyTemplate = async () => {
     if (!assigningTemplate) return;
 
     const newPlan: MemberDietItem = {
@@ -355,9 +366,7 @@ export default function DietPlansPage() {
       meals: assigningTemplate.meals,
     };
 
-    setPlans([newPlan, ...plans]);
-    setAssigningTemplate(null);
-    showToast(`Template "${assigningTemplate.title}" assigned to ${newPlan.member.memberCode}!`);
+    if(await persistPlan(newPlan))setAssigningTemplate(null);
   };
 
   const generateWhatsAppCopy = (plan: MemberDietItem) => {
@@ -377,6 +386,7 @@ export default function DietPlansPage() {
 
   return (
     <AppLayout>
+      {loadError && <p role="alert" className="p-4 text-status-danger-text">{loadError}</p>}
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] w-full mx-auto select-none">
         {/* Toast */}
         {toastMessage && (
@@ -1187,7 +1197,7 @@ export default function DietPlansPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={handleSaveDietPlan}
+                  disabled={saving} onClick={handleSaveDietPlan}
                   className="flex-1 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold btn-shadow"
                 >
                   Save &amp; Assign Diet Plan
@@ -1250,7 +1260,7 @@ export default function DietPlansPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={handleApplyTemplate}
+                  disabled={saving} onClick={handleApplyTemplate}
                   className="flex-1 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold btn-shadow"
                 >
                   Confirm &amp; Assign Plan

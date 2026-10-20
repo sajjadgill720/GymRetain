@@ -16,6 +16,7 @@ interface TopNavbarProps {
   onToggleMobileMenu?: () => void;
 }
 const pages = [
+  { name: 'Member inbox', href: '/member-inbox' },
   { name: 'Overview', href: '/' }, { name: 'Operations', href: '/operations' }, { name: 'Lead pipeline', href: '/operations?view=leads' }, { name: 'Schedule', href: '/operations?view=sessions' }, { name: 'Expenses', href: '/operations?view=expenses' }, { name: 'Members', href: '/members' },
   { name: 'Check-in', href: '/check-in' }, { name: 'Retention', href: '/retention' },
   { name: 'Insights', href: '/insights' }, { name: 'Trainers', href: '/trainers' },

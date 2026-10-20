@@ -46,7 +46,7 @@ export class CheckInsService {
     const rawPass = dto.memberIdentifier.startsWith('grm.') ? dto.memberIdentifier : null;
     let signedPass = rawPass;
     if (dto.qrPayload) {
-      try { const parsed = JSON.parse(dto.qrPayload); if (parsed.type === 'MEMBER_PASS') signedPass = parsed.token; }
+      try { const parsed = JSON.parse(dto.qrPayload); if (parsed.type === 'MEMBER_PASS') { if(typeof parsed.token !== 'string') throw new Error(); signedPass = parsed.token; } }
       catch { throw new BadRequestException('Malformed QR code payload'); }
     }
     if (signedPass) { dto.memberIdentifier = new MemberPassService().verify(signedPass, gymId); dto.qrCredential = undefined; }
@@ -115,7 +115,7 @@ export class CheckInsService {
       where: {
         gymId,
         OR: [
-          { id: searchIdentifier },
+          ...(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(searchIdentifier) ? [{ id: searchIdentifier }] : []),
           { memberCode: searchIdentifier },
           { phone: searchIdentifier },
           { qrCredential: searchIdentifier },

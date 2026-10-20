@@ -1,4 +1,5 @@
 "use client";
+import { useLiveRefresh } from '@/lib/use-live-refresh';
 
 import React, { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -218,6 +219,7 @@ function SubscriptionsContent() {
     }
   };
 
+  useLiveRefresh(loadData);
   useEffect(() => {
     loadData();
   }, [statusFilter]);

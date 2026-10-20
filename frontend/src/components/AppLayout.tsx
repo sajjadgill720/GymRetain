@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { watchEvents } from '@/lib/live-events';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/AuthProvider';
@@ -16,7 +18,8 @@ interface AppLayoutProps {
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, onRefreshData }) => {
-  const { isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading, activeGym, user } = useAuth();
+  useEffect(() => { const token=localStorage.getItem('gymretain_token'); if(authLoading||!token||!activeGym)return; return watchEvents('/staff/member-portal/events',token,()=>window.dispatchEvent(new Event('gymretain-live-change'))); }, [authLoading,activeGym?.id,user?.id]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);

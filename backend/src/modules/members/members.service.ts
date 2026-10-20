@@ -1,3 +1,5 @@
+import { MemberPassService } from '../member/member-pass.service';
+import { BadRequestException } from '@nestjs/common';
 import {
   Injectable,
   NotFoundException,
@@ -282,12 +284,15 @@ export class MembersService {
    * Lookup member for staff confirmation before check-in or checkout
    */
   async lookupMemberForCheckIn(gymId: string, identifierOrQr: string) {
+    if(identifierOrQr.startsWith('grm.'))identifierOrQr=new MemberPassService().verify(identifierOrQr,gymId);
+    else if(identifierOrQr.startsWith('{')) {try{const parsed=JSON.parse(identifierOrQr);if(parsed.type==='MEMBER_PASS'){if(typeof parsed.token!=='string')throw new BadRequestException('Malformed member pass');identifierOrQr=new MemberPassService().verify(parsed.token,gymId);}}catch(error){throw error;}}
+
     const trimmed = identifierOrQr.trim();
     const member = await this.prisma.member.findFirst({
       where: {
         gymId,
         OR: [
-          { id: trimmed },
+          ...(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed) ? [{ id: trimmed }] : []),
           { memberCode: trimmed },
           { phone: trimmed },
           { qrCredential: trimmed },

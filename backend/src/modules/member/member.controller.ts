@@ -1,17 +1,23 @@
-import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, Param, ParseUUIDPipe, Patch, Post, Req, Sse, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from '../../common/decorators/public.decorator';
 import { MemberService } from './member.service';
 import { MemberPassService } from './member-pass.service';
 import { MemberIdentity } from '../auth/member-identity';
-import { ProfileDto, WorkoutDto, RecordDto, MeasurementDto, RequestDto, MealDto, MessageDto, CheckoutDto } from './member.dto';
+import { ProfileDto, WorkoutDto, RecordDto, MeasurementDto, RequestDto, MealDto, MessageDto, CheckoutDto, PushDto } from './member.dto';
 import { MemberPaymentService } from './member-payment.service';
+import { MemberPushService } from './member-push.service';
+import { PortalEventsService } from './portal-events.service';
 
 @Public() // Staff global guard is replaced by the member-only strategy on every route.
 @UseGuards(AuthGuard('member-jwt'))
 @Controller('member')
 export class MemberController {
-  constructor(private readonly members:MemberService,private readonly passes:MemberPassService,private readonly payments:MemberPaymentService) {}
+  constructor(private readonly members:MemberService,private readonly passes:MemberPassService,private readonly payments:MemberPaymentService,private readonly push:MemberPushService,private readonly events:PortalEventsService) {}
+  @Sse('events') eventsStream(@Req() req:{user:MemberIdentity},@Headers('last-event-id') lastId:string) {return this.events.stream(req.user,lastId);}
+  @Get('push/config') pushConfig() {return this.push.config();}
+  @Post('push/subscribe') subscribe(@Req() req:{user:MemberIdentity},@Body() dto:PushDto) {return this.push.subscribe(req.user,dto);}
+  @Post('push/unsubscribe') unsubscribe(@Req() req:{user:MemberIdentity}) {return this.push.unsubscribe(req.user);}
   @Get('overview') overview(@Req() req:{user:MemberIdentity}) {return this.members.overview(req.user);}
   @Patch('profile') profile(@Req() req:{user:MemberIdentity},@Body() dto:ProfileDto) {return this.members.profile(req.user,dto);}
   @Get('pass') pass(@Req() req:{user:MemberIdentity}) {return this.passes.issue(req.user);}

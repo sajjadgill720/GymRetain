@@ -25,21 +25,21 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   // Base styling: tactile shadow on all clickable buttons, smooth transition, thumb-friendly touch target
   const baseStyles =
-    'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-150 select-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none';
+    'ui-button inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-150 select-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none';
 
   // mynext9to5-inspired luxury styling with champagne bronze primary and dedicated button shadows
   const variantStyles: Record<ButtonVariant, string> = {
     primary: 'btn-shadow-primary focus:ring-brand-500 dark:focus:ring-brass-400',
     secondary: 'bg-surface text-content-primary border border-surface-border hover:bg-surface-subtle btn-shadow',
     ghost: 'bg-transparent text-content-secondary hover:text-content-primary hover:bg-surface-subtle btn-shadow',
-    destructive: 'bg-red-600 hover:bg-red-700 text-white btn-shadow focus:ring-red-500',
-    success: 'bg-emerald-600 hover:bg-emerald-700 text-white btn-shadow focus:ring-emerald-500',
+    destructive: 'bg-status-danger-bg text-status-danger-text border border-status-danger-border btn-shadow focus:ring-red-500',
+    success: 'bg-status-success-bg text-status-success-text border border-status-success-border btn-shadow focus:ring-emerald-500',
   };
 
   // Size styles ensuring thumb-friendly touch targets on mobile (min 38-46px)
   const sizeStyles: Record<ButtonSize, string> = {
-    sm: 'text-xs px-3 py-1.5 gap-1.5 min-h-[36px]',
-    md: 'text-xs sm:text-sm px-4 py-2.5 gap-2 min-h-[42px]',
+    sm: 'text-xs px-3 py-1.5 gap-1.5 min-h-[44px]',
+    md: 'text-xs sm:text-sm px-4 py-2.5 gap-2 min-h-[44px]',
     lg: 'text-sm sm:text-base px-6 py-3 gap-2.5 min-h-[48px]',
   };
 

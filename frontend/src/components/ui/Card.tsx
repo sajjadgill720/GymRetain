@@ -20,7 +20,7 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const variantStyles = {
-    default: 'bg-surface border-surface-border shadow-card',
+    default: 'glass-card bg-surface border-surface-border shadow-card',
     highlight: 'bg-[var(--accent-brand-light)] border-brand-500/30 dark:border-brass-500/30 shadow-card',
     success: 'bg-status-success-bg border-status-success-border shadow-card',
     warning: 'bg-status-warning-bg border-status-warning-border shadow-card',

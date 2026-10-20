@@ -12,7 +12,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "node ../backend/node_modules/eslint/bin/eslint.js --config ../eslint.config.mjs src",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node prisma/seed.ts",
@@ -23,7 +23,8 @@
     "test:isolation": "jest test/tenant-isolation.spec.ts",
     "test:streak": "jest test/streak-calculation.spec.ts",
     "test:risk": "jest test/risk-scoring.spec.ts",
-    "test:e2e": "jest test/tenant-isolation.e2e-spec.ts"
+    "test:e2e": "jest test/tenant-isolation.e2e-spec.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",

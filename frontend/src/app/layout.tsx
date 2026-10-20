@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import '../styles/system.css';
 import { AuthProviderWrapper } from './AuthProviderWrapper';
 
 export const metadata: Metadata = {

@@ -1,83 +1,8 @@
+@import '../styles/tokens.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --bg-canvas: #F4F1E9;
-    --bg-surface: #FFFEFA;
-    --bg-card: #FFFEFA;
-    --bg-card-elevated: #F0F2E8;
-    --bg-subtle: #E9EBDD;
-    --bg-sidebar: #F4F1E9;
-    --border-color: #D6D9C8;
-    --border-hover: #909D80;
-    --text-primary: #24392E;
-    --text-secondary: #596959;
-    --text-tertiary: #687360;
-    --accent-brand: #234F3D;
-    --accent-brand-bg: #E4ECD8;
-    --accent-brand-light: #EDF2E4;
-    --accent-foreground: #F7F8F2;
-    --accent-brass: #806735;
-    --status-success-bg: #E9F1DE;
-    --status-success-text: #35582F;
-    --status-success-border: #B7CBA3;
-    --status-success-accent: #6B8756;
-    --status-warning-bg: #F8EED3;
-    --status-warning-text: #75591F;
-    --status-warning-border: #D9C28B;
-    --status-warning-accent: #A88942;
-    --status-danger-bg: #F8E8E2;
-    --status-danger-text: #943F37;
-    --status-danger-border: #DBADA2;
-    --status-danger-accent: #B97162;
-    --status-info-bg: #E8EEE5;
-    --shadow-card: 0 2px 8px -4px rgba(28, 40, 32, .08);
-    --shadow-card-hover: 0 6px 20px -10px rgba(28, 40, 32, .12);
-    --shadow-btn: 0 1px 2px rgba(28, 40, 32, .05);
-    --shadow-btn-hover: 0 2px 4px rgba(28, 40, 32, .08);
-    --shadow-btn-primary: 0 2px 4px rgba(28, 48, 38, .13), inset 0 1px 0 rgba(255,255,255,.08);
-    --shadow-btn-primary-hover: 0 3px 8px rgba(28, 48, 38, .18);
-  }
-  .dark {
-    --bg-canvas: #151F19;
-    --bg-surface: #1F2C23;
-    --bg-card: #1F2C23;
-    --bg-card-elevated: #28372B;
-    --bg-subtle: #30402F;
-    --bg-sidebar: #1B201D;
-    --border-color: #46583F;
-    --border-hover: #819475;
-    --text-primary: #EDEFE6;
-    --text-secondary: #BDC8B2;
-    --text-tertiary: #A0AF96;
-    --accent-brand: #D3E5B6;
-    --accent-brand-bg: #35482F;
-    --accent-brand-light: #293C2B;
-    --accent-foreground: #20271E;
-    --accent-brass: #C4B58F;
-    --status-success-bg: #2C3B29;
-    --status-success-text: #C4E3B0;
-    --status-success-border: #637F50;
-    --status-success-accent: #ABC98C;
-    --status-warning-bg: #403A24;
-    --status-warning-text: #F0D583;
-    --status-warning-border: #8B7740;
-    --status-warning-accent: #D9BA61;
-    --status-danger-bg: #432E2B;
-    --status-danger-text: #F2B5AC;
-    --status-danger-border: #966259;
-    --status-danger-accent: #DB9287;
-    --status-info-bg: #2C352E;
-    --shadow-card: 0 2px 8px -4px rgba(0,0,0,.15);
-    --shadow-card-hover: 0 6px 20px -10px rgba(0,0,0,.2);
-    --shadow-btn: 0 1px 2px rgba(0,0,0,.12);
-    --shadow-btn-hover: 0 2px 4px rgba(0,0,0,.16);
-    --shadow-btn-primary: 0 2px 4px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.1);
-    --shadow-btn-primary-hover: 0 3px 8px rgba(0,0,0,.2);
-  }
-}
 
 body {
   background-color: var(--bg-canvas);

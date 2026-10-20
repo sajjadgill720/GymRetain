@@ -1,3 +1,5 @@
+'use client';
+import { CountUp } from './CountUp';
 import React from 'react';
 import { Card } from './Card';
 
@@ -32,7 +34,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       variant={variant}
       padding="md"
       className={`relative overflow-hidden transition-all ${
-        onClick ? 'cursor-pointer hover:border-[#BFA785]/40 active:scale-[0.99]' : ''
+        onClick ? 'cursor-pointer hover:border-surface-border-hover active:scale-[0.99]' : ''
       } ${className}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}

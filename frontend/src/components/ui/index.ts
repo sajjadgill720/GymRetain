@@ -5,3 +5,7 @@ export * from './StatCard';
 export * from './EmptyState';
 export * from './Skeleton';
 export * from './Modal';
+
+export * from './ProgressRing';
+export * from './Tabs';
+export * from './CountUp';

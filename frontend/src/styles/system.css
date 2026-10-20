@@ -1,0 +1,25 @@
+/* Both applications share the existing palette in tokens.css. */
+body { font-family:var(--font-body); }
+h1,h2,h3,h4,.display-number { font-family:var(--font-display); letter-spacing:-.04em; }
+:where(button,[role=button],input:not([type=checkbox]):not([type=radio]),select) { min-height:44px; }
+:where(button,[role=button]) { min-width:44px; }
+:where(a,button,input,select,textarea):focus-visible { outline:2px solid var(--accent-brand); outline-offset:4px; }
+.glass-card,.app-card,.premium-panel { background:var(--surface-glass); border:1px solid var(--border-color); border-radius:var(--radius-card); backdrop-filter:blur(16px); box-shadow:var(--shadow-soft); }
+.ui-button { border-radius:var(--radius-control); transition:transform var(--motion-duration),box-shadow var(--motion-duration),background var(--motion-duration); }
+.ui-button:hover:not(:disabled) { transform:translateY(-2px); }
+.ui-button:active:not(:disabled) { transform:translateY(1px); }
+.progress-ring { transform:rotate(-90deg); }
+.progress-ring circle { transition:stroke-dashoffset 220ms ease; }
+.metric-sparkline { color:var(--accent-brand); width:100%; height:32px; }
+.page-enter { animation:page-enter 220ms ease both; }
+.page-enter > * { animation:page-enter 220ms ease both; }
+.page-enter > :nth-child(2) { animation-delay:40ms; }
+.page-enter > :nth-child(3) { animation-delay:80ms; }
+.ui-toast { position:fixed; right:1.5rem; bottom:1.5rem; z-index:100; max-width:min(90vw,400px); background:var(--bg-surface); color:var(--text-primary); border:1px solid var(--border-hover); border-radius:var(--radius-card); padding:1rem 1.5rem; box-shadow:var(--shadow-floating); }
+.ui-tabs { display:flex; gap:.5rem; overflow:auto; padding:.25rem; }
+.ui-tabs button { padding:.5rem 1.25rem; border-radius:var(--radius-control); border:1px solid var(--border-color); }
+.ui-tabs [aria-selected=true] { background:var(--accent-brand); color:var(--accent-foreground); }
+.ui-field { display:grid; gap:.5rem; font-size:var(--type-body); }
+.ui-field :is(input,select,textarea) { width:100%; background:var(--bg-canvas); color:var(--text-primary); border:1px solid var(--border-color); border-radius:1rem; padding:.75rem 1rem; }
+@keyframes page-enter { from {opacity:0;transform:translateY(8px)} to {opacity:1;transform:translateY(0)} }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }

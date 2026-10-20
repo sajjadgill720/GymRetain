@@ -24,5 +24,5 @@ export function PortalProvider({children}:{children:React.ReactNode}) {
   if(lock.current)return false;lock.current=true;setBusy(true);
   try{await action();await refresh();notify(message);return true;}catch(error){notify(error instanceof Error?error.message:'Could not save. Please try again.');return false;}finally{lock.current=false;setBusy(false);}
  };
- return <PortalContext.Provider value={{data,loading,error,preview,busy,notice,refresh,act,notify}}>{children}{notice&&<div className="ui-toast" role="status">{notice}</div>}</PortalContext.Provider>;
+ return <PortalContext.Provider value={{data,loading,error,preview,busy,notice,refresh,act,notify}}>{children}{notice&&<div className="ui-toast member-toast" role="status">{notice}</div>}</PortalContext.Provider>;
 }

@@ -86,7 +86,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onOpenQrModal, onToggleMob
 
   return <>
     <header className="sticky top-0 z-20 border-b border-surface-border bg-surface transition-colors">
-      <div className="flex min-h-[76px] items-center gap-3 px-4 sm:px-8">
+      <div className="flex min-h-[64px] items-center gap-3 px-4 sm:px-8">
         <button onClick={onToggleMobileMenu} aria-label="Open navigation" className="lg:hidden p-2.5 rounded-xl border border-surface-border text-content-secondary"><Menu className="w-5 h-5" /></button>
         <div className="hidden xl:block min-w-[170px]">
           <p className="text-sm font-semibold">{pages.find(page => page.href === pathname)?.name || 'Workspace'}</p>
@@ -96,7 +96,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onOpenQrModal, onToggleMob
           <Search className="absolute left-3.5 top-3 w-4 h-4 text-content-tertiary pointer-events-none" />
           <input aria-label="Search members and pages" aria-expanded={searchOpen} aria-controls="workspace-search" type="search" autoComplete="off" value={query}
             onFocus={() => setSearchOpen(true)} onChange={event => { setQuery(event.target.value); setSearchOpen(true); }} onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); setSearchOpen(false); } }}
-            placeholder="Search members or pages…" className="w-full h-10 pl-10 pr-3 rounded-xl border border-surface-border bg-canvas text-sm outline-none focus:border-brand-500 dark:focus:border-brass-400" />
+            placeholder="Search members or pages…" className="w-full h-11 pl-10 pr-3 rounded-xl border border-surface-border bg-canvas text-sm outline-none focus:border-brand-500 dark:focus:border-brass-400" />
           {searchOpen && <div id="workspace-search" className="absolute top-full mt-2 w-full max-h-[65vh] overflow-y-auto rounded-2xl border border-surface-border bg-surface p-2 shadow-xl">
             <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-content-tertiary">{query ? 'Pages' : 'Go to'}</p>
             {matchingPages.map(page => <Link key={page.href} href={page.href} onClick={() => setSearchOpen(false)} className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm hover:bg-surface-subtle">{page.name}<ArrowRight className="w-3.5 h-3.5 text-content-tertiary" /></Link>)}
@@ -111,7 +111,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onOpenQrModal, onToggleMob
           <button onClick={() => { setSimOpen(true); setReply(''); setSimError(''); }} aria-label="Preview WhatsApp replies" title="Preview WhatsApp replies" className="hidden sm:flex p-2.5 rounded-xl text-content-secondary hover:bg-surface-subtle"><MessageCircle className="w-4 h-4" /></button>
           <ThemeToggle />
           <button onClick={openAlerts} aria-label="View member alerts" title="Member alerts" className="p-2.5 rounded-xl text-content-secondary hover:bg-surface-subtle"><Bell className="w-4 h-4" /></button>
-          <Link href="/settings" aria-label="Account settings" title={name} className="hidden sm:flex w-9 h-9 ml-2 items-center justify-center rounded-full bg-brand-500/10 dark:bg-brass-400/10 text-brand-700 dark:text-brass-400 text-xs font-semibold border border-brand-500/15">{initials}</Link>
+          <Link href="/settings" aria-label="Account settings" title={name} className="hidden sm:flex w-11 h-11 ml-2 items-center justify-center rounded-full bg-brand-500/10 dark:bg-brass-400/10 text-brand-700 dark:text-brass-400 text-xs font-semibold border border-brand-500/15">{initials}</Link>
         </div>
       </div>
     </header>

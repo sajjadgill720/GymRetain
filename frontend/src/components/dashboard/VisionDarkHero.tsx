@@ -27,7 +27,7 @@ export const VisionDarkHero: React.FC<VisionDarkHeroProps> = ({ summary }) => {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Hello Bilal
               </h2>
-              <span className="text-2xl">👋</span>
+              <span className="text-xs uppercase tracking-wider">Welcome</span>
             </div>
             <p className="text-xs text-zinc-400 mt-1 max-w-md">
               Your member retention loop is active. {highRiskCount} at-risk members require attention before weekend churn.

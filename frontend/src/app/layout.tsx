@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import '../styles/system.css';
+import '../styles/workspace.css';
 import { AuthProviderWrapper } from './AuthProviderWrapper';
 
 export const metadata: Metadata = {
@@ -27,7 +28,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var theme = localStorage.getItem('gymretain_theme') || 'light';
+                var theme = localStorage.getItem('gymretain_theme') || 'dark';
                 if (theme === 'dark') {
                   document.documentElement.classList.add('dark');
                   document.documentElement.classList.remove('light');

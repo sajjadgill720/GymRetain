@@ -324,7 +324,7 @@ export default function DietPlansPage() {
     setIsBuilderOpen(false);
 
     if (sendWhatsAppOnCreate) {
-      showToast(`Diet plan "${builderTitle}" saved & WhatsApp delivered to ${newPlan.member.memberCode}! 📲`);
+      showToast(`Diet plan "${builderTitle}" saved & WhatsApp delivered to ${newPlan.member.memberCode}! `);
     } else {
       showToast(`Diet plan "${builderTitle}" saved successfully!`);
     }
@@ -361,17 +361,17 @@ export default function DietPlansPage() {
   };
 
   const generateWhatsAppCopy = (plan: MemberDietItem) => {
-    let copy = `🥗 *Your Personalized Diet Plan — GymRetain*\nSalam ${plan.member.firstName}! Here is your nutrition blueprint:\n\n`;
-    copy += `🎯 *Goal:* ${plan.goal.replace('_', ' ')}\n`;
-    copy += `🔥 *Daily Target:* ${plan.targetCalories || 2200} kcal\n`;
-    copy += `💪 *Macros:* ${plan.targetProteinG || 150}g Protein | ${plan.targetCarbsG || 200}g Carbs | ${plan.targetFatG || 60}g Fats\n\n`;
+    let copy = ` *Your Personalized Diet Plan — GymRetain*\nSalam ${plan.member.firstName}! Here is your nutrition blueprint:\n\n`;
+    copy += ` *Goal:* ${plan.goal.replace('_', ' ')}\n`;
+    copy += ` *Daily Target:* ${plan.targetCalories || 2200} kcal\n`;
+    copy += ` *Macros:* ${plan.targetProteinG || 150}g Protein | ${plan.targetCarbsG || 200}g Carbs | ${plan.targetFatG || 60}g Fats\n\n`;
     copy += `*Daily Meal Schedule:*\n`;
 
     plan.meals.forEach((m, idx) => {
       copy += `${idx + 1}. *${m.mealType}:* ${m.description} (${m.calories || 0} kcal, ${m.proteinG || 0}g protein)\n`;
     });
 
-    copy += `\nStay consistent and hit your daily goals! Reply if you need adjustments. 💪`;
+    copy += `\nStay consistent and hit your daily goals! Reply if you need adjustments. `;
     return copy;
   };
 
@@ -636,7 +636,7 @@ export default function DietPlansPage() {
                       onClick={() => {
                         const copy = generateWhatsAppCopy(plan);
                         navigator.clipboard.writeText(copy);
-                        showToast(`WhatsApp diet template copied for ${plan.member.memberCode}! 📋`);
+                        showToast(`WhatsApp diet template copied for ${plan.member.memberCode}! `);
                       }}
                       className="p-1.5 rounded-xl bg-status-success-bg hover:bg-status-success-bg text-status-success-text border border-status-success-border text-xs transition-all btn-shadow"
                       title="Copy WhatsApp format"
@@ -982,7 +982,7 @@ export default function DietPlansPage() {
                   onClick={() => {
                     const copy = generateWhatsAppCopy(viewPlan);
                     navigator.clipboard.writeText(copy);
-                    showToast('WhatsApp diet message copied! 📋');
+                    showToast('WhatsApp diet message copied! ');
                   }}
                   className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 btn-shadow"
                 >

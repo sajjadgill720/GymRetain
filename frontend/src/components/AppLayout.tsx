@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/AuthProvider';
 import { api } from '@/lib/api';
+import { WorkspaceEnhancements } from './WorkspaceEnhancements';
 import { Sidebar } from './Sidebar';
 import { TopNavbar } from './TopNavbar';
 import { QuickCheckInModal } from './QuickCheckInModal';

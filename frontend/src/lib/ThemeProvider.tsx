@@ -32,8 +32,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       applyTheme(savedTheme);
     } else {
       // Default to light to match the requested design reference
-      setThemeState('light');
-      applyTheme('light');
+      setThemeState('dark');
+      applyTheme('dark');
     }
     setMounted(true);
   }, []);

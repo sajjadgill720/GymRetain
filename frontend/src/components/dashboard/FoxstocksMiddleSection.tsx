@@ -192,7 +192,7 @@ export const FoxstocksMiddleSection: React.FC<FoxstocksMiddleSectionProps> = ({ 
             href="/rewards/winners"
             className="text-xs font-bold text-status-warning-text bg-status-warning-bg hover:bg-status-warning-bg px-2.5 py-0.5 rounded-full transition-colors"
           >
-            🔥 Top
+             Top
           </Link>
         </div>
       </div>

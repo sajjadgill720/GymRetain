@@ -1,5 +1,6 @@
 'use client';
 
+import { Modal, ProgressRing } from '@/components/ui';
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AppLayout } from '../../components/AppLayout';
@@ -472,15 +473,8 @@ function MembersDirectory() {
 
       {/* MEMBER'S PROFILE & ATTENDANCE AT A GLANCE (Drawer / Modal) */}
       {selectedMember && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface max-w-2xl w-full rounded-3xl p-5 sm:p-6 border border-surface-border shadow-2xl relative max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-100 space-y-5">
-            <button
-              onClick={() => setSelectedMember(null)}
-              className="absolute right-4 top-4 p-1.5 rounded-xl text-content-tertiary hover:text-content-primary hover:bg-surface-subtle shadow-sm btn-shadow"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
+        <Modal isOpen={!!selectedMember} onClose={() => setSelectedMember(null)} title="Member story" variant="drawer" maxWidth="xl">
+          <div className="space-y-5">
             {/* Member Profile Header */}
             <div className="flex items-start gap-3.5 pb-4 border-b border-surface-border">
               <div className="w-12 h-12 rounded-2xl bg-surface-subtle border border-surface-border flex items-center justify-center text-sm font-bold text-content-primary shrink-0">
@@ -502,6 +496,7 @@ function MembersDirectory() {
               </div>
             </div>
 
+            <div className="flex items-center gap-4"><ProgressRing value={selectedMember.streak?.currentStreak || 0} max={Math.max(7,selectedMember.streak?.longestStreak || 7)} label="Streak progress" /><p className="text-sm text-content-secondary">Every visit builds a stronger routine.</p></div>
             {/* Attendance & Streak Quick Glance */}
             <div className="grid grid-cols-3 gap-3">
               <div className="p-3 rounded-2xl bg-surface-subtle border border-surface-border btn-shadow">
@@ -726,7 +721,7 @@ function MembersDirectory() {
               )}
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* Quick Reassign Trainer Sub-Modal */}

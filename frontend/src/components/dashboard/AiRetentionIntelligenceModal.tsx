@@ -221,7 +221,7 @@ export const AiRetentionIntelligenceModal: React.FC<AiRetentionIntelligenceModal
               </div>
 
               <div className="p-2.5 rounded-xl bg-surface border border-surface-border text-[11px] text-content-secondary mt-1">
-                💡 <span className="font-semibold text-content-primary">Inflection Point:</span> Once a member misses 8 days, churn probability surges past 50%. Automated WhatsApp retention nudges are most effective between days 4–7.
+                 <span className="font-semibold text-content-primary">Inflection Point:</span> Once a member misses 8 days, churn probability surges past 50%. Automated WhatsApp retention nudges are most effective between days 4–7.
               </div>
             </div>
           </div>

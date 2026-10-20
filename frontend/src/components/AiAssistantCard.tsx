@@ -19,25 +19,25 @@ export const AiAssistantCard: React.FC<AiAssistantCardProps> = ({ className = ''
       id: 1,
       title: 'Streak Milestones',
       prompt: 'Which members are closest to reaching their 15-day streak reward?',
-      reply: '🔥 3 members are 1 check-in away from their 15-Day Milestone (Free Whey Shake): Hamza Sheikh (14d), Ayesha Khan (14d), and Bilal Malik (13d). Automated WhatsApp alerts are primed for delivery upon their next kiosk check-in.',
+      reply: ' 3 members are 1 check-in away from their 15-Day Milestone (Free Whey Shake): Hamza Sheikh (14d), Ayesha Khan (14d), and Bilal Malik (13d). Automated WhatsApp alerts are primed for delivery upon their next kiosk check-in.',
     },
     {
       id: 2,
       title: 'Churn Interventions',
       prompt: 'Who has the highest risk score this week?',
-      reply: '⚠️ Usman Tariq (Risk: 88, +42pts) and Zainab Ali (Risk: 79) have missed 11 consecutive days. Recommend triggering the "Win-Back 20% Off Renewal" WhatsApp template before Friday.',
+      reply: ' Usman Tariq (Risk: 88, +42pts) and Zainab Ali (Risk: 79) have missed 11 consecutive days. Recommend triggering the "Win-Back 20% Off Renewal" WhatsApp template before Friday.',
     },
     {
       id: 3,
       title: 'Peak Attendance',
       prompt: 'What are our highest attendance hours today?',
-      reply: '📊 Peak check-in hours today are 6:00 PM - 8:30 PM (expected 48 check-ins). Front desk staff allocation is optimal, and QR check-in kiosk capacity is 100%.',
+      reply: ' Peak check-in hours today are 6:00 PM - 8:30 PM (expected 48 check-ins). Front desk staff allocation is optimal, and QR check-in kiosk capacity is 100%.',
     },
     {
       id: 4,
       title: 'Trainer Workload',
       prompt: 'Which trainers have capacity for new assigned members?',
-      reply: '💪 Coach Tariq Vance has 8 active member assignments (capacity for 4 more). Coach Sara Ahmed has reached full quota with 15 members.',
+      reply: ' Coach Tariq Vance has 8 active member assignments (capacity for 4 more). Coach Sara Ahmed has reached full quota with 15 members.',
     },
   ];
 
@@ -75,15 +75,15 @@ export const AiAssistantCard: React.FC<AiAssistantCardProps> = ({ className = ''
       });
 
       if (aiData?.insight) {
-        setResponse(`✨ ${aiData.insight}${aiData.recommendedWhatsAppNudge ? `\n\n💬 WhatsApp Nudge: "${aiData.recommendedWhatsAppNudge}"` : ''}`);
+        setResponse(` ${aiData.insight}${aiData.recommendedWhatsAppNudge ? `\n\n WhatsApp Nudge: "${aiData.recommendedWhatsAppNudge}"` : ''}`);
       } else {
         setResponse(
-          `✨ GymRetain AI Analysis for "${q}": Based on current check-in patterns, overall gym attendance is up 12% week-over-week. Member retention stability is at 91.4% with 6 flagged at-risk members recommended for WhatsApp re-engagement.`,
+          ` GymRetain AI Analysis for "${q}": Based on current check-in patterns, overall gym attendance is up 12% week-over-week. Member retention stability is at 91.4% with 6 flagged at-risk members recommended for WhatsApp re-engagement.`,
         );
       }
     } catch {
       setResponse(
-        `✨ GymRetain AI Analysis for "${q}": Based on current check-in patterns, overall gym attendance is up 12% week-over-week. Member retention stability is at 91.4% with 6 flagged at-risk members recommended for WhatsApp re-engagement.`,
+        ` GymRetain AI Analysis for "${q}": Based on current check-in patterns, overall gym attendance is up 12% week-over-week. Member retention stability is at 91.4% with 6 flagged at-risk members recommended for WhatsApp re-engagement.`,
       );
     } finally {
       setLoading(false);

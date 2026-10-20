@@ -8,6 +8,7 @@ export interface ModalProps {
   description?: string;
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'modal' | 'drawer';
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -17,6 +18,7 @@ export const Modal: React.FC<ModalProps> = ({
   description,
   children,
   maxWidth = 'md',
+  variant = 'modal',
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
@@ -61,7 +63,7 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className={`fixed inset-0 z-50 flex ${variant === 'drawer' ? 'justify-end' : 'items-center justify-center p-4'}`}>
       {/* Dim cozy backdrop */}
       <div
         className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
@@ -77,7 +79,7 @@ export const Modal: React.FC<ModalProps> = ({
         aria-label={title ? undefined : 'Dialog'}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
-        className={`relative w-full ${maxWidthStyles[maxWidth]} max-h-[90dvh] overflow-y-auto rounded-2xl bg-surface text-content-primary border border-surface-border shadow-2xl p-6 sm:p-8 z-10`}
+        className={`relative w-full ${maxWidthStyles[maxWidth]} ${variant === 'drawer' ? 'h-dvh overflow-y-auto rounded-l-3xl' : 'max-h-[90dvh] overflow-y-auto rounded-2xl'} bg-surface text-content-primary border border-surface-border shadow-2xl p-6 sm:p-8 z-10 page-enter`}
       >
         <button
           onClick={onClose}

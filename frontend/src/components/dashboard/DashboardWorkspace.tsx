@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { ProgressRing, CountUp } from '@/components/ui';
 import { AppLayout } from "@/components/AppLayout";
 import { QuickCheckInModal } from "@/components/QuickCheckInModal";
 import { api } from "@/lib/api";
@@ -467,7 +468,7 @@ export function DashboardWorkspace() {
                 <span>Inside the gym</span>
                 <UserCheck className="w-4 h-4" />
               </div>
-              <strong>{overviewReady ? occupancy : "—"}</strong>
+              <strong>{overviewReady ? <CountUp value={occupancy} /> : "—"}</strong>
               <p>Open check-in sessions</p>
               <span className="desk-metric-link">
                 Open front desk <ArrowUpRight className="w-3.5 h-3.5" />
@@ -689,6 +690,7 @@ export function DashboardWorkspace() {
               )}
             </PanelHeader>
             <div className="desk-floor-strip">
+              {overviewReady && capacity > 0 && <div className="capacity-ring"><ProgressRing value={occupancy} max={capacity} label="Gym capacity" size={74} /></div>}
               <div>
                 <span>Inside now</span>
                 <strong>

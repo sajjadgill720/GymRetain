@@ -20,7 +20,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
   const paddingY = 24;
 
   const getX = (index: number) => {
-    return paddingX + (index / (displayData.length - 1)) * (chartWidth - paddingX * 2);
+    return paddingX + (index / (Math.max(1, displayData.length - 1))) * (chartWidth - paddingX * 2);
   };
 
   const getY = (val: number) => {
@@ -34,7 +34,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
     .join(' ')} L ${getX(displayData.length - 1)},${chartHeight - paddingY} Z`;
 
   const totalCheckIns = displayData.reduce((acc, curr) => acc + curr.checkIns, 0);
-  const avgDaily = (totalCheckIns / displayData.length).toFixed(1);
+  const avgDaily = (totalCheckIns / Math.max(1, displayData.length)).toFixed(1);
 
   return (
     <div className="bg-surface border border-surface-border rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden">
@@ -45,7 +45,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
               Attendance Trends
             </h2>
             <span className="flex items-center gap-1 text-[11px] font-medium text-status-success-text bg-status-success-bg px-2 py-0.5 rounded-full border border-status-success-border">
-              <TrendingUp className="w-3 h-3" /> +14.2% MoM
+              <TrendingUp className="w-3 h-3" /> {displayData.length} days
             </span>
           </div>
           <p className="text-xs text-content-secondary mt-0.5">
@@ -95,16 +95,16 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
 
       {/* SVG Chart */}
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[640px]">
+        <div className="min-w-0">
           <svg
             viewBox={`0 0 ${chartWidth} ${chartHeight}`}
             className="w-full h-52 overflow-visible select-none"
           >
             <defs>
               <linearGradient id="attendanceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.25" />
-                <stop offset="70%" stopColor="#7C3AED" stopOpacity="0.03" />
-                <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
+                <stop offset="0%" stopColor="var(--accent-brand)" stopOpacity="0.25" />
+                <stop offset="70%" stopColor="var(--accent-brand)" stopOpacity="0.03" />
+                <stop offset="100%" stopColor="var(--accent-brand)" stopOpacity="0" />
               </linearGradient>
             </defs>
 
@@ -131,7 +131,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
             {/* Line Path */}
             <polyline
               fill="none"
-              stroke="#7C3AED"
+              stroke="var(--accent-brand)"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -150,8 +150,8 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                     cx={cx}
                     cy={cy}
                     r={isHovered ? 5 : 3}
-                    fill={isHovered ? '#7C3AED' : '#FFFFFF'}
-                    stroke="#7C3AED"
+                    fill={isHovered ? 'var(--accent-brand)' : 'var(--bg-surface)'}
+                    stroke="var(--accent-brand)"
                     strokeWidth={isHovered ? 2.5 : 1.5}
                     className="transition-all duration-150 cursor-pointer"
                     onMouseEnter={() => setHoveredIndex(i)}
@@ -165,7 +165,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                       y1={paddingY}
                       x2={cx}
                       y2={chartHeight - paddingY}
-                      stroke="rgba(124, 58, 237, 0.4)"
+                      stroke="var(--border-color)"
                       strokeWidth="1"
                       strokeDasharray="2 2"
                     />

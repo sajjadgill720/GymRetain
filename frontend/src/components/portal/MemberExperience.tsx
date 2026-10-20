@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, ChevronRight, QrCode, Dumbbell, Calendar, Utensils, MessageCircle, Award, Flame, Target, TrendingUp, User, CreditCard, Bell, HelpCircle, Users, LogOut, Clock } from '@/components/icons';
@@ -39,7 +38,7 @@ export function MemberHome() {
   return <div className="member-experience">
     <div className="member-welcome"><div><p className="portal-eyebrow">A little stronger, every visit</p><h1>Hey, {member.firstName}.</h1></div><MemberLink href="/portal/me" className="member-avatar-link"><Initials name={`${member.firstName} ${member.lastName}`} /><span className="sr-only">My account</span></MemberLink></div>
     <div className="member-hero-grid">
-      <section className="member-photo-hero"><Image src="/portal/member-motivation.png" alt="A gym member taking a moment between exercises" fill priority sizes="(max-width: 760px) 100vw, 70vw" /><div className="member-photo-copy"><span className="portal-eyebrow">Your time. Your progress.</span><h2>SHOW UP.<br />FEEL STRONGER.</h2><p>Your next good move starts here.</p><MemberLink href="/portal/workouts" className="member-hero-link">Find my next move<ArrowRight aria-hidden="true" /></MemberLink></div></section>
+      <section className="member-motivation-hero"><div className="member-hero-art" aria-hidden="true"><Dumbbell /></div><div className="member-motivation-copy"><span className="portal-eyebrow">Your time. Your progress.</span><h2>SHOW UP.<br />FEEL STRONGER.</h2><p>Your next good move starts here.</p><MemberLink href="/portal/workouts" className="member-hero-link">Find my next move<ArrowRight aria-hidden="true" /></MemberLink></div></section>
       <section className="member-club-card"><div><span className="portal-eyebrow">My home gym</span><h2>{gym.name}</h2></div><div className="member-crowd-heading"><h3>{crowd.label}</h3><span className="member-live-dot">{preview ? 'Sample' : 'Now'}</span></div><div className="member-crowd-bars" role="meter" aria-label="Gym occupancy" aria-valuemin={0} aria-valuemax={Math.max(gym.capacity, gym.insideNow, 1)} aria-valuenow={gym.insideNow} aria-valuetext={gym.capacity > 0 ? `${gym.insideNow} of ${gym.capacity} people` : 'Capacity unavailable'}>{Array.from({ length: 12 }, (_, i) => <span key={i} className={i < Math.ceil(crowd.fraction * 12) ? 'filled' : ''} />)}</div><p className="portal-caption">{gym.insideNow} people inside{gym.capacity > 0 && ` · ${gym.capacity} capacity`}<br />Based on open check-ins.</p><MemberLink href="/portal/pass" className="member-pass-button"><QrCode aria-hidden="true" /><span>Open my gym pass<small>Ready when you are</small></span><ChevronRight aria-hidden="true" /></MemberLink></section>
     </div>
     <div className="member-shortcuts">{shortcuts.map(({ href, label, detail, icon: Icon }) => <MemberLink key={href} href={href} className="member-shortcut"><span className="member-icon-tile"><Icon aria-hidden="true" /></span><span><strong>{label}</strong><small>{detail}</small></span><ChevronRight aria-hidden="true" /></MemberLink>)}</div>

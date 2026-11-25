@@ -294,65 +294,42 @@ export default function InsightsPage() {
     <AppLayout onRefreshData={loadAnalytics}>
       <div className="flex flex-col h-[calc(100vh-65px)] max-w-[1600px] w-full mx-auto select-none">
         {/* Top Insights Navigation Bar */}
-        <div className="page-context px-4 py-3 sm:px-6 border-b border-surface-border bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brass-400 flex items-center justify-center border border-brand-500/20">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-bold text-content-primary">
-                  Gym Insights &amp; AI Assistant
-                </h1>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-brand-500/10 text-brand-600 dark:text-brass-400 border border-brand-500/20">
-                  AI Assistant
-                </span>
-              </div>
-              <p className="text-[11px] text-content-tertiary">
-                Ask questions about gym attendance, check members needing follow-up, and see peak workout times.
-              </p>
-            </div>
-          </div>
+        <div className="px-4 py-3 sm:px-6 border-b border-surface-border flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setActiveTab('COPILOT')}
+            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 ${
+              activeTab === 'COPILOT'
+                ? 'btn-shadow-primary'
+                : 'bg-surface border border-surface-border text-content-secondary hover:text-content-primary btn-shadow'
+            }`}
+          >
+            <Bot className="w-3.5 h-3.5" />
+            <span>Ask AI</span>
+          </button>
 
-          <div className="flex items-center gap-2">
-            <div className="flex items-center p-1 bg-surface-subtle border border-surface-border rounded-xl">
-              <button
-                onClick={() => setActiveTab('COPILOT')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
-                  activeTab === 'COPILOT'
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'text-content-secondary hover:text-content-primary'
-                }`}
-              >
-                <Bot className="w-3.5 h-3.5" />
-                <span>Ask AI</span>
-              </button>
+          <button
+            onClick={() => setActiveTab('PREDICTIVE')}
+            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 ${
+              activeTab === 'PREDICTIVE'
+                ? 'btn-shadow-primary'
+                : 'bg-surface border border-surface-border text-content-secondary hover:text-content-primary btn-shadow'
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Attendance Risks</span>
+          </button>
 
-              <button
-                onClick={() => setActiveTab('PREDICTIVE')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
-                  activeTab === 'PREDICTIVE'
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'text-content-secondary hover:text-content-primary'
-                }`}
-              >
-                <BarChart3 className="w-3.5 h-3.5" />
-                <span>Attendance Risks</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('ATTENDANCE')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 btn-shadow ${
-                  activeTab === 'ATTENDANCE'
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'text-content-secondary hover:text-content-primary'
-                }`}
-              >
-                <Clock className="w-3.5 h-3.5" />
-                <span>Busiest Hours</span>
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={() => setActiveTab('ATTENDANCE')}
+            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 ${
+              activeTab === 'ATTENDANCE'
+                ? 'btn-shadow-primary'
+                : 'bg-surface border border-surface-border text-content-secondary hover:text-content-primary btn-shadow'
+            }`}
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>Busiest Hours</span>
+          </button>
         </div>
 
         {/* TAB 1: AI Copilot Streaming Chat */}

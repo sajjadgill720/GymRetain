@@ -26,6 +26,7 @@ import { SaasBillingModule } from './modules/saas-billing/saas-billing.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     ChatModule,
     SaasBillingModule,
   ],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_GUARD,

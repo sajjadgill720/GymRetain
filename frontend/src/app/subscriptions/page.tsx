@@ -636,7 +636,7 @@ function SubscriptionsContent() {
                               {isPending ? (
                                 <button
                                   onClick={() => handleOpenPaymentForSub(sub)}
-                                  className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-all btn-shadow"
+                                  className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all btn-shadow-primary"
                                 >
                                   Record Fee
                                 </button>
@@ -966,7 +966,7 @@ function SubscriptionsContent() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all btn-shadow"
+                  className="px-5 py-2 rounded-full text-xs font-bold transition-all btn-shadow-primary"
                 >
                   Save &amp; Record Payment
                 </button>

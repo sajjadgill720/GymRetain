@@ -1,8 +1,8 @@
-.app-shell { isolation:isolate; background:radial-gradient(ellipse at 85% 10%,color-mix(in srgb,var(--accent-brand) 6%,transparent),transparent 60%),var(--bg-canvas); }
+.app-shell { isolation:isolate; background:var(--bg-canvas); }
 .app-shell main { position:relative; isolation:isolate; }
 .workspace-art { position:absolute; z-index:-1; top:0; right:0; width:min(80%,850px); opacity:.045; color:var(--accent-brand); pointer-events:none; }
 .app-shell main > :not(.workspace-art) { animation:page-enter 220ms ease both; }
-.app-shell main :is(.desk-panel,.desk-metric,.studio-panel,.studio-metric,.premium-panel,.app-card,.rounded-2xl.border.bg-surface) { background:var(--surface-glass); backdrop-filter:blur(12px); border-radius:var(--radius-card); box-shadow:var(--shadow-soft); }
+.app-shell main :is(.desk-panel,.desk-metric,.studio-panel,.studio-metric,.premium-panel,.app-card,.rounded-2xl.border.bg-surface) { background:var(--bg-surface); border-radius:var(--radius-card); box-shadow:var(--shadow-card); }
 .app-shell main :is(.desk-heading,.studio-heading) { background:var(--bg-card-elevated); border-color:var(--border-color); color:var(--text-primary); }
 .app-shell main :is(.desk-heading,.studio-heading) :is(h1,p) { color:var(--text-primary); }
 .app-shell main h1 { font-weight:800; font-size:var(--type-heading); }

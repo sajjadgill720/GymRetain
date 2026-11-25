@@ -22,14 +22,29 @@ async function bootstrap() {
     }),
   );
 
-  // CORS for frontend admin dashboard (Next.js)
+  // CORS for frontend admin dashboard and member portal (configurable via CORS_ORIGINS)
+  const configuredOrigins = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  const portalOrigins = [process.env.FRONTEND_URL, process.env.PORTAL_PUBLIC_URL]
+    .map((origin) => (origin || '').trim())
+    .filter(Boolean);
+  const devOrigins =
+    process.env.NODE_ENV === 'production'
+      ? []
+      : [
+          'http://localhost:3000',
+          'http://127.0.0.1:3000',
+          'http://localhost:3001',
+          'http://127.0.0.1:3001',
+        ];
+  const allowedOrigins = Array.from(
+    new Set([...configuredOrigins, ...portalOrigins, ...devOrigins]),
+  );
+
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://localhost:3001',
-      'http://127.0.0.1:3001',
-    ],
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
   });

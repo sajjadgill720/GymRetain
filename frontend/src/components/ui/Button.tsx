@@ -23,9 +23,9 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  // Base styling: tactile shadow on all clickable buttons, smooth transition, thumb-friendly touch target
+  // Base styling: tactile shadow on all clickable buttons, editorial pill shape, thumb-friendly touch target
   const baseStyles =
-    'ui-button inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-150 select-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none';
+    'ui-button inline-flex items-center justify-center font-semibold rounded-full transition-all duration-150 select-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none';
 
   // mynext9to5-inspired luxury styling with champagne bronze primary and dedicated button shadows
   const variantStyles: Record<ButtonVariant, string> = {

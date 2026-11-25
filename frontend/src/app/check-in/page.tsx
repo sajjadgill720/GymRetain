@@ -460,10 +460,10 @@ export default function CheckInTerminalPage() {
                         type="button"
                         onClick={handleConfirmCheckIn}
                         disabled={actionLoading || isBlockedByCapacity}
-                        className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-md btn-shadow transition-all flex items-center gap-1.5 ${
+                        className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
                           isBlockedByCapacity
-                            ? 'bg-zinc-600 cursor-not-allowed opacity-60'
-                            : 'bg-emerald-600 hover:bg-emerald-500'
+                            ? 'bg-zinc-600 text-white cursor-not-allowed opacity-60'
+                            : 'btn-shadow-primary'
                         }`}
                       >
                         <UserCheck className="w-4 h-4" />

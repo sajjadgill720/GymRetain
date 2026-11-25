@@ -43,7 +43,22 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, onRefreshData })
           onOpenCheckInModal={() => setIsCheckInOpen(true)}
         />
 
-        {!authLoading && !api.hasSession() && <div className="studio-demo-bar"><span><strong>Demo workspace</strong><span className="hidden sm:inline"> · Explore with sample data. New Operations records stay in this browser.</span></span><Link href="/login?mode=signup">Start your free trial <span aria-hidden="true">↗</span></Link></div>}
+        {!authLoading && !api.hasSession() && (
+          <div className="studio-demo-bar">
+            <span className="inline-flex items-center gap-2.5">
+              <span className="inline-flex items-center rounded-full bg-[var(--accent-brand)] px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-[var(--accent-foreground)] shadow-btn">
+                New
+              </span>
+              <span>
+                <strong>Sample workspace</strong>
+                <span className="hidden sm:inline"> · Explore live retention workflows. New Operations records stay in this browser.</span>
+              </span>
+            </span>
+            <Link href="/login?mode=signup" className="inline-flex items-center gap-1 font-semibold text-content-primary hover:text-[var(--accent-brand)] transition-colors">
+              Start your free trial <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        )}
         <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col w-full min-w-0">
           {children}
         </main>

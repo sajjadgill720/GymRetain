@@ -336,7 +336,7 @@ export function DashboardWorkspace() {
   return (
     <AppLayout onRefreshData={refresh}>
       <div className="desk-page">
-        <header className="desk-heading">
+        <header className="desk-heading editorial-frame">
           <div>
             <p className="premium-eyebrow">
               {activeGym?.name || "Your gym workspace"}{" "}
@@ -519,7 +519,7 @@ export function DashboardWorkspace() {
         </div>
         <div className="desk-work-grid">
           <section
-            className="desk-panel desk-focus"
+            className="desk-panel desk-focus editorial-frame"
             aria-busy={loading}
             aria-labelledby="focus-title"
           >

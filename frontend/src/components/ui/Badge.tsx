@@ -41,8 +41,8 @@ export const Badge: React.FC<BadgeProps> = ({
   };
 
   const sizeStyles: Record<BadgeSize, string> = {
-    sm: 'text-[10px] px-2 py-0.5 gap-1',
-    md: 'text-[11px] px-2.5 py-0.5 gap-1.5',
+    sm: 'text-[10px] tracking-wider uppercase px-2.5 py-0.5 gap-1',
+    md: 'text-[11px] tracking-wide px-2.5 py-0.5 gap-1.5',
   };
 
   return (

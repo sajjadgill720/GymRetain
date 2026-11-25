@@ -40,15 +40,21 @@ services:
       NODE_ENV: production
       PORT: 4000
       API_PREFIX: api/v1
-      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/gymretain?schema=public
-      JWT_SECRET: gymretain_jwt_production_secret_key_change_in_real_prod
-      JWT_EXPIRES_IN: 7d
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/gymretain?schema=public
+      JWT_SECRET: ${JWT_SECRET:-gymretain_jwt_production_secret_key_change_in_real_prod}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:3001}
+      PORTAL_PUBLIC_URL: ${PORTAL_PUBLIC_URL:-http://localhost:3000}
     ports:
       - '4000:4000'
-    # Automatically apply migrations & seed on container launch, then start API
+    healthcheck:
+      test: ['CMD-SHELL', 'node -e "fetch(\"http://127.0.0.1:4000/api/v1/health\").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Automatically apply migrations on container launch, then start API
     command: >
       sh -c "npx prisma migrate deploy &&
-             npm run prisma:seed &&
              node dist/main"
     networks:
       - gymretain_net
@@ -60,14 +66,17 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/api/v1}
     container_name: gymretain_frontend
     restart: always
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3000
-      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/api/v1}
     ports:
       - '3000:3000'
     networks:

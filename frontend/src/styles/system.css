@@ -4,10 +4,15 @@ h1,h2,h3,h4,.display-number { font-family:var(--font-display); letter-spacing:-.
 :where(button,[role=button],input:not([type=checkbox]):not([type=radio]),select) { min-height:44px; }
 :where(button,[role=button]) { min-width:44px; }
 :where(a,button,input,select,textarea):focus-visible { outline:2px solid var(--accent-brand); outline-offset:4px; }
-.glass-card,.app-card,.premium-panel { background:var(--surface-glass); border:1px solid var(--border-color); border-radius:var(--radius-card); backdrop-filter:blur(16px); box-shadow:var(--shadow-soft); }
-.ui-button { border-radius:var(--radius-control); transition:transform var(--motion-duration),box-shadow var(--motion-duration),background var(--motion-duration); }
-.ui-button:hover:not(:disabled) { transform:translateY(-2px); }
-.ui-button:active:not(:disabled) { transform:translateY(1px); }
+.glass-card,.app-card,.premium-panel { background:var(--surface-glass); border:1px solid var(--border-color); border-radius:var(--radius-card); backdrop-filter:blur(16px); box-shadow:var(--shadow-card); }
+.editorial-frame { position:relative; }
+.editorial-frame::before,.editorial-frame::after { content:'+'; position:absolute; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1; color:var(--border-hover); pointer-events:none; user-select:none; z-index:2; }
+.editorial-frame::before { top:-7px; left:-5px; }
+.editorial-frame::after { top:-7px; right:-5px; }
+.dot-matrix-accent { background-image:radial-gradient(color-mix(in srgb,var(--accent-brass) 42%,transparent) 2px,transparent 2px); background-size:18px 18px; }
+.ui-button { border-radius:var(--radius-control); box-shadow:var(--shadow-btn); transition:transform var(--motion-duration),box-shadow var(--motion-duration),background var(--motion-duration),border-color var(--motion-duration); }
+.ui-button:hover:not(:disabled) { transform:translateY(-1px); box-shadow:var(--shadow-btn-hover); }
+.ui-button:active:not(:disabled) { transform:translateY(0); }
 .progress-ring { transform:rotate(-90deg); }
 .progress-ring circle { transition:stroke-dashoffset 220ms ease; }
 .metric-sparkline { color:var(--accent-brand); width:100%; height:32px; }

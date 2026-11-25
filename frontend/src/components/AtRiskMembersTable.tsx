@@ -443,7 +443,7 @@ export const AtRiskMembersTable: React.FC<AtRiskMembersTableProps> = ({
               <button
                 onClick={handleSendNudge}
                 disabled={nudgeSent || savingIntervention}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white shadow-md btn-shadow transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold btn-shadow-primary transition-all disabled:opacity-50"
               >
                 {nudgeSent ? (
                   <>

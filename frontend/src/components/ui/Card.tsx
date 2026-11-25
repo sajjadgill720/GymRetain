@@ -3,12 +3,14 @@ import React from 'react';
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   padding?: 'none' | 'sm' | 'md' | 'lg';
   variant?: 'default' | 'highlight' | 'success' | 'warning' | 'danger';
+  editorial?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
   padding = 'md',
   variant = 'default',
+  editorial = false,
   className = '',
   ...props
 }) => {
@@ -30,7 +32,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       data-tone={variant === 'success' || variant === 'warning' || variant === 'danger' ? variant : undefined}
-      className={`rounded-2xl border transition-all duration-200 ${variantStyles[variant]} ${paddingStyles[padding]} ${className}`}
+      className={`rounded-2xl border transition-all duration-200 ${editorial ? 'editorial-frame' : ''} ${variantStyles[variant]} ${paddingStyles[padding]} ${className}`}
       {...props}
     >
       {children}
